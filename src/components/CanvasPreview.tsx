@@ -19,10 +19,10 @@ const CanvasPreview = ({
   onTransformChange,
 }: CanvasPreviewProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = useState(false);
   const dragStart = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
 
-  // Calculate display size to fit container
   const [displaySize, setDisplaySize] = useState({ w: 300, h: 300 });
 
   useEffect(() => {
@@ -80,9 +80,7 @@ const CanvasPreview = ({
     setDragging(false);
   }, []);
 
-  // Use native event listener to prevent scroll only on the canvas overlay
-  const overlayRef = useRef<HTMLDivElement>(null);
-
+  // Wheel zoom on canvas overlay only
   useEffect(() => {
     const el = overlayRef.current;
     if (!el) return;
@@ -110,20 +108,9 @@ const CanvasPreview = ({
           borderRadius: 4,
         }}
       >
-        {/* Safe area guides */}
-        <div
-          className="absolute border border-primary/20 pointer-events-none z-30"
-          style={{
-            top: "5%",
-            left: "5%",
-            right: "5%",
-            bottom: "5%",
-          }}
-        />
-
-        {/* Bottom Layer (Twibbon) */}
+        {/* Bottom Layer (Twibbon) — always behind */}
         {bottomLayer && (
-          <div className="absolute inset-0 z-10">
+          <div className="absolute inset-0" style={{ zIndex: 1 }}>
             {bottomLayer.type === "video" ? (
               <video
                 src={bottomLayer.url}
@@ -143,12 +130,13 @@ const CanvasPreview = ({
           </div>
         )}
 
-        {/* Top Layer (User - editable) */}
+        {/* Top Layer (User - editable) — always on top */}
         {topLayer && (
           <div
             ref={overlayRef}
-            className={`absolute z-20 ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
+            className={`absolute ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
             style={{
+              zIndex: 2,
               left: "50%",
               top: "50%",
               transform: `translate(-50%, -50%) translate(${transform.x * scaleRatio}px, ${transform.y * scaleRatio}px) scale(${transform.scale}) rotate(${transform.rotation}deg)`,
@@ -179,9 +167,21 @@ const CanvasPreview = ({
           </div>
         )}
 
+        {/* Safe area guides — highest z */}
+        <div
+          className="absolute border border-primary/20 pointer-events-none"
+          style={{
+            zIndex: 10,
+            top: "5%",
+            left: "5%",
+            right: "5%",
+            bottom: "5%",
+          }}
+        />
+
         {/* Empty state */}
         {!bottomLayer && !topLayer && (
-          <div className="absolute inset-0 flex items-center justify-center z-10">
+          <div className="absolute inset-0 flex items-center justify-center">
             <p className="text-muted-foreground/40 font-mono text-sm text-center px-4">
               Upload layers to preview
             </p>
