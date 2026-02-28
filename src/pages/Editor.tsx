@@ -16,6 +16,7 @@ const Editor = () => {
   const canvasW = parseInt(searchParams.get("w") || "1080");
   const canvasH = parseInt(searchParams.get("h") || "1080");
 
+  // Bottom layer = User photo, Top layer = Twibbon overlay
   const [bottomLayer, setBottomLayer] = useState<LayerMedia | null>(null);
   const [topLayer, setTopLayer] = useState<LayerMedia | null>(null);
   const [transform, setTransform] = useState<TopLayerTransform>({
@@ -78,18 +79,18 @@ const Editor = () => {
             <div className="flex items-center gap-2 mb-2">
               <div className="w-5 h-5 rounded bg-secondary flex items-center justify-center text-xs font-mono font-bold text-secondary-foreground">1</div>
               <span className="text-sm font-medium text-foreground">Bottom Layer</span>
-              <span className="text-xs text-muted-foreground ml-auto">Twibbon</span>
+              <span className="text-xs text-muted-foreground ml-auto">Your Photo</span>
             </div>
-            <UploadBox label="Twibbon Layer" sublabel="Always behind — fixed stacking" media={bottomLayer} onMediaChange={setBottomLayer} icon="bottom" />
+            <UploadBox label="Your Photo" sublabel="Your image — always behind the twibbon" media={bottomLayer} onMediaChange={setBottomLayer} icon="bottom" />
           </div>
 
           <div>
             <div className="flex items-center gap-2 mb-2">
               <div className="w-5 h-5 rounded bg-primary/20 flex items-center justify-center text-xs font-mono font-bold text-primary">2</div>
               <span className="text-sm font-medium text-foreground">Top Layer</span>
-              <span className="text-xs text-muted-foreground ml-auto">Editable</span>
+              <span className="text-xs text-muted-foreground ml-auto">Twibbon</span>
             </div>
-            <UploadBox label="User Layer" sublabel="Drag, resize, rotate on canvas" media={topLayer} onMediaChange={setTopLayer} icon="top" />
+            <UploadBox label="Twibbon Frame" sublabel="Overlay frame — always on top" media={topLayer} onMediaChange={setTopLayer} icon="top" />
           </div>
 
           <div className="mt-auto pt-4 border-t border-border space-y-2 text-xs text-muted-foreground">
@@ -97,7 +98,7 @@ const Editor = () => {
               <span className="font-medium text-foreground">Export: </span>
               {animated ? "MP4 (animated content detected)" : "PNG / JPG (static)"}
             </p>
-            <p className="text-muted-foreground/60">Scroll on canvas to zoom • Drag to reposition</p>
+            <p className="text-muted-foreground/60">Scroll on canvas to zoom • Drag to reposition your photo</p>
           </div>
         </aside>
 

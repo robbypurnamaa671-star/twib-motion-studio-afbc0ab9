@@ -22,7 +22,6 @@ const CanvasPreview = ({
   const overlayRef = useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = useState(false);
   const dragStart = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
-
   const [displaySize, setDisplaySize] = useState({ w: 300, h: 300 });
 
   useEffect(() => {
@@ -47,9 +46,10 @@ const CanvasPreview = ({
 
   const scaleRatio = displaySize.w / canvasW;
 
+  // Drag the BOTTOM layer (user photo) to reposition
   const onPointerDown = useCallback(
     (e: React.PointerEvent) => {
-      if (!topLayer) return;
+      if (!bottomLayer) return;
       setDragging(true);
       dragStart.current = {
         x: e.clientX,
@@ -59,7 +59,7 @@ const CanvasPreview = ({
       };
       (e.target as HTMLElement).setPointerCapture(e.pointerId);
     },
-    [topLayer, transform]
+    [bottomLayer, transform]
   );
 
   const onPointerMove = useCallback(
@@ -80,12 +80,12 @@ const CanvasPreview = ({
     setDragging(false);
   }, []);
 
-  // Wheel zoom on canvas overlay only
+  // Wheel zoom on the interactive area
   useEffect(() => {
     const el = overlayRef.current;
     if (!el) return;
     const handler = (e: WheelEvent) => {
-      if (!topLayer) return;
+      if (!bottomLayer) return;
       e.preventDefault();
       const delta = e.deltaY > 0 ? -0.05 : 0.05;
       const newScale = Math.max(0.1, Math.min(5, transform.scale + delta));
@@ -93,7 +93,7 @@ const CanvasPreview = ({
     };
     el.addEventListener("wheel", handler, { passive: false });
     return () => el.removeEventListener("wheel", handler);
-  }, [topLayer, transform, onTransformChange]);
+  }, [bottomLayer, transform, onTransformChange]);
 
   return (
     <div
@@ -108,35 +108,13 @@ const CanvasPreview = ({
           borderRadius: 4,
         }}
       >
-        {/* Bottom Layer (Twibbon) — always behind */}
+        {/* Bottom Layer (User photo) — draggable, scalable */}
         {bottomLayer && (
-          <div className="absolute inset-0" style={{ zIndex: 1 }}>
-            {bottomLayer.type === "video" ? (
-              <video
-                src={bottomLayer.url}
-                className="w-full h-full object-cover"
-                muted
-                loop
-                autoPlay
-                playsInline
-              />
-            ) : (
-              <img
-                src={bottomLayer.url}
-                alt="Twibbon Layer"
-                className="w-full h-full object-cover"
-              />
-            )}
-          </div>
-        )}
-
-        {/* Top Layer (User - editable) — always on top */}
-        {topLayer && (
           <div
             ref={overlayRef}
             className={`absolute ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
             style={{
-              zIndex: 2,
+              zIndex: 1,
               left: "50%",
               top: "50%",
               transform: `translate(-50%, -50%) translate(${transform.x * scaleRatio}px, ${transform.y * scaleRatio}px) scale(${transform.scale}) rotate(${transform.rotation}deg)`,
@@ -147,9 +125,9 @@ const CanvasPreview = ({
             onPointerMove={onPointerMove}
             onPointerUp={onPointerUp}
           >
-            {topLayer.type === "video" ? (
+            {bottomLayer.type === "video" ? (
               <video
-                src={topLayer.url}
+                src={bottomLayer.url}
                 className="w-full h-full object-cover pointer-events-none"
                 muted
                 loop
@@ -158,8 +136,8 @@ const CanvasPreview = ({
               />
             ) : (
               <img
-                src={topLayer.url}
-                alt="User Layer"
+                src={bottomLayer.url}
+                alt="Your Photo"
                 className="w-full h-full object-cover pointer-events-none select-none"
                 draggable={false}
               />
@@ -167,7 +145,29 @@ const CanvasPreview = ({
           </div>
         )}
 
-        {/* Safe area guides — highest z */}
+        {/* Top Layer (Twibbon frame) — fixed, non-interactive */}
+        {topLayer && (
+          <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 2 }}>
+            {topLayer.type === "video" ? (
+              <video
+                src={topLayer.url}
+                className="w-full h-full object-cover"
+                muted
+                loop
+                autoPlay
+                playsInline
+              />
+            ) : (
+              <img
+                src={topLayer.url}
+                alt="Twibbon Frame"
+                className="w-full h-full object-cover"
+              />
+            )}
+          </div>
+        )}
+
+        {/* Safe area guides */}
         <div
           className="absolute border border-primary/20 pointer-events-none"
           style={{
