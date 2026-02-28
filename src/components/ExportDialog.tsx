@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Download, X, Check, Loader2 } from "lucide-react";
 import { LayerMedia, TopLayerTransform } from "@/lib/media";
-import { exportStatic, downloadDataUrl, hasAnimation } from "@/lib/export";
+import { exportStatic, downloadBlob, hasAnimation } from "@/lib/export";
+import { useToast } from "@/hooks/use-toast";
 
 interface ExportDialogProps {
   open: boolean;
@@ -27,21 +28,17 @@ const ExportDialog = ({
   const [progress, setProgress] = useState(0);
   const [exporting, setExporting] = useState(false);
   const [done, setDone] = useState(false);
+  const { toast } = useToast();
 
   const animated = hasAnimation(bottomLayer, topLayer);
 
   const handleExport = async () => {
-    if (animated) {
-      // Video export requires backend — show message
-      return;
-    }
-
     setExporting(true);
     setProgress(0);
     setDone(false);
 
     try {
-      const dataUrl = await exportStatic({
+      const blob = await exportStatic({
         canvasW,
         canvasH,
         bottomLayer,
@@ -52,10 +49,12 @@ const ExportDialog = ({
         onProgress: setProgress,
       });
 
-      downloadDataUrl(dataUrl, `twibmotion-export.${format}`);
+      downloadBlob(blob, `twibmotion-export.${format}`);
       setDone(true);
+      toast({ title: "Export complete", description: `Downloaded as ${format.toUpperCase()}` });
     } catch (err) {
       console.error("Export failed:", err);
+      toast({ title: "Export failed", description: String(err), variant: "destructive" });
     } finally {
       setExporting(false);
     }
@@ -70,8 +69,8 @@ const ExportDialog = ({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-      <div className="bg-card border border-border rounded-xl shadow-2xl w-full max-w-md mx-4 p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm" onClick={() => { onClose(); reset(); }}>
+      <div className="bg-card border border-border rounded-xl shadow-2xl w-full max-w-md mx-4 p-6" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-mono font-bold text-lg text-foreground">Export</h2>
@@ -83,12 +82,12 @@ const ExportDialog = ({
           </button>
         </div>
 
-        {/* Animated warning */}
+        {/* Animated notice */}
         {animated && (
           <div className="mb-4 p-3 rounded-lg bg-primary/10 border border-primary/20 text-sm text-foreground">
             <p className="font-medium">Animated content detected</p>
             <p className="text-muted-foreground text-xs mt-1">
-              Video/GIF export requires a backend rendering service. You can export a static snapshot instead.
+              Video/GIF export requires a backend service. Exporting a static snapshot of the current frame.
             </p>
           </div>
         )}
@@ -133,7 +132,7 @@ const ExportDialog = ({
           </div>
         </div>
 
-        {/* Progress bar */}
+        {/* Progress */}
         {(exporting || done) && (
           <div className="mb-4">
             <div className="w-full h-2 rounded-full bg-secondary overflow-hidden">
@@ -161,7 +160,7 @@ const ExportDialog = ({
           ) : (
             <Download className="w-4 h-4" />
           )}
-          {exporting ? "Rendering…" : done ? "Exported!" : animated ? "Export Snapshot" : "Export"}
+          {exporting ? "Rendering…" : done ? "Export Again" : "Export"}
         </button>
       </div>
     </div>
