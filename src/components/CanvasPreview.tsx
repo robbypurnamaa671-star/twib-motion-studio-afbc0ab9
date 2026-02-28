@@ -80,16 +80,22 @@ const CanvasPreview = ({
     setDragging(false);
   }, []);
 
-  const onWheel = useCallback(
-    (e: React.WheelEvent) => {
+  // Use native event listener to prevent scroll only on the canvas overlay
+  const overlayRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = overlayRef.current;
+    if (!el) return;
+    const handler = (e: WheelEvent) => {
       if (!topLayer) return;
       e.preventDefault();
       const delta = e.deltaY > 0 ? -0.05 : 0.05;
       const newScale = Math.max(0.1, Math.min(5, transform.scale + delta));
       onTransformChange({ ...transform, scale: newScale });
-    },
-    [topLayer, transform, onTransformChange]
-  );
+    };
+    el.addEventListener("wheel", handler, { passive: false });
+    return () => el.removeEventListener("wheel", handler);
+  }, [topLayer, transform, onTransformChange]);
 
   return (
     <div
@@ -140,6 +146,7 @@ const CanvasPreview = ({
         {/* Top Layer (User - editable) */}
         {topLayer && (
           <div
+            ref={overlayRef}
             className={`absolute z-20 ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
             style={{
               left: "50%",
@@ -151,7 +158,6 @@ const CanvasPreview = ({
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}
             onPointerUp={onPointerUp}
-            onWheel={onWheel}
           >
             {topLayer.type === "video" ? (
               <video
