@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Layers, Download } from "lucide-react";
+import { ArrowLeft, Layers, Download, Share2 } from "lucide-react";
 import UploadBox from "@/components/UploadBox";
 import CanvasPreview from "@/components/CanvasPreview";
 import LayerControls from "@/components/LayerControls";
 import ExportDialog from "@/components/ExportDialog";
+import ShareTemplateDialog from "@/components/ShareTemplateDialog";
 import UserMenu from "@/components/UserMenu";
 import { LayerMedia, TopLayerTransform } from "@/lib/media";
 import { hasAnimation } from "@/lib/export";
@@ -24,6 +25,7 @@ const Editor = () => {
     x: 0, y: 0, scale: 1, rotation: 0,
   });
   const [exportOpen, setExportOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
 
   const animated = hasAnimation(bottomLayer, topLayer);
 
@@ -62,6 +64,14 @@ const Editor = () => {
             hasTopLayer={!!topLayer}
           />
           <div className="w-px h-5 bg-border mx-1 hidden sm:block" />
+          <button
+            onClick={() => setShareOpen(true)}
+            disabled={!topLayer}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border text-foreground font-mono text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-secondary transition-colors"
+          >
+            <Share2 className="w-4 h-4" />
+            <span className="hidden sm:inline">Share</span>
+          </button>
           <button
             onClick={() => setExportOpen(true)}
             disabled={!bottomLayer && !topLayer}
@@ -121,6 +131,18 @@ const Editor = () => {
       <ExportDialog
         open={exportOpen}
         onClose={() => setExportOpen(false)}
+        canvasW={canvasW}
+        canvasH={canvasH}
+        bottomLayer={bottomLayer}
+        topLayer={topLayer}
+        transform={transform}
+      />
+
+      {/* Share template dialog */}
+      <ShareTemplateDialog
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        canvasRatio={ratio}
         canvasW={canvasW}
         canvasH={canvasH}
         bottomLayer={bottomLayer}
