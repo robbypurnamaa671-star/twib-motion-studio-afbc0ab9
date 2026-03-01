@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layers, Play, Download, Monitor } from "lucide-react";
+import UserMenu from "@/components/UserMenu";
 
 const RATIOS = [
   { label: "9:16", desc: "Vertical / Stories", w: 1080, h: 1920 },
@@ -24,6 +25,7 @@ const Index = () => {
             TwibMotion
           </span>
         </div>
+        <UserMenu />
       </nav>
 
       {/* Hero */}
