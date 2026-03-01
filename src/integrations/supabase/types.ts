@@ -41,6 +41,51 @@ export type Database = {
         }
         Relationships: []
       }
+      shared_templates: {
+        Row: {
+          bottom_layer_config: Json
+          bottom_layer_url: string
+          canvas_h: number
+          canvas_ratio: string
+          canvas_w: number
+          created_at: string
+          expires_at: string | null
+          id: string
+          lock_settings: Json
+          owner_id: string
+          title: string
+          top_layer_config: Json
+        }
+        Insert: {
+          bottom_layer_config?: Json
+          bottom_layer_url: string
+          canvas_h: number
+          canvas_ratio: string
+          canvas_w: number
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          lock_settings?: Json
+          owner_id: string
+          title?: string
+          top_layer_config?: Json
+        }
+        Update: {
+          bottom_layer_config?: Json
+          bottom_layer_url?: string
+          canvas_h?: number
+          canvas_ratio?: string
+          canvas_w?: number
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          lock_settings?: Json
+          owner_id?: string
+          title?: string
+          top_layer_config?: Json
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Editor from "./pages/Editor";
+import UseTemplate from "./pages/UseTemplate";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,6 +21,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/editor" element={<Editor />} />
+            <Route path="/use-template/:templateId" element={<UseTemplate />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
