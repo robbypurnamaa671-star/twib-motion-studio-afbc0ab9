@@ -5,6 +5,7 @@ import UploadBox from "@/components/UploadBox";
 import CanvasPreview from "@/components/CanvasPreview";
 import LayerControls from "@/components/LayerControls";
 import ExportDialog from "@/components/ExportDialog";
+import UserMenu from "@/components/UserMenu";
 import { LayerMedia, TopLayerTransform } from "@/lib/media";
 import { hasAnimation } from "@/lib/export";
 
@@ -54,6 +55,7 @@ const Editor = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          <UserMenu />
           <LayerControls
             transform={transform}
             onTransformChange={setTransform}
