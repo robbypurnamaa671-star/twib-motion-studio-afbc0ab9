@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Download, X, Check, Loader2 } from "lucide-react";
 import { LayerMedia, TopLayerTransform } from "@/lib/media";
 import { exportStatic, downloadBlob, hasAnimation } from "@/lib/export";
+import { exportAnimated } from "@/lib/export-animated";
 import { useToast } from "@/hooks/use-toast";
 
 interface ExportDialogProps {
@@ -14,6 +15,10 @@ interface ExportDialogProps {
   transform: TopLayerTransform;
 }
 
+type StaticFormat = "png" | "jpg";
+type AnimatedFormat = "mp4" | "gif";
+type ExportFormat = StaticFormat | AnimatedFormat;
+
 const ExportDialog = ({
   open,
   onClose,
@@ -24,7 +29,7 @@ const ExportDialog = ({
   transform,
 }: ExportDialogProps) => {
   const [quality, setQuality] = useState<"720p" | "1080p">("1080p");
-  const [format, setFormat] = useState<"png" | "jpg">("png");
+  const [format, setFormat] = useState<ExportFormat>("png");
   const [progress, setProgress] = useState(0);
   const [exporting, setExporting] = useState(false);
   const [done, setDone] = useState(false);
@@ -32,26 +37,50 @@ const ExportDialog = ({
 
   const animated = hasAnimation(bottomLayer, topLayer);
 
+  // When animated content is present, default to mp4
+  const effectiveFormat = animated && (format === "png" || format === "jpg") ? "mp4" : format;
+
+  const staticFormats: StaticFormat[] = ["png", "jpg"];
+  const animatedFormats: AnimatedFormat[] = ["mp4", "gif"];
+  const availableFormats: ExportFormat[] = animated ? animatedFormats : staticFormats;
+
   const handleExport = async () => {
     setExporting(true);
     setProgress(0);
     setDone(false);
 
     try {
-      const blob = await exportStatic({
-        canvasW,
-        canvasH,
-        bottomLayer,
-        topLayer,
-        transform,
-        quality,
-        format,
-        onProgress: setProgress,
-      });
+      let blob: Blob;
+      const fmt = animated ? (effectiveFormat as AnimatedFormat) : (effectiveFormat as StaticFormat);
 
-      downloadBlob(blob, `twibmotion-export.${format}`);
+      if (animated) {
+        blob = await exportAnimated({
+          canvasW,
+          canvasH,
+          bottomLayer,
+          topLayer,
+          transform,
+          quality,
+          format: fmt as AnimatedFormat,
+          onProgress: setProgress,
+        });
+      } else {
+        blob = await exportStatic({
+          canvasW,
+          canvasH,
+          bottomLayer,
+          topLayer,
+          transform,
+          quality,
+          format: fmt as StaticFormat,
+          onProgress: setProgress,
+        });
+      }
+
+      const ext = fmt === "mp4" ? "mp4" : fmt === "gif" ? "gif" : fmt;
+      downloadBlob(blob, `twibmotion-export.${ext}`);
       setDone(true);
-      toast({ title: "Export complete", description: `Downloaded as ${format.toUpperCase()}` });
+      toast({ title: "Export complete", description: `Downloaded as ${fmt.toUpperCase()}` });
     } catch (err) {
       console.error("Export failed:", err);
       toast({ title: "Export failed", description: String(err), variant: "destructive" });
@@ -82,12 +111,13 @@ const ExportDialog = ({
           </button>
         </div>
 
-        {/* Animated notice */}
+        {/* Animated info */}
         {animated && (
           <div className="mb-4 p-3 rounded-lg bg-primary/10 border border-primary/20 text-sm text-foreground">
             <p className="font-medium">Animated content detected</p>
             <p className="text-muted-foreground text-xs mt-1">
-              Video/GIF export requires a backend service. Exporting a static snapshot of the current frame.
+              Your composition contains video or GIF. Export as MP4 or GIF below.
+              {" "}GIF is capped at 720p / 15 seconds.
             </p>
           </div>
         )}
@@ -100,11 +130,12 @@ const ExportDialog = ({
               <button
                 key={q}
                 onClick={() => setQuality(q)}
+                disabled={animated && effectiveFormat === "gif" && q === "1080p"}
                 className={`flex-1 py-2 rounded-lg font-mono text-sm border transition-colors ${
                   quality === q
                     ? "bg-primary text-primary-foreground border-primary"
                     : "bg-secondary text-secondary-foreground border-border hover:border-muted-foreground"
-                }`}
+                } disabled:opacity-40 disabled:cursor-not-allowed`}
               >
                 {q}
               </button>
@@ -116,12 +147,12 @@ const ExportDialog = ({
         <div className="mb-6">
           <label className="text-xs font-mono text-muted-foreground mb-2 block">Format</label>
           <div className="flex gap-2">
-            {(["png", "jpg"] as const).map((f) => (
+            {availableFormats.map((f) => (
               <button
                 key={f}
                 onClick={() => setFormat(f)}
                 className={`flex-1 py-2 rounded-lg font-mono text-sm border transition-colors uppercase ${
-                  format === f
+                  effectiveFormat === f
                     ? "bg-primary text-primary-foreground border-primary"
                     : "bg-secondary text-secondary-foreground border-border hover:border-muted-foreground"
                 }`}
@@ -160,7 +191,7 @@ const ExportDialog = ({
           ) : (
             <Download className="w-4 h-4" />
           )}
-          {exporting ? "Rendering…" : done ? "Export Again" : "Export"}
+          {exporting ? "Rendering…" : done ? "Export Again" : `Export ${effectiveFormat.toUpperCase()}`}
         </button>
       </div>
     </div>
