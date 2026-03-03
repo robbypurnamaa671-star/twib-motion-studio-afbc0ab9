@@ -1,5 +1,6 @@
 import { Muxer, ArrayBufferTarget } from "mp4-muxer";
 import { GIFEncoder, quantize, applyPalette } from "gifenc";
+import { parseGIF, decompressFrames } from "gifuct-js";
 import { LayerMedia, TopLayerTransform } from "./media";
 
 type AnimatedExportOptions = {
@@ -13,6 +14,15 @@ type AnimatedExportOptions = {
   onProgress?: (pct: number) => void;
 };
 
+// ──── Decoded GIF frame type ────
+type DecodedGifFrames = {
+  frames: ImageData[];
+  delays: number[]; // ms per frame
+  width: number;
+  height: number;
+  totalDuration: number; // seconds
+};
+
 function getExportDimensions(
   canvasW: number,
   canvasH: number,
@@ -23,12 +33,57 @@ function getExportDimensions(
   if (aspect >= 1) {
     const w = Math.min(canvasW, Math.round(maxDim * aspect));
     const h = Math.round(w / aspect);
-    // Ensure even dimensions for video encoding
     return { w: w - (w % 2), h: h - (h % 2) };
   }
   const h = Math.min(canvasH, maxDim);
   const w = Math.round(h * aspect);
   return { w: w - (w % 2), h: h - (h % 2) };
+}
+
+// ──── Decode a GIF file into individual ImageData frames ────
+async function decodeGif(layer: LayerMedia): Promise<DecodedGifFrames> {
+  const response = await fetch(layer.url);
+  const buffer = await response.arrayBuffer();
+  const gif = parseGIF(buffer);
+  const frames = decompressFrames(gif, true);
+
+  // We need a scratch canvas to composite GIF frames (handle disposal)
+  const gifW = gif.lsd.width;
+  const gifH = gif.lsd.height;
+  const scratch = document.createElement("canvas");
+  scratch.width = gifW;
+  scratch.height = gifH;
+  const sctx = scratch.getContext("2d")!;
+
+  const imageDataFrames: ImageData[] = [];
+  const delays: number[] = [];
+
+  for (const frame of frames) {
+    // Build a full-size ImageData from the patch
+    const patch = sctx.createImageData(frame.dims.width, frame.dims.height);
+    patch.data.set(frame.patch);
+    sctx.putImageData(patch, frame.dims.left, frame.dims.top);
+
+    // Capture current composite as a full frame
+    imageDataFrames.push(sctx.getImageData(0, 0, gifW, gifH));
+    delays.push(frame.delay || 100);
+
+    // Handle disposal
+    if (frame.disposalType === 2) {
+      // Restore to background
+      sctx.clearRect(frame.dims.left, frame.dims.top, frame.dims.width, frame.dims.height);
+    }
+    // disposalType 3 (restore to previous) is rare, skip for simplicity
+  }
+
+  const totalDuration = delays.reduce((a, b) => a + b, 0) / 1000;
+
+  return { frames: imageDataFrames, delays, width: gifW, height: gifH, totalDuration };
+}
+
+// Convert ImageData to an ImageBitmap for drawImage
+function imageDataToBitmap(imageData: ImageData): Promise<ImageBitmap> {
+  return createImageBitmap(imageData);
 }
 
 function loadMediaElement(layer: LayerMedia): Promise<HTMLVideoElement | HTMLImageElement> {
@@ -68,31 +123,60 @@ function getVideoDuration(layer: LayerMedia): Promise<number> {
   });
 }
 
-function drawFrame(
-  ctx: CanvasRenderingContext2D,
-  w: number,
-  h: number,
-  bottomSource: CanvasImageSource | null,
-  topSource: CanvasImageSource | null,
-  transform: TopLayerTransform,
-  scale: number
-) {
-  ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = "#000";
-  ctx.fillRect(0, 0, w, h);
+// ──── Source abstraction to handle video, gif, and static images ────
+type AnimatedSource = {
+  type: "video";
+  el: HTMLVideoElement;
+  duration: number;
+} | {
+  type: "gif";
+  decoded: DecodedGifFrames;
+  bitmaps: ImageBitmap[];
+} | {
+  type: "static";
+  el: HTMLImageElement;
+};
 
-  if (bottomSource) {
-    ctx.save();
-    ctx.translate(w / 2 + transform.x * scale, h / 2 + transform.y * scale);
-    ctx.rotate((transform.rotation * Math.PI) / 180);
-    ctx.scale(transform.scale, transform.scale);
-    ctx.drawImage(bottomSource, -w / 2, -h / 2, w, h);
-    ctx.restore();
+async function prepareSource(layer: LayerMedia | null): Promise<AnimatedSource | null> {
+  if (!layer) return null;
+
+  if (layer.type === "video") {
+    const el = await loadMediaElement(layer) as HTMLVideoElement;
+    return {
+      type: "video",
+      el,
+      duration: el.duration,
+    };
   }
 
-  if (topSource) {
-    ctx.drawImage(topSource, 0, 0, w, h);
+  if (layer.type === "gif") {
+    const decoded = await decodeGif(layer);
+    // Pre-create ImageBitmaps for fast drawing
+    const bitmaps = await Promise.all(decoded.frames.map(imageDataToBitmap));
+    return { type: "gif", decoded, bitmaps };
   }
+
+  // Static image
+  const el = await loadMediaElement(layer) as HTMLImageElement;
+  return { type: "static", el };
+}
+
+function getSourceDuration(source: AnimatedSource | null): number {
+  if (!source) return 0;
+  if (source.type === "video") return source.duration;
+  if (source.type === "gif") return source.decoded.totalDuration;
+  return 0; // static
+}
+
+function getGifFrameAtTime(source: AnimatedSource & { type: "gif" }, timeMs: number): ImageBitmap {
+  const { decoded, bitmaps } = source;
+  const loopTime = timeMs % (decoded.totalDuration * 1000);
+  let elapsed = 0;
+  for (let i = 0; i < decoded.delays.length; i++) {
+    elapsed += decoded.delays[i];
+    if (loopTime < elapsed) return bitmaps[i];
+  }
+  return bitmaps[bitmaps.length - 1];
 }
 
 async function seekVideo(video: HTMLVideoElement, time: number): Promise<void> {
@@ -110,7 +194,50 @@ async function seekVideo(video: HTMLVideoElement, time: number): Promise<void> {
   });
 }
 
-// ──── MP4 Export using WebCodecs ────
+function getSourceImageAtTime(source: AnimatedSource | null, timeSec: number): CanvasImageSource | null {
+  if (!source) return null;
+  if (source.type === "static") return source.el;
+  if (source.type === "video") return source.el; // caller must seek first
+  if (source.type === "gif") return getGifFrameAtTime(source, timeSec * 1000);
+  return null;
+}
+
+async function seekSourceToTime(source: AnimatedSource | null, timeSec: number): Promise<void> {
+  if (!source) return;
+  if (source.type === "video") {
+    await seekVideo(source.el, timeSec % (source.duration || 1));
+  }
+  // GIF and static don't need seeking — handled by getSourceImageAtTime
+}
+
+function drawFrame(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+  bottomImg: CanvasImageSource | null,
+  topImg: CanvasImageSource | null,
+  transform: TopLayerTransform,
+  scale: number
+) {
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, w, h);
+
+  if (bottomImg) {
+    ctx.save();
+    ctx.translate(w / 2 + transform.x * scale, h / 2 + transform.y * scale);
+    ctx.rotate((transform.rotation * Math.PI) / 180);
+    ctx.scale(transform.scale, transform.scale);
+    ctx.drawImage(bottomImg, -w / 2, -h / 2, w, h);
+    ctx.restore();
+  }
+
+  if (topImg) {
+    ctx.drawImage(topImg, 0, 0, w, h);
+  }
+}
+
+// ──── MP4 Export ────
 
 async function exportMP4(opts: AnimatedExportOptions): Promise<Blob> {
   const { canvasW, canvasH, bottomLayer, topLayer, transform, quality, onProgress } = opts;
@@ -118,51 +245,36 @@ async function exportMP4(opts: AnimatedExportOptions): Promise<Blob> {
   const scale = dims.w / canvasW;
   const fps = 30;
 
-  // Determine duration from animated layer(s)
-  let duration = 5; // default for GIF-only
-  if (bottomLayer?.type === "video") {
-    duration = Math.min(await getVideoDuration(bottomLayer), 30);
-  }
-  if (topLayer?.type === "video") {
-    const topDur = Math.min(await getVideoDuration(topLayer), 30);
-    duration = Math.max(duration, topDur);
-  }
+  onProgress?.(5);
+
+  const bottomSrc = await prepareSource(bottomLayer);
+  const topSrc = await prepareSource(topLayer);
+
+  // Determine duration
+  let duration = Math.max(getSourceDuration(bottomSrc), getSourceDuration(topSrc));
+  if (duration <= 0) duration = 5;
+  duration = Math.min(duration, 30);
 
   const totalFrames = Math.ceil(duration * fps);
 
-  onProgress?.(5);
-
-  // Load media elements
-  const bottomEl = bottomLayer ? await loadMediaElement(bottomLayer) : null;
-  const topEl = topLayer ? await loadMediaElement(topLayer) : null;
-
-  // Create offscreen canvas
   const canvas = document.createElement("canvas");
   canvas.width = dims.w;
   canvas.height = dims.h;
   const ctx = canvas.getContext("2d")!;
 
-  // Check if WebCodecs is available
+  // Check WebCodecs
   if (typeof VideoEncoder === "undefined") {
-    // Fallback: use MediaRecorder with WebM
-    return exportWebMFallback(canvas, ctx, dims, bottomEl, topEl, transform, scale, duration, fps, totalFrames, onProgress);
+    return exportWebMFallback(canvas, ctx, dims, bottomSrc, topSrc, transform, scale, duration, fps, totalFrames, onProgress);
   }
 
-  // Setup mp4-muxer
   const muxer = new Muxer({
     target: new ArrayBufferTarget(),
-    video: {
-      codec: "avc",
-      width: dims.w,
-      height: dims.h,
-    },
+    video: { codec: "avc", width: dims.w, height: dims.h },
     fastStart: "in-memory",
   });
 
   const encoder = new VideoEncoder({
-    output: (chunk, meta) => {
-      muxer.addVideoChunk(chunk, meta);
-    },
+    output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
     error: (e) => console.error("VideoEncoder error:", e),
   });
 
@@ -179,15 +291,13 @@ async function exportMP4(opts: AnimatedExportOptions): Promise<Blob> {
   for (let i = 0; i < totalFrames; i++) {
     const time = i / fps;
 
-    // Seek video elements
-    if (bottomEl instanceof HTMLVideoElement) {
-      await seekVideo(bottomEl, time % (bottomEl.duration || 1));
-    }
-    if (topEl instanceof HTMLVideoElement) {
-      await seekVideo(topEl, time % (topEl.duration || 1));
-    }
+    await seekSourceToTime(bottomSrc, time);
+    await seekSourceToTime(topSrc, time);
 
-    drawFrame(ctx, dims.w, dims.h, bottomEl, topEl, transform, scale);
+    const bottomImg = getSourceImageAtTime(bottomSrc, time);
+    const topImg = getSourceImageAtTime(topSrc, time);
+
+    drawFrame(ctx, dims.w, dims.h, bottomImg, topImg, transform, scale);
 
     const frame = new VideoFrame(canvas, {
       timestamp: (i * 1_000_000) / fps,
@@ -197,10 +307,7 @@ async function exportMP4(opts: AnimatedExportOptions): Promise<Blob> {
     encoder.encode(frame, { keyFrame: i % (fps * 2) === 0 });
     frame.close();
 
-    const pct = 10 + Math.round((i / totalFrames) * 80);
-    onProgress?.(pct);
-
-    // Yield to keep UI responsive
+    onProgress?.(10 + Math.round((i / totalFrames) * 80));
     if (i % 5 === 0) await new Promise((r) => setTimeout(r, 0));
   }
 
@@ -208,20 +315,18 @@ async function exportMP4(opts: AnimatedExportOptions): Promise<Blob> {
   encoder.close();
   muxer.finalize();
 
-  const { buffer } = muxer.target;
   onProgress?.(100);
-
-  return new Blob([buffer], { type: "video/mp4" });
+  return new Blob([muxer.target.buffer], { type: "video/mp4" });
 }
 
-// ──── WebM Fallback using MediaRecorder ────
+// ──── WebM Fallback ────
 
 async function exportWebMFallback(
   canvas: HTMLCanvasElement,
   ctx: CanvasRenderingContext2D,
   dims: { w: number; h: number },
-  bottomEl: HTMLVideoElement | HTMLImageElement | null,
-  topEl: HTMLVideoElement | HTMLImageElement | null,
+  bottomSrc: AnimatedSource | null,
+  topSrc: AnimatedSource | null,
   transform: TopLayerTransform,
   scale: number,
   duration: number,
@@ -246,18 +351,15 @@ async function exportWebMFallback(
   for (let i = 0; i < totalFrames; i++) {
     const time = i / fps;
 
-    if (bottomEl instanceof HTMLVideoElement) {
-      await seekVideo(bottomEl, time % (bottomEl.duration || 1));
-    }
-    if (topEl instanceof HTMLVideoElement) {
-      await seekVideo(topEl, time % (topEl.duration || 1));
-    }
+    await seekSourceToTime(bottomSrc, time);
+    await seekSourceToTime(topSrc, time);
 
-    drawFrame(ctx, dims.w, dims.h, bottomEl, topEl, transform, scale);
+    const bottomImg = getSourceImageAtTime(bottomSrc, time);
+    const topImg = getSourceImageAtTime(topSrc, time);
 
-    const pct = 10 + Math.round((i / totalFrames) * 80);
-    onProgress?.(pct);
+    drawFrame(ctx, dims.w, dims.h, bottomImg, topImg, transform, scale);
 
+    onProgress?.(10 + Math.round((i / totalFrames) * 80));
     await new Promise((r) => setTimeout(r, 1000 / fps));
   }
 
@@ -274,28 +376,21 @@ async function exportWebMFallback(
 // ──── GIF Export ────
 
 async function exportGIF(opts: AnimatedExportOptions): Promise<Blob> {
-  const { canvasW, canvasH, bottomLayer, topLayer, transform, quality, onProgress } = opts;
-
-  // GIF: cap at 720p and 15 seconds, lower framerate
+  const { canvasW, canvasH, bottomLayer, topLayer, transform, onProgress } = opts;
   const dims = getExportDimensions(canvasW, canvasH, "720p");
   const scale = dims.w / canvasW;
-  const fps = 10; // GIF framerate
-
-  let duration = 5;
-  if (bottomLayer?.type === "video") {
-    duration = Math.min(await getVideoDuration(bottomLayer), 15);
-  }
-  if (topLayer?.type === "video") {
-    const topDur = Math.min(await getVideoDuration(topLayer), 15);
-    duration = Math.max(duration, topDur);
-  }
-
-  const totalFrames = Math.ceil(duration * fps);
+  const fps = 10;
 
   onProgress?.(5);
 
-  const bottomEl = bottomLayer ? await loadMediaElement(bottomLayer) : null;
-  const topEl = topLayer ? await loadMediaElement(topLayer) : null;
+  const bottomSrc = await prepareSource(bottomLayer);
+  const topSrc = await prepareSource(topLayer);
+
+  let duration = Math.max(getSourceDuration(bottomSrc), getSourceDuration(topSrc));
+  if (duration <= 0) duration = 5;
+  duration = Math.min(duration, 15);
+
+  const totalFrames = Math.ceil(duration * fps);
 
   const canvas = document.createElement("canvas");
   canvas.width = dims.w;
@@ -310,23 +405,20 @@ async function exportGIF(opts: AnimatedExportOptions): Promise<Blob> {
   for (let i = 0; i < totalFrames; i++) {
     const time = i / fps;
 
-    if (bottomEl instanceof HTMLVideoElement) {
-      await seekVideo(bottomEl, time % (bottomEl.duration || 1));
-    }
-    if (topEl instanceof HTMLVideoElement) {
-      await seekVideo(topEl, time % (topEl.duration || 1));
-    }
+    await seekSourceToTime(bottomSrc, time);
+    await seekSourceToTime(topSrc, time);
 
-    drawFrame(ctx, dims.w, dims.h, bottomEl, topEl, transform, scale);
+    const bottomImg = getSourceImageAtTime(bottomSrc, time);
+    const topImg = getSourceImageAtTime(topSrc, time);
+
+    drawFrame(ctx, dims.w, dims.h, bottomImg, topImg, transform, scale);
 
     const imageData = ctx.getImageData(0, 0, dims.w, dims.h);
     const palette = quantize(imageData.data, 256);
     const index = applyPalette(imageData.data, palette);
     gif.writeFrame(index, dims.w, dims.h, { palette, delay });
 
-    const pct = 10 + Math.round((i / totalFrames) * 85);
-    onProgress?.(pct);
-
+    onProgress?.(10 + Math.round((i / totalFrames) * 85));
     if (i % 3 === 0) await new Promise((r) => setTimeout(r, 0));
   }
 
@@ -336,11 +428,9 @@ async function exportGIF(opts: AnimatedExportOptions): Promise<Blob> {
   return new Blob([gif.bytesView()], { type: "image/gif" });
 }
 
-// ──── Main export dispatcher ────
+// ──── Main dispatcher ────
 
 export async function exportAnimated(opts: AnimatedExportOptions): Promise<Blob> {
-  if (opts.format === "gif") {
-    return exportGIF(opts);
-  }
+  if (opts.format === "gif") return exportGIF(opts);
   return exportMP4(opts);
 }
