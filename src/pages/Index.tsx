@@ -4,10 +4,10 @@ import { Layers, Play, Download, Monitor } from "lucide-react";
 import UserMenu from "@/components/UserMenu";
 
 const RATIOS = [
-  { label: "9:16", desc: "Vertical / Stories", w: 1080, h: 1920 },
-  { label: "1:1", desc: "Square / Feed", w: 1080, h: 1080 },
-  { label: "16:9", desc: "Landscape / Video", w: 1920, h: 1080 },
-] as const;
+{ label: "9:16", desc: "Vertical / Stories", w: 1080, h: 1920 },
+{ label: "1:1", desc: "Square / Feed", w: 1080, h: 1080 },
+{ label: "16:9", desc: "Landscape / Video", w: 1920, h: 1080 }] as
+const;
 
 const Index = () => {
   const [selected, setSelected] = useState(1);
@@ -34,7 +34,7 @@ const Index = () => {
           <h1 className="text-4xl md:text-6xl font-mono font-bold text-foreground tracking-tight mb-4">
             Create <span className="text-primary glow-text">Twibbon</span> Content
           </h1>
-          <p className="text-muted-foreground text-lg md:text-xl leading-relaxed">
+          <p className="text-muted-foreground text-lg leading-relaxed font-mono font-normal md:text-lg">
             Layer your twibbon over photos, GIFs, or videos. 
             Two layers. Infinite possibilities.
           </p>
@@ -62,41 +62,41 @@ const Index = () => {
             Select Canvas Ratio
           </p>
           <div className="grid grid-cols-3 gap-3">
-            {RATIOS.map((r, i) => (
-              <button
-                key={r.label}
-                onClick={() => setSelected(i)}
-                className={`group relative rounded-lg border-2 p-4 transition-all duration-200 flex flex-col items-center gap-2 ${
-                  selected === i
-                    ? "border-primary bg-primary/10 glow-border"
-                    : "border-border bg-card hover:border-muted-foreground/30"
-                }`}
-              >
+            {RATIOS.map((r, i) =>
+            <button
+              key={r.label}
+              onClick={() => setSelected(i)}
+              className={`group relative rounded-lg border-2 p-4 transition-all duration-200 flex flex-col items-center gap-2 ${
+              selected === i ?
+              "border-primary bg-primary/10 glow-border" :
+              "border-border bg-card hover:border-muted-foreground/30"}`
+              }>
+              
                 {/* Aspect ratio preview */}
                 <div className="flex items-center justify-center h-16">
                   <div
-                    className={`border-2 rounded-sm transition-colors ${
-                      selected === i ? "border-primary" : "border-muted-foreground/30"
-                    }`}
-                    style={{
-                      width: r.w > r.h ? 48 : (48 * r.w) / r.h,
-                      height: r.h > r.w ? 48 : (48 * r.h) / r.w,
-                    }}
-                  >
+                  className={`border-2 rounded-sm transition-colors ${
+                  selected === i ? "border-primary" : "border-muted-foreground/30"}`
+                  }
+                  style={{
+                    width: r.w > r.h ? 48 : 48 * r.w / r.h,
+                    height: r.h > r.w ? 48 : 48 * r.h / r.w
+                  }}>
+                  
                     <Monitor className={`w-full h-full p-1 ${
-                      selected === i ? "text-primary" : "text-muted-foreground/50"
-                    }`} />
+                  selected === i ? "text-primary" : "text-muted-foreground/50"}`
+                  } />
                   </div>
                 </div>
                 <span className={`font-mono font-bold text-lg ${
-                  selected === i ? "text-primary" : "text-foreground"
-                }`}>
+              selected === i ? "text-primary" : "text-foreground"}`
+              }>
                   {r.label}
                 </span>
                 <span className="text-xs text-muted-foreground">{r.desc}</span>
                 <span className="text-xs text-muted-foreground/60">{r.w}×{r.h}</span>
               </button>
-            ))}
+            )}
           </div>
         </div>
 
@@ -107,8 +107,8 @@ const Index = () => {
             navigate(`/editor?ratio=${r.label}&w=${r.w}&h=${r.h}`);
           }}
           className="animate-fade-in px-8 py-3 rounded-lg bg-primary text-primary-foreground font-mono font-semibold text-base hover:opacity-90 transition-opacity glow-border"
-          style={{ animationDelay: "0.45s" }}
-        >
+          style={{ animationDelay: "0.45s" }}>
+          
           Open Editor →
         </button>
       </main>
@@ -117,8 +117,8 @@ const Index = () => {
       <footer className="border-t border-border px-6 py-4 text-center text-xs text-muted-foreground">
         TwibMotion — 2-Layer Twibbon Generator
       </footer>
-    </div>
-  );
+    </div>);
+
 };
 
 export default Index;
