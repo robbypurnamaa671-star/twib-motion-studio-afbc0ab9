@@ -2,6 +2,7 @@ import { Muxer, ArrayBufferTarget } from "mp4-muxer";
 import { GIFEncoder, quantize, applyPalette } from "gifenc";
 import { parseGIF, decompressFrames } from "gifuct-js";
 import { LayerMedia, TopLayerTransform } from "./media";
+import { drawImageCover } from "./export";
 
 type AnimatedExportOptions = {
   canvasW: number;
@@ -228,7 +229,7 @@ function drawFrame(
     ctx.translate(w / 2 + transform.x * scale, h / 2 + transform.y * scale);
     ctx.rotate((transform.rotation * Math.PI) / 180);
     ctx.scale(transform.scale, transform.scale);
-    ctx.drawImage(bottomImg, -w / 2, -h / 2, w, h);
+    drawImageCover(ctx, bottomImg, -w / 2, -h / 2, w, h);
     ctx.restore();
   }
 

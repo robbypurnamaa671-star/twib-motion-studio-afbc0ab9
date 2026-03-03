@@ -1,5 +1,58 @@
 import { LayerMedia, TopLayerTransform } from "./media";
 
+/**
+ * Draw an image/video onto a canvas region using "object-cover" semantics:
+ * maintain source aspect ratio, center-crop to fill the destination rect.
+ */
+export function drawImageCover(
+  ctx: CanvasRenderingContext2D,
+  source: CanvasImageSource,
+  dx: number,
+  dy: number,
+  dw: number,
+  dh: number
+) {
+  let srcW: number, srcH: number;
+  if (source instanceof HTMLVideoElement) {
+    srcW = source.videoWidth;
+    srcH = source.videoHeight;
+  } else if (source instanceof HTMLImageElement) {
+    srcW = source.naturalWidth;
+    srcH = source.naturalHeight;
+  } else {
+    // ImageBitmap or other
+    srcW = (source as ImageBitmap).width;
+    srcH = (source as ImageBitmap).height;
+  }
+
+  if (!srcW || !srcH) {
+    // Fallback to stretch
+    ctx.drawImage(source, dx, dy, dw, dh);
+    return;
+  }
+
+  const srcAspect = srcW / srcH;
+  const dstAspect = dw / dh;
+
+  let sx: number, sy: number, sw: number, sh: number;
+
+  if (srcAspect > dstAspect) {
+    // Source is wider — crop sides
+    sh = srcH;
+    sw = srcH * dstAspect;
+    sx = (srcW - sw) / 2;
+    sy = 0;
+  } else {
+    // Source is taller — crop top/bottom
+    sw = srcW;
+    sh = srcW / dstAspect;
+    sx = 0;
+    sy = (srcH - sh) / 2;
+  }
+
+  ctx.drawImage(source, sx, sy, sw, sh, dx, dy, dw, dh);
+}
+
 type ExportOptions = {
   canvasW: number;
   canvasH: number;
@@ -97,7 +150,7 @@ export async function exportStatic(opts: ExportOptions): Promise<Blob> {
       ctx.translate(dims.w / 2 + transform.x * scale, dims.h / 2 + transform.y * scale);
       ctx.rotate((transform.rotation * Math.PI) / 180);
       ctx.scale(transform.scale, transform.scale);
-      ctx.drawImage(source, -dims.w / 2, -dims.h / 2, dims.w, dims.h);
+      drawImageCover(ctx, source, -dims.w / 2, -dims.h / 2, dims.w, dims.h);
       ctx.restore();
     } catch (e) {
       console.error("Bottom layer draw failed:", e);
