@@ -8,6 +8,9 @@ import Index from "./pages/Index";
 import Editor from "./pages/Editor";
 import UseTemplate from "./pages/UseTemplate";
 import NotFound from "./pages/NotFound";
+import AdminDashboard from "./pages/admin/Dashboard";
+import UsersPage from "./pages/admin/UsersPage";
+import TemplatesPage from "./pages/admin/TemplatesPage";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +25,9 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/editor" element={<Editor />} />
             <Route path="/use-template/:templateId" element={<UseTemplate />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/users" element={<UsersPage />} />
+            <Route path="/admin/templates" element={<TemplatesPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
