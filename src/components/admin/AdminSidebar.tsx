@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, FileImage, LogOut, Layers } from "lucide-react";
+import { LayoutDashboard, Users, FileImage, LogOut, Layers, Crown } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,6 +18,7 @@ const items = [
   { title: "Overview", url: "/admin/dashboard", icon: LayoutDashboard },
   { title: "Users", url: "/admin/users", icon: Users },
   { title: "Templates", url: "/admin/templates", icon: FileImage },
+  { title: "Subscriptions", url: "/admin/subscriptions", icon: Crown },
 ];
 
 export function AdminSidebar() {

@@ -7,6 +7,7 @@ import LayerControls from "@/components/LayerControls";
 import ExportDialog from "@/components/ExportDialog";
 import ShareTemplateDialog from "@/components/ShareTemplateDialog";
 import UserMenu from "@/components/UserMenu";
+import { CreditsBadge } from "@/components/CreditsBadge";
 import { LayerMedia, TopLayerTransform } from "@/lib/media";
 import { hasAnimation } from "@/lib/export";
 
@@ -57,6 +58,7 @@ const Editor = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          <CreditsBadge />
           <UserMenu />
           <LayerControls
             transform={transform}
