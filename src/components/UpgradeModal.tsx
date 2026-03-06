@@ -58,7 +58,7 @@ export function UpgradeModal({ open, onClose }: UpgradeModalProps) {
           onClick={handleUpgrade}
           className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-mono font-semibold text-sm hover:opacity-90 transition-opacity"
         >
-          Upgrade Now — $12/month
+          Upgrade Now — $2/month
         </button>
 
         <button
