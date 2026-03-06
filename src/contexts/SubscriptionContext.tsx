@@ -75,7 +75,8 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 
     // Free user
     if (format === "gif" || format === "mp4") {
-      return { allowed: false, watermark: false, reason: "Video & GIF export requires Premium" };
+      // Allow but with watermark
+      return { allowed: true, watermark: true };
     }
 
     // JPG/PNG

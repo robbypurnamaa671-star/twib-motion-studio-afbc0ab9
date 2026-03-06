@@ -13,6 +13,7 @@ type AnimatedExportOptions = {
   quality: "720p" | "1080p";
   format: "mp4" | "gif";
   onProgress?: (pct: number) => void;
+  watermark?: boolean;
 };
 
 // ──── Decoded GIF frame type ────
@@ -211,6 +212,22 @@ async function seekSourceToTime(source: AnimatedSource | null, timeSec: number):
   // GIF and static don't need seeking — handled by getSourceImageAtTime
 }
 
+function drawWatermarkOnCanvas(ctx: CanvasRenderingContext2D, w: number, h: number) {
+  const fontSize = Math.max(14, Math.round(Math.min(w, h) * 0.04));
+  ctx.save();
+  ctx.globalAlpha = 0.3;
+  ctx.font = `bold ${fontSize}px 'JetBrains Mono', monospace`;
+  ctx.fillStyle = "#ffffff";
+  ctx.textAlign = "right";
+  ctx.textBaseline = "bottom";
+  ctx.shadowColor = "rgba(0,0,0,0.5)";
+  ctx.shadowBlur = 4;
+  ctx.shadowOffsetX = 1;
+  ctx.shadowOffsetY = 1;
+  ctx.fillText("TwibMotion", w - fontSize * 0.5, h - fontSize * 0.4);
+  ctx.restore();
+}
+
 function drawFrame(
   ctx: CanvasRenderingContext2D,
   w: number,
@@ -218,7 +235,8 @@ function drawFrame(
   bottomImg: CanvasImageSource | null,
   topImg: CanvasImageSource | null,
   transform: TopLayerTransform,
-  scale: number
+  scale: number,
+  watermark?: boolean
 ) {
   ctx.clearRect(0, 0, w, h);
   ctx.fillStyle = "#000";
@@ -236,12 +254,16 @@ function drawFrame(
   if (topImg) {
     ctx.drawImage(topImg, 0, 0, w, h);
   }
+
+  if (watermark) {
+    drawWatermarkOnCanvas(ctx, w, h);
+  }
 }
 
 // ──── MP4 Export ────
 
 async function exportMP4(opts: AnimatedExportOptions): Promise<Blob> {
-  const { canvasW, canvasH, bottomLayer, topLayer, transform, quality, onProgress } = opts;
+  const { canvasW, canvasH, bottomLayer, topLayer, transform, quality, onProgress, watermark } = opts;
   const dims = getExportDimensions(canvasW, canvasH, quality);
   const scale = dims.w / canvasW;
   const fps = 30;
@@ -265,7 +287,7 @@ async function exportMP4(opts: AnimatedExportOptions): Promise<Blob> {
 
   // Check WebCodecs
   if (typeof VideoEncoder === "undefined") {
-    return exportWebMFallback(canvas, ctx, dims, bottomSrc, topSrc, transform, scale, duration, fps, totalFrames, onProgress);
+    return exportWebMFallback(canvas, ctx, dims, bottomSrc, topSrc, transform, scale, duration, fps, totalFrames, onProgress, watermark);
   }
 
   const muxer = new Muxer({
@@ -298,7 +320,7 @@ async function exportMP4(opts: AnimatedExportOptions): Promise<Blob> {
     const bottomImg = getSourceImageAtTime(bottomSrc, time);
     const topImg = getSourceImageAtTime(topSrc, time);
 
-    drawFrame(ctx, dims.w, dims.h, bottomImg, topImg, transform, scale);
+    drawFrame(ctx, dims.w, dims.h, bottomImg, topImg, transform, scale, watermark);
 
     const frame = new VideoFrame(canvas, {
       timestamp: (i * 1_000_000) / fps,
@@ -333,7 +355,8 @@ async function exportWebMFallback(
   duration: number,
   fps: number,
   totalFrames: number,
-  onProgress?: (pct: number) => void
+  onProgress?: (pct: number) => void,
+  watermark?: boolean
 ): Promise<Blob> {
   const stream = canvas.captureStream(fps);
   const recorder = new MediaRecorder(stream, {
@@ -358,7 +381,7 @@ async function exportWebMFallback(
     const bottomImg = getSourceImageAtTime(bottomSrc, time);
     const topImg = getSourceImageAtTime(topSrc, time);
 
-    drawFrame(ctx, dims.w, dims.h, bottomImg, topImg, transform, scale);
+    drawFrame(ctx, dims.w, dims.h, bottomImg, topImg, transform, scale, watermark);
 
     onProgress?.(10 + Math.round((i / totalFrames) * 80));
     await new Promise((r) => setTimeout(r, 1000 / fps));
@@ -377,7 +400,7 @@ async function exportWebMFallback(
 // ──── GIF Export ────
 
 async function exportGIF(opts: AnimatedExportOptions): Promise<Blob> {
-  const { canvasW, canvasH, bottomLayer, topLayer, transform, onProgress } = opts;
+  const { canvasW, canvasH, bottomLayer, topLayer, transform, onProgress, watermark } = opts;
   const dims = getExportDimensions(canvasW, canvasH, "720p");
   const scale = dims.w / canvasW;
   const fps = 10;
@@ -412,7 +435,7 @@ async function exportGIF(opts: AnimatedExportOptions): Promise<Blob> {
     const bottomImg = getSourceImageAtTime(bottomSrc, time);
     const topImg = getSourceImageAtTime(topSrc, time);
 
-    drawFrame(ctx, dims.w, dims.h, bottomImg, topImg, transform, scale);
+    drawFrame(ctx, dims.w, dims.h, bottomImg, topImg, transform, scale, watermark);
 
     const imageData = ctx.getImageData(0, 0, dims.w, dims.h);
     const palette = quantize(imageData.data, 256);
