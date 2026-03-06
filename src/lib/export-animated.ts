@@ -224,7 +224,7 @@ function drawWatermarkOnCanvas(ctx: CanvasRenderingContext2D, w: number, h: numb
   ctx.shadowBlur = 6;
   ctx.shadowOffsetX = 2;
   ctx.shadowOffsetY = 2;
-  ctx.fillText("TwibMotion", w / 2, h / 2);
+  ctx.fillText("Twibmotion.com", w / 2, h / 2);
   ctx.restore();
 }
 
