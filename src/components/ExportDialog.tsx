@@ -93,6 +93,7 @@ const ExportDialog = ({
           canvasW, canvasH, bottomLayer, topLayer, transform, quality,
           format: fmt as AnimatedFormat,
           onProgress: setProgress,
+          watermark: exportCheck.watermark,
         });
       } else {
         blob = await exportStatic({
@@ -219,23 +220,19 @@ const ExportDialog = ({
             <div className="flex gap-2">
               {availableFormats.map((f) => {
                 const check = canExport(f);
-                const locked = !check.allowed;
                 return (
                   <button
                     key={f}
-                    onClick={() => locked ? setUpgradeOpen(true) : setFormat(f)}
+                    onClick={() => setFormat(f)}
                     className={`flex-1 py-2 rounded-lg font-mono text-sm border transition-colors uppercase relative ${
                       effectiveFormat === f
                         ? "bg-primary text-primary-foreground border-primary"
-                        : locked
-                        ? "bg-secondary/50 text-muted-foreground border-border opacity-60"
                         : "bg-secondary text-secondary-foreground border-border hover:border-muted-foreground"
                     }`}
                   >
-                    {locked && <Lock className="w-3 h-3 inline mr-1" />}
                     {f}
-                    {locked && (
-                      <Crown className="w-3 h-3 absolute top-1 right-1 text-primary" />
+                    {check.watermark && (
+                      <span className="text-[10px] block text-muted-foreground normal-case">watermark</span>
                     )}
                   </button>
                 );
