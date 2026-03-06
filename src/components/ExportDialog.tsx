@@ -25,19 +25,18 @@ type ExportFormat = StaticFormat | AnimatedFormat;
 const WATERMARK_TEXT = "TwibMotion";
 
 function drawWatermark(ctx: CanvasRenderingContext2D, w: number, h: number) {
-  const fontSize = Math.max(14, Math.round(Math.min(w, h) * 0.04));
+  const fontSize = Math.max(24, Math.round(Math.min(w, h) * 0.08));
   ctx.save();
   ctx.globalAlpha = 0.3;
   ctx.font = `bold ${fontSize}px 'JetBrains Mono', monospace`;
   ctx.fillStyle = "#ffffff";
-  ctx.textAlign = "right";
-  ctx.textBaseline = "bottom";
-  // Add shadow for readability
-  ctx.shadowColor = "rgba(0,0,0,0.5)";
-  ctx.shadowBlur = 4;
-  ctx.shadowOffsetX = 1;
-  ctx.shadowOffsetY = 1;
-  ctx.fillText(WATERMARK_TEXT, w - fontSize * 0.5, h - fontSize * 0.4);
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.shadowColor = "rgba(0,0,0,0.6)";
+  ctx.shadowBlur = 6;
+  ctx.shadowOffsetX = 2;
+  ctx.shadowOffsetY = 2;
+  ctx.fillText(WATERMARK_TEXT, w / 2, h / 2);
   ctx.restore();
 }
 
@@ -125,9 +124,13 @@ const ExportDialog = ({
         });
       }
 
-      // Deduct credits for static exports (free users)
-      if (!animated && status === "free" && !exportCheck.watermark) {
-        await deductCredits(5);
+      // Deduct credits for free users
+      if (status === "free") {
+        if (animated) {
+          await deductCredits(10);
+        } else if (!exportCheck.watermark) {
+          await deductCredits(5);
+        }
       }
 
       const ext = fmt === "mp4" ? "mp4" : fmt === "gif" ? "gif" : fmt;
