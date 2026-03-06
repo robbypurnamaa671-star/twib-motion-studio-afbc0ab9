@@ -65,17 +65,18 @@ serve(async (req) => {
         credit_points: newStatus === "premium" ? 9999 : 20,
       });
     } else {
-      // Check if credits need monthly reset
+      // Check if credits need daily reset (reset to 20 each new day)
       const lastReset = new Date(existing.last_credit_reset);
-      const daysSinceReset = (Date.now() - lastReset.getTime()) / (1000 * 60 * 60 * 24);
+      const now = new Date();
+      const isNewDay = lastReset.toISOString().slice(0, 10) !== now.toISOString().slice(0, 10);
       
       const updates: any = { subscription_status: newStatus };
       
       if (newStatus === "premium") {
         updates.credit_points = 9999;
-      } else if (daysSinceReset >= 30) {
+      } else if (isNewDay) {
         updates.credit_points = 20;
-        updates.last_credit_reset = new Date().toISOString();
+        updates.last_credit_reset = now.toISOString();
       }
 
       await supabaseAdmin
