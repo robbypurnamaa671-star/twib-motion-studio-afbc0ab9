@@ -22,7 +22,7 @@ type StaticFormat = "png" | "jpg";
 type AnimatedFormat = "mp4" | "gif";
 type ExportFormat = StaticFormat | AnimatedFormat;
 
-const WATERMARK_TEXT = "TwibMotion";
+const WATERMARK_TEXT = "Twibmotion.com";
 
 function drawWatermark(ctx: CanvasRenderingContext2D, w: number, h: number) {
   const fontSize = Math.max(24, Math.round(Math.min(w, h) * 0.08));
