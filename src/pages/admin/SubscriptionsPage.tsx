@@ -73,7 +73,7 @@ export default function AdminSubscriptions() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-mono font-bold text-foreground">
-                $12<span className="text-sm text-muted-foreground">/month</span>
+                $2<span className="text-sm text-muted-foreground">/month</span>
               </div>
             </CardContent>
           </Card>
