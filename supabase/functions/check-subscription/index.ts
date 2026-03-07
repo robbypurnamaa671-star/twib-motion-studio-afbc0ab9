@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@18.5.0";
+import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
@@ -10,6 +10,17 @@ const corsHeaders = {
 const logStep = (step: string, details?: any) => {
   console.log(`[CHECK-SUBSCRIPTION] ${step}${details ? ` - ${JSON.stringify(details)}` : ''}`);
 };
+
+function safeDateToISO(timestamp: number | undefined | null): string | null {
+  if (timestamp == null) return null;
+  try {
+    const d = new Date(timestamp * 1000);
+    if (isNaN(d.getTime())) return null;
+    return d.toISOString();
+  } catch {
+    return null;
+  }
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -33,7 +44,7 @@ serve(async (req) => {
     logStep("User authenticated", { email: user.email });
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
-      apiVersion: "2025-08-27.basil",
+      apiVersion: "2023-10-16",
     });
 
     // Check Stripe subscription
@@ -43,15 +54,22 @@ serve(async (req) => {
 
     if (customers.data.length > 0) {
       const customerId = customers.data[0].id;
+      logStep("Found Stripe customer", { customerId });
       const subs = await stripe.subscriptions.list({ customer: customerId, status: "active", limit: 1 });
+      logStep("Subscriptions found", { count: subs.data.length });
       if (subs.data.length > 0) {
         subscribed = true;
-        subscriptionEnd = new Date(subs.data[0].current_period_end * 1000).toISOString();
+        subscriptionEnd = safeDateToISO(subs.data[0].current_period_end);
+        logStep("Active subscription", { end: subscriptionEnd });
       }
+    } else {
+      logStep("No Stripe customer found");
     }
 
     // Sync to database
     const newStatus = subscribed ? "premium" : "free";
+    logStep("Syncing status", { newStatus });
+
     const { data: existing } = await supabaseAdmin
       .from("user_subscriptions")
       .select("*")
@@ -65,13 +83,19 @@ serve(async (req) => {
         credit_points: newStatus === "premium" ? 9999 : 20,
       });
     } else {
-      // Check if credits need daily reset (reset to 20 each new day)
-      const lastReset = new Date(existing.last_credit_reset);
       const now = new Date();
-      const isNewDay = lastReset.toISOString().slice(0, 10) !== now.toISOString().slice(0, 10);
-      
+      let isNewDay = true;
+      try {
+        if (existing.last_credit_reset) {
+          const lastReset = new Date(existing.last_credit_reset);
+          if (!isNaN(lastReset.getTime())) {
+            isNewDay = lastReset.toISOString().slice(0, 10) !== now.toISOString().slice(0, 10);
+          }
+        }
+      } catch { /* default isNewDay = true */ }
+
       const updates: any = { subscription_status: newStatus };
-      
+
       if (newStatus === "premium") {
         updates.credit_points = 9999;
       } else if (isNewDay) {
@@ -91,6 +115,8 @@ serve(async (req) => {
       .select("*")
       .eq("user_id", user.id)
       .single();
+
+    logStep("Returning", { subscribed, status: sub?.subscription_status, credits: sub?.credit_points });
 
     return new Response(JSON.stringify({
       subscribed,
