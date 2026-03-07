@@ -10,6 +10,7 @@ import { exportStatic, downloadBlob } from "@/lib/export";
 import ExportDialog from "@/components/ExportDialog";
 
 const UseTemplate = () => {
+  const { user, signInWithGoogle, loading: authLoading } = useAuth();
   const { templateId } = useParams<{ templateId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
