@@ -8,6 +8,7 @@ import { LayerMedia, TopLayerTransform, getMediaType, validateFile } from "@/lib
 import { SharedTemplate, LockSettings } from "@/lib/templates";
 import { exportStatic, downloadBlob } from "@/lib/export";
 import ExportDialog from "@/components/ExportDialog";
+import { lovable } from "@/integrations/lovable";
 
 const UseTemplate = () => {
   const { user, signInWithGoogle, loading: authLoading } = useAuth();
