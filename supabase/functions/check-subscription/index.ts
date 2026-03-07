@@ -66,9 +66,14 @@ serve(async (req) => {
       });
     } else {
       // Check if credits need daily reset (reset to 20 each new day)
-      const lastReset = new Date(existing.last_credit_reset);
       const now = new Date();
-      const isNewDay = lastReset.toISOString().slice(0, 10) !== now.toISOString().slice(0, 10);
+      let isNewDay = true;
+      try {
+        const lastReset = existing.last_credit_reset ? new Date(existing.last_credit_reset) : null;
+        if (lastReset && !isNaN(lastReset.getTime())) {
+          isNewDay = lastReset.toISOString().slice(0, 10) !== now.toISOString().slice(0, 10);
+        }
+      } catch { isNewDay = true; }
       
       const updates: any = { subscription_status: newStatus };
       
