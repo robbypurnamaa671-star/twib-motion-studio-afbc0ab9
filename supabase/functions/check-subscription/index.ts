@@ -11,6 +11,17 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CHECK-SUBSCRIPTION] ${step}${details ? ` - ${JSON.stringify(details)}` : ''}`);
 };
 
+function safeDateToISO(timestamp: number | undefined | null): string | null {
+  if (timestamp == null) return null;
+  try {
+    const d = new Date(timestamp * 1000);
+    if (isNaN(d.getTime())) return null;
+    return d.toISOString();
+  } catch {
+    return null;
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -43,15 +54,22 @@ serve(async (req) => {
 
     if (customers.data.length > 0) {
       const customerId = customers.data[0].id;
+      logStep("Found Stripe customer", { customerId });
       const subs = await stripe.subscriptions.list({ customer: customerId, status: "active", limit: 1 });
+      logStep("Subscriptions found", { count: subs.data.length });
       if (subs.data.length > 0) {
         subscribed = true;
-        subscriptionEnd = new Date(subs.data[0].current_period_end * 1000).toISOString();
+        subscriptionEnd = safeDateToISO(subs.data[0].current_period_end);
+        logStep("Active subscription", { end: subscriptionEnd });
       }
+    } else {
+      logStep("No Stripe customer found");
     }
 
     // Sync to database
     const newStatus = subscribed ? "premium" : "free";
+    logStep("Syncing status", { newStatus });
+
     const { data: existing } = await supabaseAdmin
       .from("user_subscriptions")
       .select("*")
@@ -65,18 +83,19 @@ serve(async (req) => {
         credit_points: newStatus === "premium" ? 9999 : 20,
       });
     } else {
-      // Check if credits need daily reset (reset to 20 each new day)
       const now = new Date();
       let isNewDay = true;
       try {
-        const lastReset = existing.last_credit_reset ? new Date(existing.last_credit_reset) : null;
-        if (lastReset && !isNaN(lastReset.getTime())) {
-          isNewDay = lastReset.toISOString().slice(0, 10) !== now.toISOString().slice(0, 10);
+        if (existing.last_credit_reset) {
+          const lastReset = new Date(existing.last_credit_reset);
+          if (!isNaN(lastReset.getTime())) {
+            isNewDay = lastReset.toISOString().slice(0, 10) !== now.toISOString().slice(0, 10);
+          }
         }
-      } catch { isNewDay = true; }
-      
+      } catch { /* default isNewDay = true */ }
+
       const updates: any = { subscription_status: newStatus };
-      
+
       if (newStatus === "premium") {
         updates.credit_points = 9999;
       } else if (isNewDay) {
@@ -96,6 +115,8 @@ serve(async (req) => {
       .select("*")
       .eq("user_id", user.id)
       .single();
+
+    logStep("Returning", { subscribed, status: sub?.subscription_status, credits: sub?.credit_points });
 
     return new Response(JSON.stringify({
       subscribed,
