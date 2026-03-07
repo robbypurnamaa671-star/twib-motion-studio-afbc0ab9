@@ -212,7 +212,7 @@ const UseTemplate = () => {
           <div className="w-px h-5 bg-border mx-1 hidden sm:block" />
           <button
             onClick={() => setExportOpen(true)}
-            disabled={!userPhoto}
+            disabled={!userPhoto || !user}
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-mono text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
           >
             <Download className="w-4 h-4" />
