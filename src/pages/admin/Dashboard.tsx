@@ -16,6 +16,7 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout>
+      <SEOHead title="Admin Dashboard – TwibMotion" noindex />
       <div className="space-y-6">
         <h1 className="text-2xl font-mono font-bold text-foreground">Dashboard Overview</h1>
 
