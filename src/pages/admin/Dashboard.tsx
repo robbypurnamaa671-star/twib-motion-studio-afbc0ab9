@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { useAdminApi } from "@/hooks/useAdminApi";
 import { Users, FileImage, Loader2 } from "lucide-react";
+import SEOHead from "@/components/SEOHead";
 
 export default function AdminDashboard() {
   const api = useAdminApi();
