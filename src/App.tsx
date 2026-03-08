@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { AdminGuard } from "@/components/admin/AdminGuard";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import Index from "./pages/Index";
 import Editor from "./pages/Editor";
@@ -28,10 +29,10 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/editor" element={<Editor />} />
               <Route path="/use-template/:templateId" element={<UseTemplate />} />
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              <Route path="/admin/users" element={<UsersPage />} />
-              <Route path="/admin/templates" element={<TemplatesPage />} />
-              <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
+              <Route path="/admin/dashboard" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
+              <Route path="/admin/users" element={<AdminGuard><UsersPage /></AdminGuard>} />
+              <Route path="/admin/templates" element={<AdminGuard><TemplatesPage /></AdminGuard>} />
+              <Route path="/admin/subscriptions" element={<AdminGuard><AdminSubscriptions /></AdminGuard>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
