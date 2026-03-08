@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Layers, Download, Share2 } from "lucide-react";
+import SEOHead from "@/components/SEOHead";
 import UploadBox from "@/components/UploadBox";
 import CanvasPreview from "@/components/CanvasPreview";
 import LayerControls from "@/components/LayerControls";
@@ -32,6 +33,7 @@ const Editor = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col lg:h-screen lg:overflow-hidden">
+      <SEOHead title="Editor – TwibMotion" noindex />
       {/* Top bar */}
       <header className="border-b border-border px-4 py-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">

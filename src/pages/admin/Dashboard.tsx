@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { useAdminApi } from "@/hooks/useAdminApi";
 import { Users, FileImage, Loader2 } from "lucide-react";
+import SEOHead from "@/components/SEOHead";
 
 export default function AdminDashboard() {
   const api = useAdminApi();
@@ -15,6 +16,7 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout>
+      <SEOHead title="Admin Dashboard – TwibMotion" noindex />
       <div className="space-y-6">
         <h1 className="text-2xl font-mono font-bold text-foreground">Dashboard Overview</h1>
 
