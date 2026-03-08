@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Layers, Download, Share2 } from "lucide-react";
+import SEOHead from "@/components/SEOHead";
 import UploadBox from "@/components/UploadBox";
 import CanvasPreview from "@/components/CanvasPreview";
 import LayerControls from "@/components/LayerControls";
