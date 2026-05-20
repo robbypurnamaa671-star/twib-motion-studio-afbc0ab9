@@ -8,6 +8,12 @@ const EDITOR_LINKS = {
   landscape: "/editor?ratio=16:9&w=1920&h=1080",
 };
 
+const RATIO_PAGES = {
+  vertical: "/create/vertical-9-16",
+  square: "/create/square-1-1",
+  landscape: "/create/landscape-16-9",
+};
+
 const steps = [
   { icon: Upload, title: "Upload Your Photo or Video", desc: "Choose a photo, GIF, or video as your base layer.", href: EDITOR_LINKS.square, cta: "Start uploading" },
   { icon: Layers, title: "Add Your Twibbon Frame", desc: "Upload a twibbon overlay frame and position it over your media.", href: EDITOR_LINKS.square, cta: "Open the editor" },
@@ -103,9 +109,9 @@ const HomepageSEOSections = () => {
           to design a frame, then share the template link so participants can apply twibbons to their own photos and videos.
         </p>
         <div className="flex flex-wrap justify-center gap-3 text-sm font-mono">
-          <Link to={EDITOR_LINKS.vertical} className="px-4 py-2 rounded-md border border-border hover:border-primary/60 text-foreground">9:16 Stories</Link>
-          <Link to={EDITOR_LINKS.square} className="px-4 py-2 rounded-md border border-border hover:border-primary/60 text-foreground">1:1 Feed</Link>
-          <Link to={EDITOR_LINKS.landscape} className="px-4 py-2 rounded-md border border-border hover:border-primary/60 text-foreground">16:9 Video</Link>
+          <Link to={RATIO_PAGES.vertical} className="px-4 py-2 rounded-md border border-border hover:border-primary/60 text-foreground">9:16 Stories</Link>
+          <Link to={RATIO_PAGES.square} className="px-4 py-2 rounded-md border border-border hover:border-primary/60 text-foreground">1:1 Feed</Link>
+          <Link to={RATIO_PAGES.landscape} className="px-4 py-2 rounded-md border border-border hover:border-primary/60 text-foreground">16:9 Video</Link>
         </div>
       </section>
 
