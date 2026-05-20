@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { render } from "@testing-library/react";
 import { screen, fireEvent, within } from "@testing-library/dom";
 import HomepageSEOSections from "./HomepageSEOSections";
+import { MemoryRouter } from "react-router-dom";
 
 const BREAKPOINTS = [
   { name: "mobile-small", width: 320, height: 568 },
@@ -29,7 +30,11 @@ describe("HomepageSEOSections", () => {
   describe.each(BREAKPOINTS)("at $name ($width x $height)", ({ width, height }) => {
     beforeEach(() => {
       setViewport(width, height);
-      render(<HomepageSEOSections />);
+      render(
+        <MemoryRouter>
+          <HomepageSEOSections />
+        </MemoryRouter>,
+      );
     });
 
     it("renders all five SEO sections with semantic landmarks and H2 headings", () => {
