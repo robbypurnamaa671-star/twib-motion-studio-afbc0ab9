@@ -9,6 +9,7 @@ import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
 import Index from "./pages/Index";
 import Editor from "./pages/Editor";
 import UseTemplate from "./pages/UseTemplate";
+import CreateTwibbon from "./pages/CreateTwibbon";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/Dashboard";
 import UsersPage from "./pages/admin/UsersPage";
@@ -28,6 +29,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/editor" element={<Editor />} />
+              <Route path="/create/:ratio" element={<CreateTwibbon />} />
               <Route path="/use-template/:templateId" element={<UseTemplate />} />
               <Route path="/admin/dashboard" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
               <Route path="/admin/users" element={<AdminGuard><UsersPage /></AdminGuard>} />
