@@ -1,17 +1,24 @@
-import { Upload, Layers, Download, Smartphone, School, Heart, Zap, Globe, Shield } from "lucide-react";
+import { Upload, Layers, Download, Smartphone, School, Heart, Zap, Globe, Shield, ArrowRight } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
+
+const EDITOR_LINKS = {
+  vertical: "/editor?ratio=9:16&w=1080&h=1920",
+  square: "/editor?ratio=1:1&w=1080&h=1080",
+  landscape: "/editor?ratio=16:9&w=1920&h=1080",
+};
 
 const steps = [
-  { icon: Upload, title: "Upload Your Photo or Video", desc: "Choose a photo, GIF, or video as your base layer." },
-  { icon: Layers, title: "Add Your Twibbon Frame", desc: "Upload a twibbon overlay frame and position it over your media." },
-  { icon: Download, title: "Export & Share", desc: "Download your twibbon in HD quality, ready for social media." },
+  { icon: Upload, title: "Upload Your Photo or Video", desc: "Choose a photo, GIF, or video as your base layer.", href: EDITOR_LINKS.square, cta: "Start uploading" },
+  { icon: Layers, title: "Add Your Twibbon Frame", desc: "Upload a twibbon overlay frame and position it over your media.", href: EDITOR_LINKS.square, cta: "Open the editor" },
+  { icon: Download, title: "Export & Share", desc: "Download your twibbon in HD quality, ready for social media.", href: EDITOR_LINKS.square, cta: "Create & export" },
 ];
 
 const useCases = [
-  { icon: Smartphone, title: "Instagram & TikTok", desc: "Create vertical twibbons for Stories, Reels, and TikTok videos." },
-  { icon: Globe, title: "Social Media Campaigns", desc: "Design branded twibbons for awareness campaigns and movements." },
-  { icon: School, title: "Schools & Universities", desc: "Graduation frames, school events, and alumni campaigns." },
-  { icon: Heart, title: "Events & Celebrations", desc: "Birthdays, weddings, independence days, and community events." },
+  { icon: Smartphone, title: "Instagram & TikTok", desc: "Create vertical twibbons for Stories, Reels, and TikTok videos.", href: EDITOR_LINKS.vertical, cta: "Make a 9:16 twibbon" },
+  { icon: Globe, title: "Social Media Campaigns", desc: "Design branded twibbons for awareness campaigns and movements.", href: EDITOR_LINKS.square, cta: "Start a 1:1 campaign" },
+  { icon: School, title: "Schools & Universities", desc: "Graduation frames, school events, and alumni campaigns.", href: EDITOR_LINKS.square, cta: "Design a school frame" },
+  { icon: Heart, title: "Events & Celebrations", desc: "Birthdays, weddings, independence days, and community events.", href: EDITOR_LINKS.landscape, cta: "Create an event twibbon" },
 ];
 
 const whyChoose = [
@@ -48,6 +55,9 @@ const HomepageSEOSections = () => {
               <span className="text-xs font-mono text-muted-foreground uppercase tracking-widest">Step {i + 1}</span>
               <h3 className="font-mono font-semibold text-foreground text-lg">{s.title}</h3>
               <p className="text-muted-foreground text-sm leading-relaxed">{s.desc}</p>
+              <Link to={s.href} className="text-primary text-sm font-mono inline-flex items-center gap-1 hover:underline">
+                {s.cta} <ArrowRight className="w-3 h-3" />
+              </Link>
             </article>
           ))}
         </div>
@@ -63,15 +73,20 @@ const HomepageSEOSections = () => {
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {useCases.map((u, i) => (
-            <article key={i} className="flex gap-4 p-5 rounded-lg border border-border bg-card">
+            <Link key={i} to={u.href} className="block group">
+            <article className="flex gap-4 p-5 rounded-lg border border-border bg-card h-full transition-colors group-hover:border-primary/60">
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                 <u.icon className="w-5 h-5 text-primary" />
               </div>
               <div>
                 <h3 className="font-mono font-semibold text-foreground mb-1">{u.title}</h3>
-                <p className="text-muted-foreground text-sm">{u.desc}</p>
+                <p className="text-muted-foreground text-sm mb-2">{u.desc}</p>
+                <span className="text-primary text-xs font-mono inline-flex items-center gap-1">
+                  {u.cta} <ArrowRight className="w-3 h-3" />
+                </span>
               </div>
             </article>
+            </Link>
           ))}
         </div>
       </section>
@@ -81,11 +96,17 @@ const HomepageSEOSections = () => {
         <h2 className="text-2xl md:text-3xl font-mono font-bold text-foreground text-center mb-4">
           Twibbon Maker for Campaigns, Schools, and Events
         </h2>
-        <p className="text-muted-foreground text-center max-w-2xl mx-auto leading-relaxed">
+        <p className="text-muted-foreground text-center max-w-2xl mx-auto leading-relaxed mb-6">
           Whether you're launching an awareness campaign, celebrating a school event, or organizing a community gathering,
-          TwibMotion makes it easy to create professional twibbon frames that anyone can use. Share your template link and let
-          participants apply twibbons to their own photos and videos.
+          TwibMotion makes it easy to create professional twibbon frames that anyone can use.{" "}
+          <Link to={EDITOR_LINKS.square} className="text-primary hover:underline">Open the editor</Link>{" "}
+          to design a frame, then share the template link so participants can apply twibbons to their own photos and videos.
         </p>
+        <div className="flex flex-wrap justify-center gap-3 text-sm font-mono">
+          <Link to={EDITOR_LINKS.vertical} className="px-4 py-2 rounded-md border border-border hover:border-primary/60 text-foreground">9:16 Stories</Link>
+          <Link to={EDITOR_LINKS.square} className="px-4 py-2 rounded-md border border-border hover:border-primary/60 text-foreground">1:1 Feed</Link>
+          <Link to={EDITOR_LINKS.landscape} className="px-4 py-2 rounded-md border border-border hover:border-primary/60 text-foreground">16:9 Video</Link>
+        </div>
       </section>
 
       {/* Why Choose */}
@@ -132,6 +153,10 @@ const HomepageSEOSections = () => {
             </div>
           ))}
         </div>
+        <p className="text-center text-sm text-muted-foreground mt-8">
+          Ready to try it?{" "}
+          <Link to={EDITOR_LINKS.square} className="text-primary hover:underline font-mono">Open the TwibMotion editor →</Link>
+        </p>
       </section>
     </>
   );
