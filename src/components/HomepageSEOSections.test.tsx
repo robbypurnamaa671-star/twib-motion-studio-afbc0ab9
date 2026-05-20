@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { render, screen, fireEvent, within } from "@testing-library/react";
+import { render } from "@testing-library/react";
+import { screen, fireEvent, within } from "@testing-library/dom";
 import HomepageSEOSections from "./HomepageSEOSections";
 
 const BREAKPOINTS = [
