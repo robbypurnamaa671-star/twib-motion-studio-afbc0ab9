@@ -61,8 +61,12 @@ const HomepageSEOSections = () => {
               <span className="text-xs font-mono text-muted-foreground uppercase tracking-widest">Step {i + 1}</span>
               <h3 className="font-mono font-semibold text-foreground text-lg">{s.title}</h3>
               <p className="text-muted-foreground text-sm leading-relaxed">{s.desc}</p>
-              <Link to={s.href} className="text-primary text-sm font-mono inline-flex items-center gap-1 hover:underline">
-                {s.cta} <ArrowRight className="w-3 h-3" />
+              <Link
+                to={s.href}
+                aria-label={`${s.cta}: ${s.title}`}
+                className="text-primary text-sm font-mono inline-flex items-center gap-1 hover:underline rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              >
+                {s.cta} <ArrowRight className="w-3 h-3" aria-hidden="true" />
               </Link>
             </article>
           ))}
@@ -79,7 +83,12 @@ const HomepageSEOSections = () => {
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {useCases.map((u, i) => (
-            <Link key={i} to={u.href} className="block group">
+            <Link
+              key={i}
+              to={u.href}
+              aria-label={`${u.cta}: ${u.title} – ${u.desc}`}
+              className="block group rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
             <article className="flex gap-4 p-5 rounded-lg border border-border bg-card h-full transition-colors group-hover:border-primary/60">
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                 <u.icon className="w-5 h-5 text-primary" />
@@ -88,7 +97,7 @@ const HomepageSEOSections = () => {
                 <h3 className="font-mono font-semibold text-foreground mb-1">{u.title}</h3>
                 <p className="text-muted-foreground text-sm mb-2">{u.desc}</p>
                 <span className="text-primary text-xs font-mono inline-flex items-center gap-1">
-                  {u.cta} <ArrowRight className="w-3 h-3" />
+                  {u.cta} <ArrowRight className="w-3 h-3" aria-hidden="true" />
                 </span>
               </div>
             </article>
@@ -105,13 +114,29 @@ const HomepageSEOSections = () => {
         <p className="text-muted-foreground text-center max-w-2xl mx-auto leading-relaxed mb-6">
           Whether you're launching an awareness campaign, celebrating a school event, or organizing a community gathering,
           TwibMotion makes it easy to create professional twibbon frames that anyone can use.{" "}
-          <Link to={EDITOR_LINKS.square} className="text-primary hover:underline">Open the editor</Link>{" "}
+          <Link
+            to={EDITOR_LINKS.square}
+            aria-label="Open the TwibMotion editor to design a square 1:1 twibbon frame"
+            className="text-primary hover:underline rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >Open the editor</Link>{" "}
           to design a frame, then share the template link so participants can apply twibbons to their own photos and videos.
         </p>
         <div className="flex flex-wrap justify-center gap-3 text-sm font-mono">
-          <Link to={RATIO_PAGES.vertical} className="px-4 py-2 rounded-md border border-border hover:border-primary/60 text-foreground">9:16 Stories</Link>
-          <Link to={RATIO_PAGES.square} className="px-4 py-2 rounded-md border border-border hover:border-primary/60 text-foreground">1:1 Feed</Link>
-          <Link to={RATIO_PAGES.landscape} className="px-4 py-2 rounded-md border border-border hover:border-primary/60 text-foreground">16:9 Video</Link>
+          <Link
+            to={RATIO_PAGES.vertical}
+            aria-label="Create a vertical 9:16 twibbon for Instagram and TikTok Stories"
+            className="px-4 py-2 rounded-md border border-border hover:border-primary/60 text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >9:16 Stories</Link>
+          <Link
+            to={RATIO_PAGES.square}
+            aria-label="Create a square 1:1 twibbon for social media feeds"
+            className="px-4 py-2 rounded-md border border-border hover:border-primary/60 text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >1:1 Feed</Link>
+          <Link
+            to={RATIO_PAGES.landscape}
+            aria-label="Create a landscape 16:9 twibbon for video platforms"
+            className="px-4 py-2 rounded-md border border-border hover:border-primary/60 text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >16:9 Video</Link>
         </div>
       </section>
 
@@ -145,7 +170,7 @@ const HomepageSEOSections = () => {
             <div key={i} className="border border-border rounded-lg overflow-hidden">
               <button
                 onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                className="w-full flex items-center justify-between p-4 text-left font-mono font-medium text-foreground hover:bg-muted/50 transition-colors"
+                className="w-full flex items-center justify-between p-4 text-left font-mono font-medium text-foreground hover:bg-muted/50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
                 aria-expanded={openFaq === i}
               >
                 <span>{f.q}</span>
@@ -161,7 +186,11 @@ const HomepageSEOSections = () => {
         </div>
         <p className="text-center text-sm text-muted-foreground mt-8">
           Ready to try it?{" "}
-          <Link to={EDITOR_LINKS.square} className="text-primary hover:underline font-mono">Open the TwibMotion editor →</Link>
+          <Link
+            to={EDITOR_LINKS.square}
+            aria-label="Open the TwibMotion editor to start creating a twibbon"
+            className="text-primary hover:underline font-mono rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >Open the TwibMotion editor →</Link>
         </p>
       </section>
     </>
