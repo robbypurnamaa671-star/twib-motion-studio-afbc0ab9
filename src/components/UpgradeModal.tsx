@@ -1,4 +1,5 @@
 import { Crown, Lock, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 
 interface UpgradeModalProps {
@@ -8,6 +9,7 @@ interface UpgradeModalProps {
 
 export function UpgradeModal({ open, onClose }: UpgradeModalProps) {
   const { startCheckout } = useSubscription();
+  const { t } = useTranslation();
 
   if (!open) return null;
 
@@ -36,17 +38,12 @@ export function UpgradeModal({ open, onClose }: UpgradeModalProps) {
           <Crown className="w-7 h-7 text-primary" />
         </div>
 
-        <h2 className="font-mono font-bold text-xl text-foreground mb-2">
-          Upgrade to Premium
-        </h2>
+        <h2 className="font-mono font-bold text-xl text-foreground mb-2">{t("upgrade.title")}</h2>
 
-        <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
-          Video & GIF export is available for Premium users.
-          Upgrade for unlimited exports and no watermark.
-        </p>
+        <p className="text-muted-foreground text-sm mb-6 leading-relaxed">{t("upgrade.desc")}</p>
 
         <div className="space-y-2 text-sm text-left mb-6">
-          {["Unlimited JPG/PNG exports", "Unlimited GIF exports", "Unlimited Video exports", "No watermark on any export", "Unlimited credit points"].map((f) => (
+          {[t("upgrade.feat1"), t("upgrade.feat2"), t("upgrade.feat3"), t("upgrade.feat4"), t("upgrade.feat5")].map((f) => (
             <div key={f} className="flex items-center gap-2 text-foreground">
               <Crown className="w-3.5 h-3.5 text-primary shrink-0" />
               <span>{f}</span>
@@ -58,14 +55,14 @@ export function UpgradeModal({ open, onClose }: UpgradeModalProps) {
           onClick={handleUpgrade}
           className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-mono font-semibold text-sm hover:opacity-90 transition-opacity"
         >
-          Upgrade Now — $2/month
+          {t("upgrade.cta")}
         </button>
 
         <button
           onClick={onClose}
           className="w-full mt-2 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
-          Maybe later
+          {t("upgrade.maybeLater")}
         </button>
       </div>
     </div>
