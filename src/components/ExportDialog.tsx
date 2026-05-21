@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Download, X, Check, Loader2, Lock, Crown } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { LayerMedia, TopLayerTransform } from "@/lib/media";
 import { exportStatic, downloadBlob, hasAnimation } from "@/lib/export";
 import { exportAnimated } from "@/lib/export-animated";
@@ -58,6 +59,7 @@ const ExportDialog = ({
   const { toast } = useToast();
   const { user } = useAuth();
   const { canExport, deductCredits, status, creditPoints } = useSubscription();
+  const { t } = useTranslation();
 
   const animated = hasAnimation(bottomLayer, topLayer);
   const effectiveFormat = animated && (format === "png" || format === "jpg") ? "mp4" : format;
@@ -70,7 +72,7 @@ const ExportDialog = ({
 
   const handleExport = async () => {
     if (!user) {
-      toast({ title: "Sign in required", description: "Please sign in to export", variant: "destructive" });
+      toast({ title: t("exportDlg.signinRequired"), description: t("exportDlg.signinDesc"), variant: "destructive" });
       return;
     }
 
@@ -137,11 +139,11 @@ const ExportDialog = ({
       downloadBlob(blob, `twibmotion-export.${ext}`);
       setDone(true);
 
-      const wmText = exportCheck.watermark ? " (with watermark)" : "";
-      toast({ title: "Export complete", description: `Downloaded as ${fmt.toUpperCase()}${wmText}` });
+      const wmText = exportCheck.watermark ? t("exportDlg.withWatermark") : "";
+      toast({ title: t("exportDlg.exportComplete"), description: t("exportDlg.downloadedAs", { fmt: fmt.toUpperCase(), wm: wmText }) });
     } catch (err) {
       console.error("Export failed:", err);
-      toast({ title: "Export failed", description: String(err), variant: "destructive" });
+      toast({ title: t("exportDlg.exportFailed"), description: String(err), variant: "destructive" });
     } finally {
       setExporting(false);
     }
@@ -161,10 +163,11 @@ const ExportDialog = ({
         <div className="bg-card border border-border rounded-xl shadow-2xl w-full max-w-md mx-4 p-6" onClick={(e) => e.stopPropagation()}>
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-mono font-bold text-lg text-foreground">Export</h2>
+            <h2 className="font-mono font-bold text-lg text-foreground">{t("exportDlg.title")}</h2>
             <button
               onClick={() => { onClose(); reset(); }}
               className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+              aria-label={t("common.cancel")}
             >
               <X className="w-5 h-5" />
             </button>
@@ -174,13 +177,11 @@ const ExportDialog = ({
           {user && status === "free" && (
             <div className="mb-4 p-3 rounded-lg bg-secondary border border-border text-sm">
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Credits remaining</span>
+                <span className="text-muted-foreground">{t("exportDlg.creditsRemaining")}</span>
                 <span className="font-mono font-bold text-foreground">{creditPoints}</span>
               </div>
               {creditPoints < 5 && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  No credits left. Exports will include a watermark.
-                </p>
+                <p className="text-xs text-muted-foreground mt-1">{t("exportDlg.noCreditsLeft")}</p>
               )}
             </div>
           )}
@@ -188,17 +189,14 @@ const ExportDialog = ({
           {/* Animated info */}
           {animated && (
             <div className="mb-4 p-3 rounded-lg bg-primary/10 border border-primary/20 text-sm text-foreground">
-              <p className="font-medium">Animated content detected</p>
-              <p className="text-muted-foreground text-xs mt-1">
-                Your composition contains video or GIF. Export as MP4 or GIF below.
-                {" "}GIF is capped at 720p / 15 seconds.
-              </p>
+              <p className="font-medium">{t("exportDlg.animatedDetected")}</p>
+              <p className="text-muted-foreground text-xs mt-1">{t("exportDlg.animatedDesc")}</p>
             </div>
           )}
 
           {/* Quality */}
           <div className="mb-4">
-            <label className="text-xs font-mono text-muted-foreground mb-2 block">Quality</label>
+            <label className="text-xs font-mono text-muted-foreground mb-2 block">{t("exportDlg.quality")}</label>
             <div className="flex gap-2">
               {(["720p", "1080p"] as const).map((q) => (
                 <button
@@ -219,7 +217,7 @@ const ExportDialog = ({
 
           {/* Format */}
           <div className="mb-6">
-            <label className="text-xs font-mono text-muted-foreground mb-2 block">Format</label>
+            <label className="text-xs font-mono text-muted-foreground mb-2 block">{t("exportDlg.format")}</label>
             <div className="flex gap-2">
               {availableFormats.map((f) => {
                 const check = canExport(f);
@@ -235,7 +233,7 @@ const ExportDialog = ({
                   >
                     {f}
                     {check.watermark && (
-                      <span className="text-[10px] block text-muted-foreground normal-case">watermark</span>
+                      <span className="text-[10px] block text-muted-foreground normal-case">{t("exportDlg.watermark")}</span>
                     )}
                   </button>
                 );
@@ -253,7 +251,7 @@ const ExportDialog = ({
                 />
               </div>
               <p className="text-xs font-mono text-muted-foreground mt-1 text-center">
-                {done ? "Done!" : `${progress}%`}
+                {done ? t("exportDlg.done") : `${progress}%`}
               </p>
             </div>
           )}
@@ -274,20 +272,21 @@ const ExportDialog = ({
               <Download className="w-4 h-4" />
             )}
             {exporting
-              ? "Rendering…"
+              ? t("exportDlg.rendering")
               : done
-              ? "Export Again"
+              ? t("exportDlg.exportAgain")
               : !exportCheck.allowed
-              ? "Upgrade to Export"
+              ? t("exportDlg.upgradeToExport")
               : exportCheck.watermark
-              ? `Export ${effectiveFormat.toUpperCase()} (watermark)`
-              : `Export ${effectiveFormat.toUpperCase()}`}
+              ? t("exportDlg.exportWithWm", { fmt: effectiveFormat.toUpperCase() })
+              : t("exportDlg.exportBtn", { fmt: effectiveFormat.toUpperCase() })}
           </button>
 
           {/* Watermark notice */}
           {exportCheck.watermark && (
             <p className="text-xs text-center text-muted-foreground mt-2">
-              Out of credits. <button onClick={() => setUpgradeOpen(true)} className="text-primary hover:underline">Upgrade to remove watermark</button>
+              {t("exportDlg.watermarkNotice")}{" "}
+              <button onClick={() => setUpgradeOpen(true)} className="text-primary hover:underline">{t("exportDlg.upgradeRemoveWm")}</button>
             </p>
           )}
         </div>
