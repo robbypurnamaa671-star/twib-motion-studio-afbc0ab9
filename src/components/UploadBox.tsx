@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { Upload, Image, Film, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { LayerMedia, getMediaType, validateFile } from "@/lib/media";
 import { useToast } from "@/hooks/use-toast";
 
@@ -15,12 +16,13 @@ const UploadBox = ({ label, sublabel, media, onMediaChange, icon }: UploadBoxPro
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const handleFile = useCallback(
     (file: File) => {
       const error = validateFile(file);
       if (error) {
-        toast({ title: "Invalid file", description: error, variant: "destructive" });
+        toast({ title: t("upload.invalidFile"), description: error, variant: "destructive" });
         return;
       }
       const type = getMediaType(file);
@@ -32,7 +34,7 @@ const UploadBox = ({ label, sublabel, media, onMediaChange, icon }: UploadBoxPro
         video.onloadedmetadata = () => {
           URL.revokeObjectURL(video.src);
           if (video.duration > 30) {
-            toast({ title: "Too long", description: "Max video duration is 30 seconds.", variant: "destructive" });
+            toast({ title: t("upload.tooLong"), description: t("upload.maxDuration"), variant: "destructive" });
             return;
           }
           onMediaChange({ file, url: URL.createObjectURL(file), type });
@@ -42,7 +44,7 @@ const UploadBox = ({ label, sublabel, media, onMediaChange, icon }: UploadBoxPro
         onMediaChange({ file, url: URL.createObjectURL(file), type });
       }
     },
-    [onMediaChange, toast]
+    [onMediaChange, toast, t]
   );
 
   const onDrop = useCallback(
@@ -108,7 +110,7 @@ const UploadBox = ({ label, sublabel, media, onMediaChange, icon }: UploadBoxPro
             <p className="text-sm font-medium text-foreground">{label}</p>
             <p className="text-xs text-muted-foreground mt-1">{sublabel}</p>
           </div>
-          <p className="text-xs text-muted-foreground/60">JPG, PNG, GIF, MP4 (max 50MB)</p>
+          <p className="text-xs text-muted-foreground/60">{t("upload.fileTypes")}</p>
         </button>
       )}
       <input

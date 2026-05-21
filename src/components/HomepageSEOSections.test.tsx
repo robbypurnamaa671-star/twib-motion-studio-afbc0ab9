@@ -19,11 +19,11 @@ const setViewport = (width: number, height: number) => {
 };
 
 const EXPECTED_SECTIONS = [
-  { label: "How to create a twibbon", h2: /how to create a twibbon in seconds/i },
-  { label: "Twibbon use cases", h2: /create twibbons for instagram/i },
-  { label: "Twibbon for campaigns", h2: /twibbon maker for campaigns/i },
-  { label: "Why choose TwibMotion", h2: /why choose twibmotion/i },
-  { label: "Frequently asked questions", h2: /frequently asked questions about twibbons/i },
+  { label: "How to Create a Twibbon in Seconds", h2: /how to create a twibbon in seconds/i },
+  { label: "Create Twibbons for Instagram, TikTok, and Social Media", h2: /create twibbons for instagram/i },
+  { label: "Twibbon Maker for Campaigns, Schools, and Events", h2: /twibbon maker for campaigns/i },
+  { label: "Why Choose TwibMotion", h2: /why choose twibmotion/i },
+  { label: "Frequently Asked Questions About Twibbons", h2: /frequently asked questions about twibbons/i },
 ];
 
 describe("HomepageSEOSections", () => {
@@ -47,18 +47,18 @@ describe("HomepageSEOSections", () => {
     });
 
     it("renders the 3 step articles, 4 use-case articles, and 4 why-choose articles", () => {
-      const steps = within(screen.getByRole("region", { name: "How to create a twibbon" })).getAllByRole("article");
+      const steps = within(screen.getByRole("region", { name: "How to Create a Twibbon in Seconds" })).getAllByRole("article");
       expect(steps).toHaveLength(3);
 
-      const useCases = within(screen.getByRole("region", { name: "Twibbon use cases" })).getAllByRole("article");
+      const useCases = within(screen.getByRole("region", { name: "Create Twibbons for Instagram, TikTok, and Social Media" })).getAllByRole("article");
       expect(useCases).toHaveLength(4);
 
-      const why = within(screen.getByRole("region", { name: "Why choose TwibMotion" })).getAllByRole("article");
+      const why = within(screen.getByRole("region", { name: "Why Choose TwibMotion" })).getAllByRole("article");
       expect(why).toHaveLength(4);
     });
 
     it("renders 5 collapsed FAQ items that expand on click", () => {
-      const faqRegion = screen.getByRole("region", { name: "Frequently asked questions" });
+      const faqRegion = screen.getByRole("region", { name: "Frequently Asked Questions About Twibbons" });
       const triggers = within(faqRegion).getAllByRole("button");
       expect(triggers).toHaveLength(5);
       triggers.forEach((t) => expect(t).toHaveAttribute("aria-expanded", "false"));

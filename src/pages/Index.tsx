@@ -1,32 +1,35 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layers, Play, Download, Monitor } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import UserMenu from "@/components/UserMenu";
 import SEOHead from "@/components/SEOHead";
 import HomepageSEOSections from "@/components/HomepageSEOSections";
-
-const RATIOS = [
-  { label: "9:16", desc: "Vertical / Stories", w: 1080, h: 1920 },
-  { label: "1:1", desc: "Square / Feed", w: 1080, h: 1080 },
-  { label: "16:9", desc: "Landscape / Video", w: 1920, h: 1080 },
-] as const;
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const Index = () => {
   const [selected, setSelected] = useState(1);
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  const RATIOS = [
+    { label: "9:16", desc: t("home.ratioVerticalDesc"), w: 1080, h: 1920 },
+    { label: "1:1", desc: t("home.ratioSquareDesc"), w: 1080, h: 1080 },
+    { label: "16:9", desc: t("home.ratioLandscapeDesc"), w: 1920, h: 1080 },
+  ] as const;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead
-        title="TwibMotion – Free Twibbon Maker for Photos, GIFs, and Videos"
-        description="TwibMotion is a free online twibbon maker that lets you create twibbons by layering frames over photos, GIFs, or videos. Export high-quality twibbons for campaigns, social media, Reels, and events in seconds."
+        title={t("home.metaTitle")}
+        description={t("home.metaDescription")}
         canonical="https://twibmotion.com"
       />
 
       {/* Nav */}
       <header>
-        <nav className="border-b border-border px-6 py-4 flex items-center justify-between" aria-label="Main navigation">
-          <a href="/" className="flex items-center gap-2" aria-label="TwibMotion home">
+        <nav className="border-b border-border px-6 py-4 flex items-center justify-between" aria-label={t("nav.main")}>
+          <a href="/" className="flex items-center gap-2" aria-label={t("nav.twibmotionHome")}>
             <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center">
               <Layers className="w-4 h-4 text-primary-foreground" />
             </div>
@@ -43,11 +46,10 @@ const Index = () => {
         <section className="flex flex-col items-center justify-center px-6 py-16 gap-12" aria-label="Hero">
           <div className="text-center max-w-2xl animate-fade-in">
             <h1 className="text-3xl md:text-5xl font-mono font-bold text-foreground tracking-tight mb-4 leading-tight">
-              Free Twibbon Maker – Create Twibbons for Photos, GIFs, and Videos Online
+              {t("home.heroTitle")}
             </h1>
             <p className="text-muted-foreground text-lg leading-relaxed font-mono font-normal">
-              Layer your twibbon over photos, GIFs, or videos.
-              Two layers. Infinite possibilities.
+              {t("home.heroSubtitle")}
             </p>
           </div>
 
@@ -55,22 +57,22 @@ const Index = () => {
           <div className="flex gap-6 md:gap-10 text-muted-foreground text-sm animate-fade-in" style={{ animationDelay: "0.15s" }}>
             <div className="flex items-center gap-2">
               <Layers className="w-4 h-4 text-primary" aria-hidden="true" />
-              <span>2-Layer System</span>
+              <span>{t("home.feat2Layer")}</span>
             </div>
             <div className="flex items-center gap-2">
               <Play className="w-4 h-4 text-primary" aria-hidden="true" />
-              <span>Video & GIF</span>
+              <span>{t("home.featVideo")}</span>
             </div>
             <div className="flex items-center gap-2">
               <Download className="w-4 h-4 text-primary" aria-hidden="true" />
-              <span>HD Export</span>
+              <span>{t("home.featHD")}</span>
             </div>
           </div>
 
           {/* Ratio Selection */}
           <div className="w-full max-w-lg animate-fade-in" style={{ animationDelay: "0.3s" }}>
             <p className="text-sm text-muted-foreground font-mono mb-4 text-center uppercase tracking-widest">
-              Select Canvas Ratio
+              {t("home.selectRatio")}
             </p>
             <div className="grid grid-cols-3 gap-3">
               {RATIOS.map((r, i) => (
@@ -125,7 +127,7 @@ const Index = () => {
             className="animate-fade-in px-8 py-3 rounded-lg bg-primary text-primary-foreground font-mono font-semibold text-base hover:opacity-90 transition-opacity glow-border"
             style={{ animationDelay: "0.45s" }}
           >
-            Open Editor →
+            {t("home.openEditorCta")}
           </button>
         </section>
 
@@ -134,13 +136,12 @@ const Index = () => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border px-6 py-6 text-center">
-        <p className="text-xs text-muted-foreground">
-          TwibMotion — Free Twibbon Maker for Photos, GIFs, and Videos
-        </p>
-        <nav className="mt-2 flex justify-center gap-4 text-xs text-muted-foreground" aria-label="Footer navigation">
-          <a href="/" className="hover:text-primary transition-colors">Home</a>
+      <footer className="border-t border-border px-6 py-6 text-center flex flex-col items-center gap-3">
+        <p className="text-xs text-muted-foreground">{t("footer.tagline")}</p>
+        <nav className="flex justify-center gap-4 text-xs text-muted-foreground" aria-label={t("nav.footer")}>
+          <a href="/" className="hover:text-primary transition-colors">{t("nav.home")}</a>
         </nav>
+        <LanguageSwitcher />
       </footer>
     </div>
   );

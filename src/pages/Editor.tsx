@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Layers, Download, Share2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import SEOHead from "@/components/SEOHead";
 import UploadBox from "@/components/UploadBox";
 import CanvasPreview from "@/components/CanvasPreview";
@@ -15,6 +16,7 @@ import { hasAnimation } from "@/lib/export";
 const Editor = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const ratio = searchParams.get("ratio") || "1:1";
   const canvasW = parseInt(searchParams.get("w") || "1080");
@@ -33,13 +35,14 @@ const Editor = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col lg:h-screen lg:overflow-hidden">
-      <SEOHead title="Editor – TwibMotion" noindex />
+      <SEOHead title={t("editor.metaTitle")} noindex />
       {/* Top bar */}
       <header className="border-b border-border px-4 py-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate("/")}
             className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+            aria-label={t("editor.back")}
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
@@ -74,7 +77,7 @@ const Editor = () => {
             className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border text-foreground font-mono text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-secondary transition-colors"
           >
             <Share2 className="w-4 h-4" />
-            <span className="hidden sm:inline">Share</span>
+            <span className="hidden sm:inline">{t("editor.share")}</span>
           </button>
           <button
             onClick={() => setExportOpen(true)}
@@ -82,7 +85,7 @@ const Editor = () => {
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-mono text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-opacity"
           >
             <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">Export</span>
+            <span className="hidden sm:inline">{t("editor.export")}</span>
           </button>
         </div>
       </header>
@@ -94,27 +97,27 @@ const Editor = () => {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <div className="w-5 h-5 rounded bg-secondary flex items-center justify-center text-xs font-mono font-bold text-secondary-foreground">1</div>
-              <span className="text-sm font-medium text-foreground">Bottom Layer</span>
-              <span className="text-xs text-muted-foreground ml-auto">Your Photo</span>
+              <span className="text-sm font-medium text-foreground">{t("editor.bottomLayer")}</span>
+              <span className="text-xs text-muted-foreground ml-auto">{t("editor.yourPhoto")}</span>
             </div>
-            <UploadBox label="Your Photo" sublabel="Your image — always behind the twibbon" media={bottomLayer} onMediaChange={setBottomLayer} icon="bottom" />
+            <UploadBox label={t("editor.yourPhoto")} sublabel={t("editor.yourPhotoSub")} media={bottomLayer} onMediaChange={setBottomLayer} icon="bottom" />
           </div>
 
           <div>
             <div className="flex items-center gap-2 mb-2">
               <div className="w-5 h-5 rounded bg-primary/20 flex items-center justify-center text-xs font-mono font-bold text-primary">2</div>
-              <span className="text-sm font-medium text-foreground">Top Layer</span>
-              <span className="text-xs text-muted-foreground ml-auto">Twibbon</span>
+              <span className="text-sm font-medium text-foreground">{t("editor.topLayer")}</span>
+              <span className="text-xs text-muted-foreground ml-auto">{t("editor.twibbon")}</span>
             </div>
-            <UploadBox label="Twibbon Frame" sublabel="Overlay frame — always on top" media={topLayer} onMediaChange={setTopLayer} icon="top" />
+            <UploadBox label={t("editor.twibbonFrame")} sublabel={t("editor.twibbonFrameSub")} media={topLayer} onMediaChange={setTopLayer} icon="top" />
           </div>
 
           <div className="mt-auto pt-4 border-t border-border space-y-2 text-xs text-muted-foreground">
             <p>
-              <span className="font-medium text-foreground">Export: </span>
-              {animated ? "MP4 (animated content detected)" : "PNG / JPG (static)"}
+              <span className="font-medium text-foreground">{t("editor.exportLabel")} </span>
+              {animated ? t("editor.exportInfoMp4") : t("editor.exportInfoStatic")}
             </p>
-            <p className="text-muted-foreground/60">Scroll on canvas to zoom • Drag to reposition your photo</p>
+            <p className="text-muted-foreground/60">{t("editor.canvasHint")}</p>
           </div>
         </aside>
 
