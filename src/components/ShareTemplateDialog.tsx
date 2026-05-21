@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { X, Share2, Copy, Check, Loader2, Lock, Unlock } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -29,7 +30,8 @@ const ShareTemplateDialog = ({
 }: ShareTemplateDialogProps) => {
   const { user, signInWithGoogle } = useAuth();
   const { toast } = useToast();
-  const [title, setTitle] = useState("My Twibbon Template");
+  const { t } = useTranslation();
+  const [title, setTitle] = useState(t("share.defaultTitle"));
   const [locks, setLocks] = useState<LockSettings>(DEFAULT_LOCK_SETTINGS);
   const [expireHours, setExpireHours] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
@@ -45,7 +47,7 @@ const ShareTemplateDialog = ({
     }
 
     if (!topLayer) {
-      toast({ title: "Missing twibbon", description: "Upload a twibbon frame (top layer) before sharing.", variant: "destructive" });
+      toast({ title: t("share.missingTwibbon"), description: t("share.missingTwibbonDesc"), variant: "destructive" });
       return;
     }
 
@@ -90,10 +92,10 @@ const ShareTemplateDialog = ({
 
       const url = `${window.location.origin}/use-template/${data.id}`;
       setShareUrl(url);
-      toast({ title: "Template shared!", description: "Your shareable link is ready." });
+      toast({ title: t("share.shared"), description: t("share.sharedDesc") });
     } catch (err: any) {
       console.error("Share failed:", err);
-      toast({ title: "Share failed", description: err.message || String(err), variant: "destructive" });
+      toast({ title: t("share.shareFailed"), description: err.message || String(err), variant: "destructive" });
     } finally {
       setSaving(false);
     }
@@ -119,23 +121,23 @@ const ShareTemplateDialog = ({
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <Share2 className="w-5 h-5 text-primary" />
-            <h2 className="font-mono font-bold text-lg text-foreground">Share as Template</h2>
+            <h2 className="font-mono font-bold text-lg text-foreground">{t("share.title")}</h2>
           </div>
-          <button onClick={handleClose} className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
+          <button onClick={handleClose} aria-label={t("common.cancel")} className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {!user && (
           <div className="mb-4 p-3 rounded-lg bg-primary/10 border border-primary/20 text-sm text-foreground">
-            <p>You need to sign in to share templates.</p>
+            <p>{t("share.signinNotice")}</p>
           </div>
         )}
 
         {/* Share URL result */}
         {shareUrl ? (
           <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">Your template is live! Share this link:</p>
+            <p className="text-sm text-muted-foreground">{t("share.yourLink")}</p>
             <div className="flex gap-2">
               <input
                 readOnly
@@ -147,7 +149,7 @@ const ShareTemplateDialog = ({
                 className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-mono hover:opacity-90 transition-opacity flex items-center gap-1"
               >
                 {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                {copied ? "Copied" : "Copy"}
+                {copied ? t("common.copied") : t("common.copy")}
               </button>
             </div>
           </div>
@@ -155,34 +157,34 @@ const ShareTemplateDialog = ({
           <div className="space-y-4">
             {/* Title */}
             <div>
-              <label className="text-xs font-mono text-muted-foreground mb-1 block">Template Title</label>
+              <label className="text-xs font-mono text-muted-foreground mb-1 block">{t("share.templateTitle")}</label>
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="w-full px-3 py-2 rounded-lg bg-secondary text-foreground text-sm border border-border focus:border-primary focus:outline-none transition-colors"
-                placeholder="e.g. School Event 2026"
+                placeholder={t("share.titlePlaceholder")}
               />
             </div>
 
             {/* Lock settings */}
             <div>
-              <label className="text-xs font-mono text-muted-foreground mb-2 block">Lock Settings</label>
+              <label className="text-xs font-mono text-muted-foreground mb-2 block">{t("share.lockSettings")}</label>
               <div className="space-y-2">
                 <LockToggle
-                  label="Lock twibbon position"
-                  description="Users can't move the twibbon frame"
+                  label={t("share.lockPosition")}
+                  description={t("share.lockPositionDesc")}
                   checked={locks.lockBottomPosition}
                   onChange={(v) => setLocks({ ...locks, lockBottomPosition: v })}
                 />
                 <LockToggle
-                  label="Lock twibbon media"
-                  description="Users can't replace the twibbon frame"
+                  label={t("share.lockMedia")}
+                  description={t("share.lockMediaDesc")}
                   checked={locks.lockBottomMedia}
                   onChange={(v) => setLocks({ ...locks, lockBottomMedia: v })}
                 />
                 <LockToggle
-                  label="Allow photo rotation"
-                  description="Users can rotate their uploaded photo"
+                  label={t("share.allowRotation")}
+                  description={t("share.allowRotationDesc")}
                   checked={locks.allowTopRotation}
                   onChange={(v) => setLocks({ ...locks, allowTopRotation: v })}
                 />
@@ -191,13 +193,13 @@ const ShareTemplateDialog = ({
 
             {/* Expiration */}
             <div>
-              <label className="text-xs font-mono text-muted-foreground mb-2 block">Expiration</label>
+              <label className="text-xs font-mono text-muted-foreground mb-2 block">{t("share.expiration")}</label>
               <div className="flex gap-2">
                 {[
-                  { label: "Never", value: null },
-                  { label: "24h", value: 24 },
-                  { label: "7 days", value: 168 },
-                  { label: "30 days", value: 720 },
+                  { label: t("share.never"), value: null },
+                  { label: t("share.h24"), value: 24 },
+                  { label: t("share.days7"), value: 168 },
+                  { label: t("share.days30"), value: 720 },
                 ].map((opt) => (
                   <button
                     key={opt.label}
@@ -225,7 +227,7 @@ const ShareTemplateDialog = ({
               ) : (
                 <Share2 className="w-4 h-4" />
               )}
-              {saving ? "Uploading…" : !user ? "Sign in & Share" : "Generate Share Link"}
+              {saving ? t("share.uploading") : !user ? t("share.signinShare") : t("share.generateLink")}
             </button>
           </div>
         )}
