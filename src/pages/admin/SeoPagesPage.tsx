@@ -15,6 +15,7 @@ import {
 import { Loader2, Plus, Trash2, Edit, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 
 interface FaqItem { question: string; answer: string }
 
@@ -126,14 +127,14 @@ export default function SeoPagesPage() {
       title: form.title,
       meta_description: form.meta_description,
       intro_text: form.intro_text,
-      faq_json: faqParsed as unknown as Record<string, unknown>[],
+      faq_json: faqParsed as unknown as Json,
       featured_template_ids: tplText.split(",").map((s) => s.trim()).filter(Boolean),
       related_slugs: relText.split(",").map((s) => s.trim()).filter(Boolean).map(slugify),
       is_indexable: form.is_indexable,
     };
     const { error } = form.id
       ? await supabase.from("seo_pages").update(payload).eq("id", form.id)
-      : await supabase.from("seo_pages").insert(payload);
+      : await supabase.from("seo_pages").insert([payload]);
     setSaving(false);
     if (error) { toast.error(error.message); return; }
     toast.success(form.id ? "SEO page updated" : "SEO page created");
