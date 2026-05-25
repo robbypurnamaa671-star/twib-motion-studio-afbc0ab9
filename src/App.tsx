@@ -15,6 +15,8 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import UsersPage from "./pages/admin/UsersPage";
 import TemplatesPage from "./pages/admin/TemplatesPage";
 import AdminSubscriptions from "./pages/admin/SubscriptionsPage";
+import SeoPagesPage from "./pages/admin/SeoPagesPage";
+import TwibbonSEO from "./pages/TwibbonSEO";
 
 const queryClient = new QueryClient();
 
@@ -30,11 +32,13 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/editor" element={<Editor />} />
               <Route path="/create/:ratio" element={<CreateTwibbon />} />
+              <Route path="/twibbon/:keyword" element={<TwibbonSEO />} />
               <Route path="/use-template/:templateId" element={<UseTemplate />} />
               <Route path="/admin/dashboard" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
               <Route path="/admin/users" element={<AdminGuard><UsersPage /></AdminGuard>} />
               <Route path="/admin/templates" element={<AdminGuard><TemplatesPage /></AdminGuard>} />
               <Route path="/admin/subscriptions" element={<AdminGuard><AdminSubscriptions /></AdminGuard>} />
+              <Route path="/admin/seo-pages" element={<AdminGuard><SeoPagesPage /></AdminGuard>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

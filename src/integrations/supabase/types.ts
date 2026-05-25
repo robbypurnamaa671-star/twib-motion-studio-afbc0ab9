@@ -41,6 +41,51 @@ export type Database = {
         }
         Relationships: []
       }
+      seo_pages: {
+        Row: {
+          created_at: string
+          faq_json: Json
+          featured_template_ids: string[]
+          id: string
+          intro_text: string
+          is_indexable: boolean
+          keyword: string
+          meta_description: string
+          related_slugs: string[]
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          faq_json?: Json
+          featured_template_ids?: string[]
+          id?: string
+          intro_text: string
+          is_indexable?: boolean
+          keyword: string
+          meta_description: string
+          related_slugs?: string[]
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          faq_json?: Json
+          featured_template_ids?: string[]
+          id?: string
+          intro_text?: string
+          is_indexable?: boolean
+          keyword?: string
+          meta_description?: string
+          related_slugs?: string[]
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       shared_templates: {
         Row: {
           bottom_layer_config: Json
