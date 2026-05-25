@@ -2,7 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /dashboard
-Disallow: /editor
 Disallow: /api
 
 Sitemap: https://twibmotion.com/sitemap.xml
