@@ -59,27 +59,21 @@ const TwibbonSEO = () => {
       const seo = data as unknown as SeoPage;
       setPage(seo);
 
-      const tasks: Promise<unknown>[] = [];
       if (seo.featured_template_ids?.length) {
-        tasks.push(
-          supabase
-            .from("shared_templates")
-            .select("id, title, bottom_layer_url, canvas_ratio, canvas_w, canvas_h")
-            .in("id", seo.featured_template_ids)
-            .then(({ data }) => mounted && setTemplates((data as Template[]) || [])),
-        );
+        const { data: tpls } = await supabase
+          .from("shared_templates")
+          .select("id, title, bottom_layer_url, canvas_ratio, canvas_w, canvas_h")
+          .in("id", seo.featured_template_ids);
+        if (mounted) setTemplates((tpls as Template[]) || []);
       }
       if (seo.related_slugs?.length) {
-        tasks.push(
-          supabase
-            .from("seo_pages")
-            .select("slug, keyword")
-            .in("slug", seo.related_slugs)
-            .eq("is_indexable", true)
-            .then(({ data }) => mounted && setRelated((data as Pick<SeoPage,"slug"|"keyword">[]) || [])),
-        );
+        const { data: rel } = await supabase
+          .from("seo_pages")
+          .select("slug, keyword")
+          .in("slug", seo.related_slugs)
+          .eq("is_indexable", true);
+        if (mounted) setRelated((rel as Pick<SeoPage, "slug" | "keyword">[]) || []);
       }
-      await Promise.all(tasks);
       if (mounted) setLoading(false);
     })();
     return () => { mounted = false; };
