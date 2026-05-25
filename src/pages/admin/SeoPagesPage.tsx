@@ -126,7 +126,7 @@ export default function SeoPagesPage() {
       title: form.title,
       meta_description: form.meta_description,
       intro_text: form.intro_text,
-      faq_json: faqParsed,
+      faq_json: faqParsed as unknown as Record<string, unknown>[],
       featured_template_ids: tplText.split(",").map((s) => s.trim()).filter(Boolean),
       related_slugs: relText.split(",").map((s) => s.trim()).filter(Boolean).map(slugify),
       is_indexable: form.is_indexable,
