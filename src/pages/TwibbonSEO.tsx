@@ -57,18 +57,19 @@ const TwibbonSEO = () => {
       const seo = data as unknown as SeoPage;
       setPage(seo);
 
-      const tasks: Promise<unknown>[] = [];
+      const tasks: Promise<void>[] = [];
       if (seo.featured_template_ids?.length) {
-        tasks.push(
-          supabase.from("shared_templates").select("id, title, bottom_layer_url, canvas_ratio, canvas_w, canvas_h").in("id", seo.featured_template_ids).then(({ data: t }) => mounted && setTemplates((t as Template[]) || []))
-        );
+        tasks.push((async () => {
+          const { data: t } = await supabase.from("shared_templates").select("id, title, bottom_layer_url, canvas_ratio, canvas_w, canvas_h").in("id", seo.featured_template_ids);
+          if (mounted) setTemplates((t as Template[]) || []);
+        })());
       }
-      tasks.push(fetchRelatedSeoPages(seo.related_slugs || []).then((r) => mounted && setRelated(r)));
-      if (seo.category) tasks.push(fetchCategoryPages(seo.category, seo.slug).then((r) => mounted && setCategoryRelated(r)));
-      tasks.push(
-        (supabase.from("blog_posts") as any).select("slug, title").contains("related_seo_slugs", [seo.slug]).eq("is_published", true).limit(5)
-          .then(({ data: b }: { data: { slug: string; title: string }[] | null }) => mounted && setBlogLinks(b || []))
-      );
+      tasks.push((async () => { const r = await fetchRelatedSeoPages(seo.related_slugs || []); if (mounted) setRelated(r); })());
+      if (seo.category) tasks.push((async () => { const r = await fetchCategoryPages(seo.category!, seo.slug); if (mounted) setCategoryRelated(r); })());
+      tasks.push((async () => {
+        const { data: b } = await (supabase.from("blog_posts") as any).select("slug, title").contains("related_seo_slugs", [seo.slug]).eq("is_published", true).limit(5);
+        if (mounted) setBlogLinks((b as { slug: string; title: string }[]) || []);
+      })());
       await Promise.all(tasks);
       if (mounted) setLoading(false);
     })();
