@@ -21,6 +21,7 @@ interface SitemapEntry {
 const staticEntries: SitemapEntry[] = [
   { path: "/", changefreq: "weekly", priority: "1.0" },
   { path: "/use-template", changefreq: "weekly", priority: "0.8" },
+  { path: "/blog", changefreq: "daily", priority: "0.8" },
   { path: "/create/vertical-9-16", changefreq: "weekly", priority: "0.9" },
   { path: "/create/square-1-1", changefreq: "weekly", priority: "0.9" },
   { path: "/create/landscape-16-9", changefreq: "weekly", priority: "0.9" },
@@ -28,7 +29,7 @@ const staticEntries: SitemapEntry[] = [
 
 async function fetchSeoPages(): Promise<SitemapEntry[]> {
   try {
-    const url = `${SUPABASE_URL}/rest/v1/seo_pages?select=slug,updated_at&is_indexable=eq.true`;
+    const url = `${SUPABASE_URL}/rest/v1/seo_pages?select=slug,updated_at,page_type,route_path&is_indexable=eq.true`;
     const res = await fetch(url, {
       headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
     });
@@ -36,9 +37,9 @@ async function fetchSeoPages(): Promise<SitemapEntry[]> {
       console.warn(`sitemap: seo_pages fetch failed (${res.status}), skipping dynamic entries`);
       return [];
     }
-    const rows = (await res.json()) as { slug: string; updated_at: string }[];
+    const rows = (await res.json()) as { slug: string; updated_at: string; page_type?: string; route_path?: string }[];
     return rows.map((r) => ({
-      path: `/twibbon/${r.slug}`,
+      path: r.page_type === "global" && r.route_path ? r.route_path : `/twibbon/${r.slug}`,
       lastmod: r.updated_at?.split("T")[0],
       changefreq: "weekly" as const,
       priority: "0.8",
@@ -47,6 +48,26 @@ async function fetchSeoPages(): Promise<SitemapEntry[]> {
     console.warn("sitemap: seo_pages fetch error, skipping dynamic entries", e);
     return [];
   }
+}
+
+async function fetchBlogPosts(): Promise<SitemapEntry[]> {
+  try {
+    const url = `${SUPABASE_URL}/rest/v1/blog_posts?select=slug,updated_at&is_published=eq.true`;
+    const res = await fetch(url, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } });
+    if (!res.ok) return [];
+    const rows = (await res.json()) as { slug: string; updated_at: string }[];
+    return rows.map((r) => ({ path: `/blog/${r.slug}`, lastmod: r.updated_at?.split("T")[0], changefreq: "weekly" as const, priority: "0.7" }));
+  } catch { return []; }
+}
+
+async function fetchTemplateSeo(): Promise<SitemapEntry[]> {
+  try {
+    const url = `${SUPABASE_URL}/rest/v1/template_seo?select=slug,updated_at&is_indexable=eq.true`;
+    const res = await fetch(url, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } });
+    if (!res.ok) return [];
+    const rows = (await res.json()) as { slug: string; updated_at: string }[];
+    return rows.map((r) => ({ path: `/template/${r.slug}`, lastmod: r.updated_at?.split("T")[0], changefreq: "weekly" as const, priority: "0.7" }));
+  } catch { return []; }
 }
 
 function buildSitemap(entries: SitemapEntry[]) {
@@ -71,8 +92,8 @@ function buildSitemap(entries: SitemapEntry[]) {
 }
 
 (async () => {
-  const seo = await fetchSeoPages();
-  const all = [...staticEntries, ...seo];
+  const [seo, blog, tpl] = await Promise.all([fetchSeoPages(), fetchBlogPosts(), fetchTemplateSeo()]);
+  const all = [...staticEntries, ...seo, ...blog, ...tpl];
   writeFileSync(resolve("public/sitemap.xml"), buildSitemap(all));
-  console.log(`sitemap.xml written (${all.length} entries: ${staticEntries.length} static + ${seo.length} SEO)`);
+  console.log(`sitemap.xml written (${all.length} entries: ${staticEntries.length} static + ${seo.length} SEO + ${blog.length} blog + ${tpl.length} templates)`);
 })();
