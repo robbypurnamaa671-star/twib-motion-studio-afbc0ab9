@@ -349,4 +349,3 @@ const HomepageSEOSections = () => {
 };
 
 export default HomepageSEOSections;
-        <h2 className="text-2xl md:text-3xl font-mono font-bold text-foreground text-center mb-10">
