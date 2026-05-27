@@ -19,14 +19,11 @@ const setViewport = (width: number, height: number) => {
 };
 
 const EXPECTED_SECTIONS = [
-  { label: "Built for Modern Social Content", h2: /built for modern social content/i },
-  { label: "Why Choose Twibmotion", h2: /beyond static frame generators/i },
-  { label: "Live Editor Preview", h2: /two-layer overlay studio/i },
-  { label: "Template Gallery", h2: /ready-to-use overlay categories/i },
-  { label: "Export Formats", h2: /export for every platform/i },
-  { label: "Popular Overlay Categories", h2: /popular overlay categories/i },
-  { label: "Frequently Asked Questions", h2: /frequently asked questions/i },
-  { label: "Start Creating", h2: /start creating your overlay now/i },
+  { label: "How to Create a Twibbon in Seconds", h2: /how to create a twibbon in seconds/i },
+  { label: "Create Twibbons for Instagram, TikTok, and Social Media", h2: /create twibbons for instagram/i },
+  { label: "Twibbon Maker for Campaigns, Schools, and Events", h2: /twibbon maker for campaigns/i },
+  { label: "Why Choose TwibMotion", h2: /why choose twibmotion/i },
+  { label: "Frequently Asked Questions About Twibbons", h2: /frequently asked questions about twibbons/i },
 ];
 
 describe("HomepageSEOSections", () => {
@@ -40,7 +37,7 @@ describe("HomepageSEOSections", () => {
       );
     });
 
-    it("renders all SEO sections with semantic landmarks and H2 headings", () => {
+    it("renders all five SEO sections with semantic landmarks and H2 headings", () => {
       for (const section of EXPECTED_SECTIONS) {
         const region = screen.getByRole("region", { name: section.label });
         expect(region).toBeInTheDocument();
@@ -49,27 +46,26 @@ describe("HomepageSEOSections", () => {
       }
     });
 
-    it("renders 6 platform cards, 6 differentiators, and 8 template categories", () => {
-      const platforms = within(screen.getByRole("region", { name: "Built for Modern Social Content" })).getAllByRole("article");
-      expect(platforms).toHaveLength(6);
+    it("renders the 3 step articles, 4 use-case articles, and 4 why-choose articles", () => {
+      const steps = within(screen.getByRole("region", { name: "How to Create a Twibbon in Seconds" })).getAllByRole("article");
+      expect(steps).toHaveLength(3);
 
-      const diff = within(screen.getByRole("region", { name: "Why Choose Twibmotion" })).getAllByRole("article");
-      expect(diff).toHaveLength(6);
+      const useCases = within(screen.getByRole("region", { name: "Create Twibbons for Instagram, TikTok, and Social Media" })).getAllByRole("article");
+      expect(useCases).toHaveLength(4);
 
-      const templates = within(screen.getByRole("region", { name: "Template Gallery" })).getAllByRole("link");
-      // 8 category links + 1 "Browse all" link
-      expect(templates.length).toBeGreaterThanOrEqual(8);
+      const why = within(screen.getByRole("region", { name: "Why Choose TwibMotion" })).getAllByRole("article");
+      expect(why).toHaveLength(4);
     });
 
-    it("renders 6 collapsed FAQ items that expand on click", () => {
-      const faqRegion = screen.getByRole("region", { name: "Frequently Asked Questions" });
+    it("renders 5 collapsed FAQ items that expand on click", () => {
+      const faqRegion = screen.getByRole("region", { name: "Frequently Asked Questions About Twibbons" });
       const triggers = within(faqRegion).getAllByRole("button");
-      expect(triggers).toHaveLength(6);
+      expect(triggers).toHaveLength(5);
       triggers.forEach((t) => expect(t).toHaveAttribute("aria-expanded", "false"));
 
       fireEvent.click(triggers[0]);
       expect(triggers[0]).toHaveAttribute("aria-expanded", "true");
-      expect(within(faqRegion).getByText(/browser-based animated overlay maker/i)).toBeInTheDocument();
+      expect(within(faqRegion).getByText(/digital overlay or frame/i)).toBeInTheDocument();
     });
   });
 });
