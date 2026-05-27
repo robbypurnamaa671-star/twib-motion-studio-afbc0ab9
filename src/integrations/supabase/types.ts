@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      blog_posts: {
+        Row: {
+          category: string | null
+          content_md: string
+          cover_image_url: string | null
+          created_at: string
+          excerpt: string
+          id: string
+          is_published: boolean
+          meta_description: string
+          published_at: string | null
+          related_seo_slugs: string[]
+          related_slugs: string[]
+          slug: string
+          tags: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          content_md?: string
+          cover_image_url?: string | null
+          created_at?: string
+          excerpt?: string
+          id?: string
+          is_published?: boolean
+          meta_description: string
+          published_at?: string | null
+          related_seo_slugs?: string[]
+          related_slugs?: string[]
+          slug: string
+          tags?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          content_md?: string
+          cover_image_url?: string | null
+          created_at?: string
+          excerpt?: string
+          id?: string
+          is_published?: boolean
+          meta_description?: string
+          published_at?: string | null
+          related_seo_slugs?: string[]
+          related_slugs?: string[]
+          slug?: string
+          tags?: string[]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -43,43 +97,61 @@ export type Database = {
       }
       seo_pages: {
         Row: {
+          benefits_json: Json
+          category: string | null
           created_at: string
           faq_json: Json
           featured_template_ids: string[]
+          h1: string | null
+          howto_json: Json
           id: string
           intro_text: string
           is_indexable: boolean
           keyword: string
           meta_description: string
+          page_type: string
           related_slugs: string[]
+          route_path: string | null
           slug: string
           title: string
           updated_at: string
         }
         Insert: {
+          benefits_json?: Json
+          category?: string | null
           created_at?: string
           faq_json?: Json
           featured_template_ids?: string[]
+          h1?: string | null
+          howto_json?: Json
           id?: string
           intro_text: string
           is_indexable?: boolean
           keyword: string
           meta_description: string
+          page_type?: string
           related_slugs?: string[]
+          route_path?: string | null
           slug: string
           title: string
           updated_at?: string
         }
         Update: {
+          benefits_json?: Json
+          category?: string | null
           created_at?: string
           faq_json?: Json
           featured_template_ids?: string[]
+          h1?: string | null
+          howto_json?: Json
           id?: string
           intro_text?: string
           is_indexable?: boolean
           keyword?: string
           meta_description?: string
+          page_type?: string
           related_slugs?: string[]
+          route_path?: string | null
           slug?: string
           title?: string
           updated_at?: string
@@ -128,6 +200,45 @@ export type Database = {
           owner_id?: string
           title?: string
           top_layer_config?: Json
+        }
+        Relationships: []
+      }
+      template_seo: {
+        Row: {
+          created_at: string
+          id: string
+          intro_text: string
+          is_indexable: boolean
+          meta_description: string
+          slug: string
+          tags: string[]
+          template_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          intro_text?: string
+          is_indexable?: boolean
+          meta_description: string
+          slug: string
+          tags?: string[]
+          template_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          intro_text?: string
+          is_indexable?: boolean
+          meta_description?: string
+          slug?: string
+          tags?: string[]
+          template_id?: string
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
