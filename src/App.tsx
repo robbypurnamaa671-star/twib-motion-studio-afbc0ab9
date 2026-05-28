@@ -51,6 +51,8 @@ const App = () => (
               <Route path="/twibbon-template-online" element={<GlobalSEO />} />
               <Route path="/twibbon-frame-maker" element={<GlobalSEO />} />
               <Route path="/digital-campaign-frame-maker" element={<GlobalSEO />} />
+              <Route path="/gif-twibbon-creator" element={<GlobalSEO />} />
+              <Route path="/social-media-overlay-frame" element={<GlobalSEO />} />
               <Route path="/use-template/:templateId" element={<UseTemplate />} />
               <Route path="/admin/dashboard" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
               <Route path="/admin/users" element={<AdminGuard><UsersPage /></AdminGuard>} />
