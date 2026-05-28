@@ -165,11 +165,18 @@ export type Database = {
           canvas_h: number
           canvas_ratio: string
           canvas_w: number
+          category: string | null
           created_at: string
+          event_type: string | null
           expires_at: string | null
+          format: string | null
           id: string
+          language: string
           lock_settings: Json
           owner_id: string
+          slug: string | null
+          tags: string[]
+          template_type: string
           title: string
           top_layer_config: Json
         }
@@ -179,11 +186,18 @@ export type Database = {
           canvas_h: number
           canvas_ratio: string
           canvas_w: number
+          category?: string | null
           created_at?: string
+          event_type?: string | null
           expires_at?: string | null
+          format?: string | null
           id?: string
+          language?: string
           lock_settings?: Json
           owner_id: string
+          slug?: string | null
+          tags?: string[]
+          template_type?: string
           title?: string
           top_layer_config?: Json
         }
@@ -193,11 +207,18 @@ export type Database = {
           canvas_h?: number
           canvas_ratio?: string
           canvas_w?: number
+          category?: string | null
           created_at?: string
+          event_type?: string | null
           expires_at?: string | null
+          format?: string | null
           id?: string
+          language?: string
           lock_settings?: Json
           owner_id?: string
+          slug?: string | null
+          tags?: string[]
+          template_type?: string
           title?: string
           top_layer_config?: Json
         }
