@@ -2,6 +2,14 @@ import { Upload, Layers, Download, Smartphone, School, Heart, Zap, Globe, Shield
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import frame1 from "@/assets/homepage-frame-1.png";
+import frame2 from "@/assets/homepage-frame-2.png";
+import frame3 from "@/assets/homepage-frame-3.png";
+import frame4 from "@/assets/homepage-frame-4.png";
+import frame5 from "@/assets/homepage-frame-5.png";
+import frame6 from "@/assets/homepage-frame-6.png";
+import frame7 from "@/assets/homepage-frame-7.png";
+import frame8 from "@/assets/homepage-frame-8.png";
 
 const EDITOR_LINKS = {
   vertical: "/editor?ratio=9:16&w=1080&h=1920",
@@ -21,6 +29,17 @@ const focusRing =
 const HomepageSEOSections = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const { t } = useTranslation();
+
+  const sampleFrames = [
+    { src: frame1, alt: "Elegant academic twibbon frame sample in teal and gold" },
+    { src: frame2, alt: "Premium graduation twibbon frame sample with books and gold details" },
+    { src: frame3, alt: "Formal education twibbon frame sample with navy and gold accents" },
+    { src: frame4, alt: "Celebratory graduation twibbon frame sample with illustrated students" },
+    { src: frame5, alt: "Colorful school twibbon frame sample for children and students" },
+    { src: frame6, alt: "Pastel spring twibbon frame sample with rainbow and bunny illustration" },
+    { src: frame7, alt: "Ocean themed twibbon frame sample with dolphin and turtle" },
+    { src: frame8, alt: "Blue underwater twibbon frame sample with dolphin and whale" },
+  ];
 
   const steps = [
     { icon: Upload, title: t("seoSections.step1Title"), desc: t("seoSections.step1Desc"), href: EDITOR_LINKS.square, cta: t("seoSections.step1Cta") },
@@ -76,6 +95,38 @@ const HomepageSEOSections = () => {
               </Link>
             </article>
           ))}
+        </div>
+
+        <div className="mt-12">
+          <div className="text-center mb-5">
+            <p className="text-sm font-mono uppercase tracking-widest text-muted-foreground">
+              Sample Twibbon Frames
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              A moving preview of frame styles users can customize inside TwibMotion.
+            </p>
+          </div>
+
+          <div className="relative overflow-hidden rounded-lg border border-border bg-card/60 py-4">
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-background to-transparent z-10" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-background to-transparent z-10" />
+
+            <div className="homepage-frame-marquee flex w-max gap-4 px-4">
+              {[...sampleFrames, ...sampleFrames].map((frame, index) => (
+                <figure
+                  key={`${frame.alt}-${index}`}
+                  className="w-[220px] sm:w-[260px] md:w-[300px] shrink-0 overflow-hidden rounded-md border border-border bg-background/80 shadow-sm"
+                >
+                  <img
+                    src={frame.src}
+                    alt={frame.alt}
+                    loading="lazy"
+                    className="aspect-square w-full object-cover"
+                  />
+                </figure>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
