@@ -101,4 +101,23 @@
     background-size: 20px 20px;
     background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
   }
+
+  .homepage-frame-marquee {
+    animation: homepage-frame-marquee 55s linear infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .homepage-frame-marquee {
+      animation: none;
+    }
+  }
+}
+
+@keyframes homepage-frame-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-50% - 0.5rem));
+  }
 }
