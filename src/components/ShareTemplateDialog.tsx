@@ -169,11 +169,6 @@ const ShareTemplateDialog = ({
               />
             </div>
 
-            {/* Lock settings */}
-            <div>
-              <label className="text-xs font-mono text-muted-foreground mb-2 block">{t("share.lockSettings")}</label>
-            </div>
-
             {/* Visibility */}
             <div>
               <label className="text-xs font-mono text-muted-foreground mb-2 block">Visibility</label>
