@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, Share2, Copy, Check, Loader2, Lock, Unlock } from "lucide-react";
+import { X, Share2, Copy, Check, Loader2, Lock, Unlock, Globe, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -37,6 +37,7 @@ const ShareTemplateDialog = ({
   const [saving, setSaving] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [isPublic, setIsPublic] = useState(false);
 
   if (!open) return null;
 
@@ -84,6 +85,8 @@ const ShareTemplateDialog = ({
           top_layer_config: {},
           lock_settings: locks as unknown as Record<string, unknown>,
           expires_at: expiresAt,
+          is_public: isPublic,
+          preview_url: urlData.publicUrl,
         } as any)
         .select("id")
         .single();
@@ -166,9 +169,41 @@ const ShareTemplateDialog = ({
               />
             </div>
 
-            {/* Lock settings */}
+            {/* Visibility */}
             <div>
-              <label className="text-xs font-mono text-muted-foreground mb-2 block">{t("share.lockSettings")}</label>
+              <label className="text-xs font-mono text-muted-foreground mb-2 block">Visibility</label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsPublic(false)}
+                  className={`flex items-center gap-2 p-3 rounded-lg border text-left transition-colors ${
+                    !isPublic ? "border-primary bg-primary/10" : "border-border bg-secondary hover:border-muted-foreground"
+                  }`}
+                >
+                  <EyeOff className="w-4 h-4 text-foreground shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Private</p>
+                    <p className="text-[10px] text-muted-foreground leading-tight">Only people with the link</p>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsPublic(true)}
+                  className={`flex items-center gap-2 p-3 rounded-lg border text-left transition-colors ${
+                    isPublic ? "border-primary bg-primary/10" : "border-border bg-secondary hover:border-muted-foreground"
+                  }`}
+                >
+                  <Globe className="w-4 h-4 text-primary shrink-0" />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Public</p>
+                    <p className="text-[10px] text-muted-foreground leading-tight">Show on homepage gallery</p>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs font-mono text-muted-foreground mb-2 block">Lock settings</label>
               <div className="space-y-2">
                 <LockToggle
                   label={t("share.lockPosition")}

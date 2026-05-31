@@ -171,9 +171,11 @@ export type Database = {
           expires_at: string | null
           format: string | null
           id: string
+          is_public: boolean
           language: string
           lock_settings: Json
           owner_id: string
+          preview_url: string | null
           slug: string | null
           tags: string[]
           template_type: string
@@ -192,9 +194,11 @@ export type Database = {
           expires_at?: string | null
           format?: string | null
           id?: string
+          is_public?: boolean
           language?: string
           lock_settings?: Json
           owner_id: string
+          preview_url?: string | null
           slug?: string | null
           tags?: string[]
           template_type?: string
@@ -213,9 +217,11 @@ export type Database = {
           expires_at?: string | null
           format?: string | null
           id?: string
+          is_public?: boolean
           language?: string
           lock_settings?: Json
           owner_id?: string
+          preview_url?: string | null
           slug?: string | null
           tags?: string[]
           template_type?: string
