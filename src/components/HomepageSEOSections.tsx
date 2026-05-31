@@ -162,6 +162,10 @@ const HomepageSEOSections = () => {
         <h2 className="text-2xl md:text-3xl font-mono font-bold text-foreground text-center mb-4">
           {t("seoSections.useCasesTitle")}
         </h2>
+      </section>
+      <PlaceholderUseCases />
+      {false && (
+      <section>
         <p className="text-muted-foreground text-center mb-10 max-w-2xl mx-auto">
           {t("seoSections.useCasesIntro")}
         </p>
