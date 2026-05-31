@@ -1,5 +1,5 @@
-import { Upload, Layers, Download, Smartphone, School, Heart, Zap, Globe, Shield, ArrowRight, Users, Sparkles } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Upload, Layers, Download, Smartphone, School, Heart, Zap, Globe, Shield, ArrowRight } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import frame1 from "@/assets/homepage-frame-1.webp";
@@ -10,7 +10,7 @@ import frame5 from "@/assets/homepage-frame-5.webp";
 import frame6 from "@/assets/homepage-frame-6.webp";
 import frame7 from "@/assets/homepage-frame-7.webp";
 import frame8 from "@/assets/homepage-frame-8.webp";
-import { supabase } from "@/integrations/supabase/client";
+import PublicGallery from "@/components/PublicGallery";
 
 const EDITOR_LINKS = {
   vertical: "/editor?ratio=9:16&w=1080&h=1920",
@@ -30,33 +30,6 @@ const focusRing =
 const HomepageSEOSections = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const { t } = useTranslation();
-
-  type PublicTwibbon = {
-    id: string;
-    title: string | null;
-    bottom_layer_url: string | null;
-    canvas_ratio: string | null;
-  };
-  const [publicTwibbons, setPublicTwibbons] = useState<PublicTwibbon[]>([]);
-  const [loadingPublic, setLoadingPublic] = useState(true);
-
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      const { data } = await supabase
-        .from("shared_templates")
-        .select("id, title, bottom_layer_url, canvas_ratio")
-        .eq("is_public", true)
-        .order("created_at", { ascending: false })
-        .limit(12);
-      if (!active) return;
-      setPublicTwibbons((data ?? []) as PublicTwibbon[]);
-      setLoadingPublic(false);
-    })();
-    return () => {
-      active = false;
-    };
-  }, []);
 
   const sampleFrames = [
     { src: frame1, alt: "Elegant academic twibbon frame sample in teal and gold" },
@@ -158,77 +131,7 @@ const HomepageSEOSections = () => {
         </div>
       </section>
 
-      <section className="w-full max-w-5xl mx-auto px-6 py-16 border-t border-border" aria-label="Public twibbons created by our users">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary text-xs font-mono uppercase tracking-widest mb-3">
-            <Users className="w-3.5 h-3.5" /> Live community
-          </div>
-          <h2 className="text-2xl md:text-3xl font-mono font-bold text-foreground mb-2">
-            Twibbons created by our users
-          </h2>
-          <p className="text-muted-foreground text-sm max-w-2xl mx-auto">
-            Real public twibbons made by people just like you on TwibMotion. Join thousands creating campaign frames, graduation overlays, and animated twibbons every day.
-          </p>
-        </div>
-
-        {loadingPublic ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="aspect-square rounded-lg bg-muted/40 animate-pulse" />
-            ))}
-          </div>
-        ) : publicTwibbons.length === 0 ? (
-          <div className="text-center py-10 border border-dashed border-border rounded-xl">
-            <Sparkles className="w-6 h-6 text-primary mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground mb-4">
-              Be the first to share a public twibbon — your creation could appear here.
-            </p>
-            <Link
-              to={EDITOR_LINKS.square}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-mono text-sm hover:opacity-90 ${focusRing}`}
-            >
-              Create your twibbon <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-              {publicTwibbons.map((tw) => (
-                <Link
-                  key={tw.id}
-                  to={`/use-template/${tw.id}`}
-                  aria-label={`Use public twibbon: ${tw.title ?? "Untitled"}`}
-                  className={`group block aspect-square overflow-hidden rounded-lg border border-border bg-card relative ${focusRing}`}
-                >
-                  {tw.bottom_layer_url ? (
-                    <img
-                      src={tw.bottom_layer_url}
-                      alt={tw.title ?? "Public twibbon frame by a TwibMotion user"}
-                      loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
-                      No preview
-                    </div>
-                  )}
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-background/90 to-transparent p-2">
-                    <p className="text-xs font-mono text-foreground truncate">{tw.title ?? "Untitled twibbon"}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-            <div className="text-center mt-8">
-              <Link
-                to={EDITOR_LINKS.square}
-                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/40 text-primary font-mono text-sm hover:bg-primary/10 ${focusRing}`}
-              >
-                Make yours and join the gallery <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-          </>
-        )}
-      </section>
+      <PublicGallery createUrl={EDITOR_LINKS.square} />
 
       <section className="w-full max-w-4xl mx-auto px-6 py-16 border-t border-border" aria-label={t("seoSections.useCasesTitle")}>
         <h2 className="text-2xl md:text-3xl font-mono font-bold text-foreground text-center mb-4">
