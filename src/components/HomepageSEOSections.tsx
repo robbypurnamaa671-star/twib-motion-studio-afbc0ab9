@@ -1,5 +1,5 @@
-import { Upload, Layers, Download, Smartphone, School, Heart, Zap, Globe, Shield, ArrowRight, Users, Sparkles } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Upload, Layers, Download, Smartphone, School, Heart, Zap, Globe, Shield, ArrowRight } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import frame1 from "@/assets/homepage-frame-1.webp";
@@ -10,7 +10,7 @@ import frame5 from "@/assets/homepage-frame-5.webp";
 import frame6 from "@/assets/homepage-frame-6.webp";
 import frame7 from "@/assets/homepage-frame-7.webp";
 import frame8 from "@/assets/homepage-frame-8.webp";
-import { supabase } from "@/integrations/supabase/client";
+import PublicGallery from "@/components/PublicGallery";
 
 const EDITOR_LINKS = {
   vertical: "/editor?ratio=9:16&w=1080&h=1920",
@@ -30,33 +30,6 @@ const focusRing =
 const HomepageSEOSections = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const { t } = useTranslation();
-
-  type PublicTwibbon = {
-    id: string;
-    title: string | null;
-    bottom_layer_url: string | null;
-    canvas_ratio: string | null;
-  };
-  const [publicTwibbons, setPublicTwibbons] = useState<PublicTwibbon[]>([]);
-  const [loadingPublic, setLoadingPublic] = useState(true);
-
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      const { data } = await supabase
-        .from("shared_templates")
-        .select("id, title, bottom_layer_url, canvas_ratio")
-        .eq("is_public", true)
-        .order("created_at", { ascending: false })
-        .limit(12);
-      if (!active) return;
-      setPublicTwibbons((data ?? []) as PublicTwibbon[]);
-      setLoadingPublic(false);
-    })();
-    return () => {
-      active = false;
-    };
-  }, []);
 
   const sampleFrames = [
     { src: frame1, alt: "Elegant academic twibbon frame sample in teal and gold" },
