@@ -4,6 +4,7 @@ import { ArrowLeft, Layers, Download, Share2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import SEOHead from "@/components/SEOHead";
 import UploadBox from "@/components/UploadBox";
+import BackgroundRemoverButton from "@/components/BackgroundRemoverButton";
 import CanvasPreview from "@/components/CanvasPreview";
 import LayerControls from "@/components/LayerControls";
 import ExportDialog from "@/components/ExportDialog";
@@ -101,6 +102,9 @@ const Editor = () => {
               <span className="text-xs text-muted-foreground ml-auto">{t("editor.yourPhoto")}</span>
             </div>
             <UploadBox label={t("editor.yourPhoto")} sublabel={t("editor.yourPhotoSub")} media={bottomLayer} onMediaChange={setBottomLayer} icon="bottom" />
+            <div className="mt-2">
+              <BackgroundRemoverButton media={bottomLayer} onMediaChange={setBottomLayer} />
+            </div>
           </div>
 
           <div>
