@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { LayerMedia, TopLayerTransform } from "@/lib/media";
 import { DEFAULT_LOCK_SETTINGS, LockSettings } from "@/lib/templates";
+import { exportStatic } from "@/lib/export";
 
 interface ShareTemplateDialogProps {
   open: boolean;
@@ -68,6 +69,38 @@ const ShareTemplateDialog = ({
         .from("template-assets")
         .getPublicUrl(path);
 
+      // If sharing publicly, render a composite preview (user photo + frame)
+      // so the gallery shows the finished twibbon, not just the frame.
+      let previewPublicUrl: string | null = urlData.publicUrl;
+      if (isPublic && bottomLayer) {
+        try {
+          const compositeBlob = await exportStatic({
+            canvasW,
+            canvasH,
+            bottomLayer,
+            topLayer,
+            transform,
+            quality: "720p",
+            format: "jpg",
+          });
+          const previewPath = `${user.id}/preview-${crypto.randomUUID()}.jpg`;
+          const { error: previewErr } = await supabase.storage
+            .from("template-assets")
+            .upload(previewPath, compositeBlob, {
+              upsert: false,
+              contentType: "image/jpeg",
+            });
+          if (!previewErr) {
+            const { data: previewUrlData } = supabase.storage
+              .from("template-assets")
+              .getPublicUrl(previewPath);
+            previewPublicUrl = previewUrlData.publicUrl;
+          }
+        } catch (e) {
+          console.error("Composite preview failed:", e);
+        }
+      }
+
       const expiresAt = expireHours
         ? new Date(Date.now() + expireHours * 3600000).toISOString()
         : null;
@@ -86,7 +119,7 @@ const ShareTemplateDialog = ({
           lock_settings: locks as unknown as Record<string, unknown>,
           expires_at: expiresAt,
           is_public: isPublic,
-          preview_url: urlData.publicUrl,
+          preview_url: previewPublicUrl,
         } as any)
         .select("id")
         .single();

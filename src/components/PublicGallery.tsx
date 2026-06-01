@@ -8,6 +8,7 @@ type PublicTwibbon = {
   id: string;
   title: string | null;
   bottom_layer_url: string | null;
+  preview_url: string | null;
   canvas_ratio: string | null;
   category: string | null;
 };
@@ -65,7 +66,7 @@ const PublicGallery = ({ createUrl }: { createUrl: string }) => {
     (async () => {
       let query = supabase
         .from("shared_templates")
-        .select("id, title, bottom_layer_url, canvas_ratio, category", { count: "exact" })
+        .select("id, title, bottom_layer_url, preview_url, canvas_ratio, category", { count: "exact" })
         .eq("is_public", true)
         .order("created_at", { ascending: false })
         .range(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE - 1);
@@ -160,9 +161,9 @@ const PublicGallery = ({ createUrl }: { createUrl: string }) => {
                 aria-label={`Use public twibbon: ${tw.title ?? "Untitled"}`}
                 className={`group block aspect-square overflow-hidden rounded-lg border border-border bg-card relative ${focusRing}`}
               >
-                {tw.bottom_layer_url ? (
+                {(tw.preview_url || tw.bottom_layer_url) ? (
                   <ProgressiveImage
-                    src={tw.bottom_layer_url}
+                    src={(tw.preview_url || tw.bottom_layer_url) as string}
                     alt={tw.title ?? "Public twibbon frame by a TwibMotion user"}
                     className="transition-transform duration-500 group-hover:scale-105"
                   />
