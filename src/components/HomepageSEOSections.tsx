@@ -11,6 +11,7 @@ import frame6 from "@/assets/homepage-frame-6.webp";
 import frame7 from "@/assets/homepage-frame-7.webp";
 import frame8 from "@/assets/homepage-frame-8.webp";
 import PublicGallery from "@/components/PublicGallery";
+import movingTwibbonSample from "@/assets/moving-twibbon-sample.gif.asset.json";
 
 const EDITOR_LINKS = {
   vertical: "/editor?ratio=9:16&w=1080&h=1920",
@@ -128,6 +129,44 @@ const HomepageSEOSections = () => {
               ))}
             </div>
           </div>
+        </div>
+
+        <div className="mt-12">
+          <div className="text-center mb-5">
+            <p className="text-sm font-mono uppercase tracking-widest text-primary">
+              Moving Twibbon Frames
+            </p>
+            <p className="text-sm text-muted-foreground mt-2 max-w-xl mx-auto">
+              Only on TwibMotion — create <strong className="text-foreground">animated twibbons</strong> that actually move.
+              Support for <strong className="text-foreground">GIF</strong> and <strong className="text-foreground">MP4 video</strong> frames,
+              so your campaign stands out in every feed.
+            </p>
+          </div>
+
+          <div className="relative overflow-hidden rounded-lg border border-border bg-card/60 py-4">
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-background to-transparent z-10" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-background to-transparent z-10" />
+
+            <div className="homepage-frame-marquee flex w-max gap-4 px-4">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <figure
+                  key={`moving-${index}`}
+                  className="w-[200px] sm:w-[240px] md:w-[280px] shrink-0 overflow-hidden rounded-md border border-primary/30 bg-background/80 shadow-sm"
+                >
+                  <img
+                    src={movingTwibbonSample.url}
+                    alt="Animated moving twibbon frame sample — GIF/MP4 supported"
+                    loading="lazy"
+                    className="aspect-square w-full object-cover"
+                  />
+                </figure>
+              ))}
+            </div>
+          </div>
+
+          <p className="text-center text-xs text-muted-foreground mt-4 font-mono">
+            Upload your photo, drop an animated frame, export as MP4 or GIF.
+          </p>
         </div>
       </section>
 
