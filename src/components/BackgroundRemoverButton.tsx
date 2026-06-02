@@ -1,9 +1,7 @@
 import { useRef, useState } from "react";
-import { Scissors, Loader2, Undo2, Crown } from "lucide-react";
+import { Scissors, Loader2, Undo2 } from "lucide-react";
 import { LayerMedia } from "@/lib/media";
 import { removeBackgroundFromFile } from "@/lib/background-removal";
-import { useSubscription } from "@/contexts/SubscriptionContext";
-import { UpgradeModal } from "@/components/UpgradeModal";
 import { useToast } from "@/hooks/use-toast";
 
 interface Props {
@@ -12,23 +10,16 @@ interface Props {
 }
 
 const BackgroundRemoverButton = ({ media, onMediaChange }: Props) => {
-  const { status } = useSubscription();
   const { toast } = useToast();
   const [processing, setProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [upgradeOpen, setUpgradeOpen] = useState(false);
   const previousRef = useRef<LayerMedia | null>(null);
 
-  const isPremium = status === "premium";
   // Only image (jpg/png) layers are supported — not GIFs or videos.
   const supported = media?.type === "image";
 
   const handleClick = async () => {
     if (!media || !supported || processing) return;
-    if (!isPremium) {
-      setUpgradeOpen(true);
-      return;
-    }
 
     setProcessing(true);
     setProgress(0);
@@ -65,8 +56,7 @@ const BackgroundRemoverButton = ({ media, onMediaChange }: Props) => {
   if (!media) return null;
 
   return (
-    <>
-      <div className="space-y-2">
+    <div className="space-y-2">
         <button
           type="button"
           onClick={handleClick}
@@ -81,9 +71,8 @@ const BackgroundRemoverButton = ({ media, onMediaChange }: Props) => {
             </>
           ) : (
             <>
-              {!isPremium ? <Crown className="w-3.5 h-3.5" /> : <Scissors className="w-3.5 h-3.5" />}
+              <Scissors className="w-3.5 h-3.5" />
               Remove background
-              {!isPremium && <span className="ml-1 opacity-70">(Premium)</span>}
             </>
           )}
         </button>
@@ -112,10 +101,7 @@ const BackgroundRemoverButton = ({ media, onMediaChange }: Props) => {
             <Undo2 className="w-3 h-3" /> Restore original
           </button>
         )}
-      </div>
-
-      <UpgradeModal open={upgradeOpen} onClose={() => setUpgradeOpen(false)} />
-    </>
+    </div>
   );
 };
 

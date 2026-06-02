@@ -114,6 +114,9 @@ const Editor = () => {
               <span className="text-xs text-muted-foreground ml-auto">{t("editor.twibbon")}</span>
             </div>
             <UploadBox label={t("editor.twibbonFrame")} sublabel={t("editor.twibbonFrameSub")} media={topLayer} onMediaChange={setTopLayer} icon="top" />
+            <div className="mt-2">
+              <BackgroundRemoverButton media={topLayer} onMediaChange={setTopLayer} />
+            </div>
           </div>
 
           <div className="mt-auto pt-4 border-t border-border space-y-2 text-xs text-muted-foreground">
