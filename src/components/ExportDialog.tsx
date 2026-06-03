@@ -17,6 +17,13 @@ interface ExportDialogProps {
   bottomLayer: LayerMedia | null;
   topLayer: LayerMedia | null;
   transform: TopLayerTransform;
+  /**
+   * When true, free users always get a watermark on the export regardless of
+   * format or remaining credits. Premium users are unaffected. Used for
+   * community-shared templates so free users cannot bypass watermarks by
+   * exporting through the public gallery.
+   */
+  forceWatermark?: boolean;
 }
 
 type StaticFormat = "png" | "jpg";
@@ -49,6 +56,7 @@ const ExportDialog = ({
   bottomLayer,
   topLayer,
   transform,
+  forceWatermark = false,
 }: ExportDialogProps) => {
   const [quality, setQuality] = useState<"720p" | "1080p">("1080p");
   const [format, setFormat] = useState<ExportFormat>("png");
@@ -68,7 +76,10 @@ const ExportDialog = ({
   const animatedFormats: AnimatedFormat[] = ["mp4", "gif"];
   const availableFormats: ExportFormat[] = animated ? animatedFormats : staticFormats;
 
-  const exportCheck = canExport(effectiveFormat as any);
+  const baseCheck = canExport(effectiveFormat as any);
+  const exportCheck = forceWatermark && status !== "premium"
+    ? { ...baseCheck, watermark: true }
+    : baseCheck;
 
   const handleExport = async () => {
     if (!user) {

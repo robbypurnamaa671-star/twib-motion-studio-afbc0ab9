@@ -387,6 +387,7 @@ const UseTemplate = () => {
         bottomLayer={userPhoto}
         topLayer={twibbonMedia}
         transform={transform}
+        forceWatermark
       />
     </div>
   );
