@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Layers, Download, Share2 } from "lucide-react";
+import { ArrowLeft, Download, Share2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import SEOHead from "@/components/SEOHead";
 import UploadBox from "@/components/UploadBox";
@@ -48,9 +48,7 @@ const Editor = () => {
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-primary flex items-center justify-center">
-              <Layers className="w-3 h-3 text-primary-foreground" />
-            </div>
+            <img src="/logo.png" alt="TwibMotion logo" width={24} height={24} className="w-6 h-6 rounded" />
             <span className="font-mono font-bold text-sm text-foreground">TwibMotion</span>
           </div>
           <div className="hidden sm:flex items-center gap-2 ml-4">
