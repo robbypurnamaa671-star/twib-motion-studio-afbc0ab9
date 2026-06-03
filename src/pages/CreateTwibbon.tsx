@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Link, useParams, Navigate } from "react-router-dom";
-import { Layers, ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import SEOHead from "@/components/SEOHead";
 import UserMenu from "@/components/UserMenu";

@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { Layers } from "lucide-react";
 import UserMenu from "@/components/UserMenu";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 

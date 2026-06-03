@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Layers, Download, Loader2, Upload, Image, Film, X, ZoomIn, ZoomOut, RotateCw, RotateCcw, LogIn } from "lucide-react";
+import { Download, Loader2, Upload, Image, Film, X, ZoomIn, ZoomOut, RotateCw, RotateCcw, LogIn } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
