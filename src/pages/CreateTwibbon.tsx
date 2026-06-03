@@ -55,9 +55,7 @@ const CreateTwibbon = () => {
       <header>
         <nav className="border-b border-border px-6 py-4 flex items-center justify-between" aria-label={t("nav.main")}>
           <Link to="/" className="flex items-center gap-2" aria-label={t("nav.twibmotionHome")}>
-            <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center">
-              <Layers className="w-4 h-4 text-primary-foreground" />
-            </div>
+            <img src="/logo.png" alt="TwibMotion logo" width={32} height={32} className="w-8 h-8 rounded-md" />
             <span className="font-mono font-bold text-lg text-foreground tracking-tight">TwibMotion</span>
           </Link>
           <UserMenu />
