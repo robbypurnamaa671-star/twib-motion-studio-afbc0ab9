@@ -11,7 +11,8 @@ import frame6 from "@/assets/homepage-frame-6.webp";
 import frame7 from "@/assets/homepage-frame-7.webp";
 import frame8 from "@/assets/homepage-frame-8.webp";
 import PublicGallery from "@/components/PublicGallery";
-import movingTwibbonSample from "@/assets/moving-twibbon-sample.gif.asset.json";
+
+const movingTwibbonSampleUrl = "/moving-twibbon-sample.gif";
 
 const EDITOR_LINKS = {
   vertical: "/editor?ratio=9:16&w=1080&h=1920",
@@ -154,7 +155,7 @@ const HomepageSEOSections = () => {
                   className="w-[200px] sm:w-[240px] md:w-[280px] shrink-0 overflow-hidden rounded-md border border-primary/30 bg-background/80 shadow-sm"
                 >
                   <img
-                    src={movingTwibbonSample.url}
+                    src={movingTwibbonSampleUrl}
                     alt="Animated moving twibbon frame sample — GIF/MP4 supported"
                     loading="lazy"
                     className="aspect-square w-full object-cover"
