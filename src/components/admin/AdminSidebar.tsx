@@ -37,9 +37,7 @@ export function AdminSidebar() {
       <SidebarContent>
         {/* Logo */}
         <div className="p-4 flex items-center gap-2 border-b border-border">
-          <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center shrink-0">
-            <Layers className="w-4 h-4 text-primary-foreground" />
-          </div>
+          <img src="/logo.png" alt="TwibMotion logo" width={32} height={32} className="w-8 h-8 rounded-md shrink-0" />
           {!collapsed && (
             <span className="font-mono font-bold text-sm text-foreground tracking-tight">
               Admin Panel
