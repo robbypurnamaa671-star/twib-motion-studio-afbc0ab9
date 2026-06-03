@@ -185,9 +185,7 @@ const UseTemplate = () => {
       {/* Header */}
       <header className="border-b border-border px-4 py-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-6 h-6 rounded bg-primary flex items-center justify-center">
-            <Layers className="w-3 h-3 text-primary-foreground" />
-          </div>
+          <img src="/logo.png" alt="TwibMotion logo" width={24} height={24} className="w-6 h-6 rounded" />
           <span className="font-mono font-bold text-sm text-foreground">TwibMotion</span>
           <span className="text-xs font-mono px-2 py-1 rounded bg-secondary text-secondary-foreground ml-2">
             {template.canvas_ratio}
