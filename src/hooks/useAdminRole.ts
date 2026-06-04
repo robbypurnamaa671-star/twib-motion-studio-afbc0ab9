@@ -4,13 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 
 export function useAdminRole() {
   const { user, loading: authLoading } = useAuth();
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [role, setRole] = useState<"super_admin" | "admin" | "user" | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
-      setIsAdmin(false);
+      setRole(null);
       setLoading(false);
       return;
     }
@@ -25,9 +25,9 @@ export function useAdminRole() {
           { headers: { Authorization: `Bearer ${token}` } }
         );
         const json = await res.json();
-        setIsAdmin(json.role === "admin");
+        setRole(json.role ?? "user");
       } catch {
-        setIsAdmin(false);
+        setRole(null);
       } finally {
         setLoading(false);
       }
@@ -35,5 +35,10 @@ export function useAdminRole() {
     check();
   }, [user, authLoading]);
 
-  return { isAdmin, loading: loading || authLoading };
+  return {
+    role,
+    isAdmin: role === "admin" || role === "super_admin",
+    isSuperAdmin: role === "super_admin",
+    loading: loading || authLoading,
+  };
 }
