@@ -16,6 +16,11 @@ import UsersPage from "./pages/admin/UsersPage";
 import TemplatesPage from "./pages/admin/TemplatesPage";
 import AdminSubscriptions from "./pages/admin/SubscriptionsPage";
 import SeoPagesPage from "./pages/admin/SeoPagesPage";
+import CreditsPage from "./pages/admin/CreditsPage";
+import ReportsPage from "./pages/admin/ReportsPage";
+import AnalyticsPage from "./pages/admin/AnalyticsPage";
+import AuditLogsPage from "./pages/admin/AuditLogsPage";
+import SettingsPage from "./pages/admin/SettingsPage";
 import TwibbonSEO from "./pages/TwibbonSEO";
 import GlobalSEO from "./pages/GlobalSEO";
 import BlogIndex from "./pages/BlogIndex";
@@ -58,6 +63,11 @@ const App = () => (
               <Route path="/admin/users" element={<AdminGuard><UsersPage /></AdminGuard>} />
               <Route path="/admin/templates" element={<AdminGuard><TemplatesPage /></AdminGuard>} />
               <Route path="/admin/subscriptions" element={<AdminGuard><AdminSubscriptions /></AdminGuard>} />
+              <Route path="/admin/credits" element={<AdminGuard><CreditsPage /></AdminGuard>} />
+              <Route path="/admin/reports" element={<AdminGuard><ReportsPage /></AdminGuard>} />
+              <Route path="/admin/analytics" element={<AdminGuard><AnalyticsPage /></AdminGuard>} />
+              <Route path="/admin/audit" element={<AdminGuard><AuditLogsPage /></AdminGuard>} />
+              <Route path="/admin/settings" element={<AdminGuard><SettingsPage /></AdminGuard>} />
               <Route path="/admin/seo-pages" element={<AdminGuard><SeoPagesPage /></AdminGuard>} />
               <Route path="/admin/blog" element={<AdminGuard><BlogPostsPage /></AdminGuard>} />
               <Route path="*" element={<NotFound />} />
