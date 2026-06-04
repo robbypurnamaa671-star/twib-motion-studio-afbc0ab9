@@ -8,6 +8,7 @@ import { LayerMedia, TopLayerTransform, getMediaType, validateFile } from "@/lib
 import { SharedTemplate, LockSettings } from "@/lib/templates";
 import { exportStatic, downloadBlob } from "@/lib/export";
 import ExportDialog from "@/components/ExportDialog";
+import { ReportTemplateDialog } from "@/components/ReportTemplateDialog";
 import { lovable } from "@/integrations/lovable";
 
 const UseTemplate = () => {
@@ -226,7 +227,10 @@ const UseTemplate = () => {
         <aside className="lg:w-80 border-b lg:border-b-0 lg:border-r border-border p-4 flex flex-col gap-4 overflow-y-auto shrink-0">
           <div>
             <h2 className="font-mono font-bold text-lg text-foreground mb-1">{template.title}</h2>
-            <p className="text-xs text-muted-foreground">Upload your photo below to create your twibbon</p>
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">Upload your photo below to create your twibbon</p>
+              {templateId && <ReportTemplateDialog templateId={templateId} />}
+            </div>
           </div>
 
           {/* Login prompt for unauthenticated users */}
