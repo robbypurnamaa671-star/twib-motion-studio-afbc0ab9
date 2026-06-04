@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_roles: {
+        Row: {
+          created_at: string
+          granted_by: string | null
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          admin_email: string | null
+          admin_id: string
+          created_at: string
+          details: Json
+          id: string
+          target_id: string | null
+          target_type: string | null
+        }
+        Insert: {
+          action: string
+          admin_email?: string | null
+          admin_id: string
+          created_at?: string
+          details?: Json
+          id?: string
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Update: {
+          action?: string
+          admin_email?: string | null
+          admin_id?: string
+          created_at?: string
+          details?: Json
+          id?: string
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           category: string | null
@@ -68,8 +125,63 @@ export type Database = {
         }
         Relationships: []
       }
+      credit_history: {
+        Row: {
+          admin_id: string | null
+          balance_after: number
+          created_at: string
+          delta: number
+          id: string
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          admin_id?: string | null
+          balance_after: number
+          created_at?: string
+          delta: number
+          id?: string
+          reason: string
+          user_id: string
+        }
+        Update: {
+          admin_id?: string | null
+          balance_after?: number
+          created_at?: string
+          delta?: number
+          id?: string
+          reason?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      export_logs: {
+        Row: {
+          created_at: string
+          format: string
+          id: string
+          template_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          format: string
+          id?: string
+          template_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          format?: string
+          id?: string
+          template_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
+          account_status: string
           avatar_url: string | null
           created_at: string
           display_name: string | null
@@ -78,6 +190,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          account_status?: string
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
@@ -86,6 +199,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          account_status?: string
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
@@ -167,20 +281,26 @@ export type Database = {
           canvas_w: number
           category: string | null
           created_at: string
+          description: string | null
           event_type: string | null
           expires_at: string | null
           format: string | null
           id: string
+          is_featured: boolean
           is_public: boolean
+          is_staff_pick: boolean
+          is_trending: boolean
           language: string
           lock_settings: Json
           owner_id: string
           preview_url: string | null
           slug: string | null
+          status: string
           tags: string[]
           template_type: string
           title: string
           top_layer_config: Json
+          usage_count: number
         }
         Insert: {
           bottom_layer_config?: Json
@@ -190,20 +310,26 @@ export type Database = {
           canvas_w: number
           category?: string | null
           created_at?: string
+          description?: string | null
           event_type?: string | null
           expires_at?: string | null
           format?: string | null
           id?: string
+          is_featured?: boolean
           is_public?: boolean
+          is_staff_pick?: boolean
+          is_trending?: boolean
           language?: string
           lock_settings?: Json
           owner_id: string
           preview_url?: string | null
           slug?: string | null
+          status?: string
           tags?: string[]
           template_type?: string
           title?: string
           top_layer_config?: Json
+          usage_count?: number
         }
         Update: {
           bottom_layer_config?: Json
@@ -213,22 +339,93 @@ export type Database = {
           canvas_w?: number
           category?: string | null
           created_at?: string
+          description?: string | null
           event_type?: string | null
           expires_at?: string | null
           format?: string | null
           id?: string
+          is_featured?: boolean
           is_public?: boolean
+          is_staff_pick?: boolean
+          is_trending?: boolean
           language?: string
           lock_settings?: Json
           owner_id?: string
           preview_url?: string | null
           slug?: string | null
+          status?: string
           tags?: string[]
           template_type?: string
           title?: string
           top_layer_config?: Json
+          usage_count?: number
         }
         Relationships: []
+      }
+      site_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
+      template_reports: {
+        Row: {
+          created_at: string
+          details: string | null
+          id: string
+          reason: string
+          reporter_id: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          template_id: string
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason: string
+          reporter_id: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          template_id: string
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason?: string
+          reporter_id?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_reports_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "shared_templates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       template_seo: {
         Row: {
@@ -296,6 +493,8 @@ export type Database = {
           credit_points: number
           id: string
           last_credit_reset: string
+          premium_expires_at: string | null
+          premium_started_at: string | null
           subscription_status: string
           updated_at: string
           user_id: string
@@ -305,6 +504,8 @@ export type Database = {
           credit_points?: number
           id?: string
           last_credit_reset?: string
+          premium_expires_at?: string | null
+          premium_started_at?: string | null
           subscription_status?: string
           updated_at?: string
           user_id: string
@@ -314,6 +515,8 @@ export type Database = {
           credit_points?: number
           id?: string
           last_credit_reset?: string
+          premium_expires_at?: string | null
+          premium_started_at?: string | null
           subscription_status?: string
           updated_at?: string
           user_id?: string
@@ -332,6 +535,8 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_admin_or_super: { Args: { _user_id: string }; Returns: boolean }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"
