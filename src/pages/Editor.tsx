@@ -11,6 +11,7 @@ import ExportDialog from "@/components/ExportDialog";
 import ShareTemplateDialog from "@/components/ShareTemplateDialog";
 import UserMenu from "@/components/UserMenu";
 import { CreditsBadge } from "@/components/CreditsBadge";
+import { StickyHeader } from "@/components/StickyHeader";
 import { LayerMedia, TopLayerTransform } from "@/lib/media";
 import { hasAnimation } from "@/lib/export";
 
@@ -38,7 +39,7 @@ const Editor = () => {
     <div className="min-h-screen bg-background flex flex-col lg:h-screen lg:overflow-hidden">
       <SEOHead title={t("editor.metaTitle")} noindex />
       {/* Top bar */}
-      <header className="border-b border-border px-4 py-3 flex items-center justify-between shrink-0">
+      <StickyHeader className="px-4 py-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate("/")}
@@ -87,7 +88,7 @@ const Editor = () => {
             <span className="hidden sm:inline">{t("editor.export")}</span>
           </button>
         </div>
-      </header>
+      </StickyHeader>
 
       {/* Main area */}
       <div className="flex-1 flex flex-col lg:flex-row min-h-0">
