@@ -9,6 +9,7 @@ import { SharedTemplate, LockSettings } from "@/lib/templates";
 import { exportStatic, downloadBlob } from "@/lib/export";
 import ExportDialog from "@/components/ExportDialog";
 import { ReportTemplateDialog } from "@/components/ReportTemplateDialog";
+import { StickyHeader } from "@/components/StickyHeader";
 import { lovable } from "@/integrations/lovable";
 
 const UseTemplate = () => {
@@ -184,7 +185,7 @@ const UseTemplate = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col lg:h-screen lg:overflow-hidden">
       {/* Header */}
-      <header className="border-b border-border px-4 py-3 flex items-center justify-between shrink-0">
+      <StickyHeader className="px-4 py-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <img src="/logo.png" alt="TwibMotion logo" width={24} height={24} className="w-6 h-6 rounded" />
           <span className="font-mono font-bold text-sm text-foreground">TwibMotion</span>
@@ -219,7 +220,7 @@ const UseTemplate = () => {
             <span className="hidden sm:inline">Export</span>
           </button>
         </div>
-      </header>
+      </StickyHeader>
 
       {/* Main */}
       <div className="flex-1 flex flex-col lg:flex-row min-h-0">

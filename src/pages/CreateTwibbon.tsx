@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import SEOHead from "@/components/SEOHead";
 import UserMenu from "@/components/UserMenu";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { StickyHeader } from "@/components/StickyHeader";
 
 type RatioKey = "vertical" | "square" | "landscape";
 
@@ -52,15 +53,15 @@ const CreateTwibbon = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead title={title} description={description} canonical={canonical} />
 
-      <header>
-        <nav className="border-b border-border px-6 py-4 flex items-center justify-between" aria-label={t("nav.main")}>
+      <StickyHeader>
+        <nav className="px-6 py-4 flex items-center justify-between" aria-label={t("nav.main")}>
           <Link to="/" className="flex items-center gap-2" aria-label={t("nav.twibmotionHome")}>
             <img src="/logo.png" alt="TwibMotion logo" width={32} height={32} className="w-8 h-8 rounded-md" />
             <span className="font-mono font-bold text-lg text-foreground tracking-tight">TwibMotion</span>
           </Link>
           <UserMenu />
         </nav>
-      </header>
+      </StickyHeader>
 
       <main className="flex-1 w-full max-w-4xl mx-auto px-6 py-12">
         <nav className="text-xs font-mono text-muted-foreground mb-6" aria-label={t("nav.breadcrumb")}>

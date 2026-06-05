@@ -6,6 +6,7 @@ import UserMenu from "@/components/UserMenu";
 import SEOHead from "@/components/SEOHead";
 import HomepageSEOSections from "@/components/HomepageSEOSections";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { StickyHeader } from "@/components/StickyHeader";
 
 const Index = () => {
   const [selected, setSelected] = useState(1);
@@ -27,8 +28,8 @@ const Index = () => {
       />
 
       {/* Nav */}
-      <header>
-        <nav className="border-b border-border px-6 py-4 flex items-center justify-between" aria-label={t("nav.main")}>
+      <StickyHeader>
+        <nav className="px-6 py-4 flex items-center justify-between" aria-label={t("nav.main")}>
           <a href="/" className="flex items-center gap-2" aria-label={t("nav.twibmotionHome")}>
             <img src="/logo.png" alt="TwibMotion logo" width={32} height={32} className="w-8 h-8 rounded-md" />
             <span className="font-mono font-bold text-lg text-foreground tracking-tight">
@@ -37,7 +38,7 @@ const Index = () => {
           </a>
           <UserMenu />
         </nav>
-      </header>
+      </StickyHeader>
 
       {/* Hero */}
       <main className="flex-1 flex flex-col items-center">
