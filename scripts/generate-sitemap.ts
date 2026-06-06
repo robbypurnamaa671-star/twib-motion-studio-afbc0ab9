@@ -5,11 +5,20 @@ import { writeFileSync } from "fs";
 import { resolve } from "path";
 
 const BASE_URL = "https://twibmotion.com";
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || "https://xfybnitxislnuetlltaz.supabase.co";
-const SUPABASE_KEY =
-  process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-  process.env.VITE_SUPABASE_ANON_KEY ||
+// Pinned to the live Lovable Cloud project. Anon key is public/safe to commit.
+// We intentionally do NOT read VITE_SUPABASE_URL from env unless it matches this project ref,
+// because Vercel may have stale env vars pointing at an old project (causes 404 on seo_pages).
+const PROJECT_REF = "xfybnitxislnuetlltaz";
+const DEFAULT_URL = `https://${PROJECT_REF}.supabase.co`;
+const DEFAULT_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmeWJuaXR4aXNsbnVldGxsdGF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzNDk4ODAsImV4cCI6MjA4NzkyNTg4MH0.jU-68dDvy4jWHsWq3HES9idazywVcs-b6TyFc-cL9mw";
+const envUrl = process.env.VITE_SUPABASE_URL || "";
+const SUPABASE_URL = envUrl.includes(PROJECT_REF) ? envUrl : DEFAULT_URL;
+const SUPABASE_KEY =
+  SUPABASE_URL === DEFAULT_URL
+    ? DEFAULT_KEY
+    : process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || DEFAULT_KEY;
+console.log(`sitemap: using Supabase ${SUPABASE_URL}`);
 
 interface SitemapEntry {
   path: string;
