@@ -5,11 +5,20 @@ import { writeFileSync } from "fs";
 import { resolve } from "path";
 
 const BASE_URL = "https://twibmotion.com";
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || "https://xfybnitxislnuetlltaz.supabase.co";
-const SUPABASE_KEY =
-  process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
-  process.env.VITE_SUPABASE_ANON_KEY ||
+// Pinned to the live Lovable Cloud project. Anon key is public/safe to commit.
+// We intentionally do NOT read VITE_SUPABASE_URL from env unless it matches this project ref,
+// because Vercel may have stale env vars pointing at an old project (causes 404 on seo_pages).
+const PROJECT_REF = "xfybnitxislnuetlltaz";
+const DEFAULT_URL = `https://${PROJECT_REF}.supabase.co`;
+const DEFAULT_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmeWJuaXR4aXNsbnVldGxsdGF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzNDk4ODAsImV4cCI6MjA4NzkyNTg4MH0.jU-68dDvy4jWHsWq3HES9idazywVcs-b6TyFc-cL9mw";
+const envUrl = process.env.VITE_SUPABASE_URL || "";
+const SUPABASE_URL = envUrl.includes(PROJECT_REF) ? envUrl : DEFAULT_URL;
+const SUPABASE_KEY =
+  SUPABASE_URL === DEFAULT_URL
+    ? DEFAULT_KEY
+    : process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_ANON_KEY || DEFAULT_KEY;
+console.log(`sitemap: using Supabase ${SUPABASE_URL}`);
 
 interface SitemapEntry {
   path: string;
@@ -27,47 +36,61 @@ const staticEntries: SitemapEntry[] = [
   { path: "/create/landscape-16-9", changefreq: "weekly", priority: "0.9" },
 ];
 
-async function fetchSeoPages(): Promise<SitemapEntry[]> {
+async function fetchJson(url: string, label: string): Promise<any[] | null> {
   try {
-    const url = `${SUPABASE_URL}/rest/v1/seo_pages?select=slug,updated_at,page_type,route_path&is_indexable=eq.true`;
-    const res = await fetch(url, {
-      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
-    });
+    const res = await fetch(url, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } });
     if (!res.ok) {
-      console.warn(`sitemap: seo_pages fetch failed (${res.status}), skipping dynamic entries`);
-      return [];
+      const body = await res.text().catch(() => "");
+      console.warn(`sitemap: ${label} fetch failed (${res.status}) at ${url} :: ${body.slice(0, 200)}`);
+      return null;
     }
-    const rows = (await res.json()) as { slug: string; updated_at: string; page_type?: string; route_path?: string }[];
-    return rows.map((r) => ({
-      path: r.page_type === "global" && r.route_path ? r.route_path : `/twibbon/${r.slug}`,
-      lastmod: r.updated_at?.split("T")[0],
-      changefreq: "weekly" as const,
-      priority: "0.8",
-    }));
+    return await res.json();
   } catch (e) {
-    console.warn("sitemap: seo_pages fetch error, skipping dynamic entries", e);
-    return [];
+    console.warn(`sitemap: ${label} fetch error`, e);
+    return null;
   }
 }
 
+async function fetchSeoPages(): Promise<SitemapEntry[]> {
+  const rows = await fetchJson(
+    `${SUPABASE_URL}/rest/v1/seo_pages?select=slug,updated_at,page_type,route_path&is_indexable=eq.true`,
+    "seo_pages",
+  );
+  if (!rows) return [];
+  return (rows as { slug: string; updated_at: string; page_type?: string; route_path?: string }[]).map((r) => ({
+    path: r.page_type === "global" && r.route_path ? r.route_path : `/twibbon/${r.slug}`,
+    lastmod: r.updated_at?.split("T")[0],
+    changefreq: "weekly" as const,
+    priority: "0.8",
+  }));
+}
+
 async function fetchBlogPosts(): Promise<SitemapEntry[]> {
-  try {
-    const url = `${SUPABASE_URL}/rest/v1/blog_posts?select=slug,updated_at&is_published=eq.true`;
-    const res = await fetch(url, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } });
-    if (!res.ok) return [];
-    const rows = (await res.json()) as { slug: string; updated_at: string }[];
-    return rows.map((r) => ({ path: `/blog/${r.slug}`, lastmod: r.updated_at?.split("T")[0], changefreq: "weekly" as const, priority: "0.7" }));
-  } catch { return []; }
+  const rows = await fetchJson(
+    `${SUPABASE_URL}/rest/v1/blog_posts?select=slug,updated_at&is_published=eq.true`,
+    "blog_posts",
+  );
+  if (!rows) return [];
+  return (rows as { slug: string; updated_at: string }[]).map((r) => ({
+    path: `/blog/${r.slug}`,
+    lastmod: r.updated_at?.split("T")[0],
+    changefreq: "weekly" as const,
+    priority: "0.7",
+  }));
 }
 
 async function fetchTemplateSeo(): Promise<SitemapEntry[]> {
-  try {
-    const url = `${SUPABASE_URL}/rest/v1/template_seo?select=slug,updated_at&is_indexable=eq.true`;
-    const res = await fetch(url, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } });
-    if (!res.ok) return [];
-    const rows = (await res.json()) as { slug: string; updated_at: string }[];
-    return rows.map((r) => ({ path: `/template/${r.slug}`, lastmod: r.updated_at?.split("T")[0], changefreq: "weekly" as const, priority: "0.7" }));
-  } catch { return []; }
+  const rows = await fetchJson(
+    `${SUPABASE_URL}/rest/v1/template_seo?select=slug,updated_at&is_indexable=eq.true`,
+    "template_seo",
+  );
+  if (!rows) return [];
+  return (rows as { slug: string; updated_at: string }[]).map((r) => ({
+    path: `/template/${r.slug}`,
+    lastmod: r.updated_at?.split("T")[0],
+    changefreq: "weekly" as const,
+    priority: "0.7",
+  }));
 }
 
 function buildSitemap(entries: SitemapEntry[]) {
