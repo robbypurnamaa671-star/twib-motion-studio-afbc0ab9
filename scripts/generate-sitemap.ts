@@ -36,16 +36,28 @@ const staticEntries: SitemapEntry[] = [
   { path: "/create/landscape-16-9", changefreq: "weekly", priority: "0.9" },
 ];
 
-async function fetchSeoPages(): Promise<SitemapEntry[]> {
+async function fetchJson(url: string, label: string): Promise<any[] | null> {
   try {
-    const url = `${SUPABASE_URL}/rest/v1/seo_pages?select=slug,updated_at,page_type,route_path&is_indexable=eq.true`;
-    const res = await fetch(url, {
-      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
-    });
+    const res = await fetch(url, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } });
     if (!res.ok) {
-      console.warn(`sitemap: seo_pages fetch failed (${res.status}), skipping dynamic entries`);
-      return [];
+      const body = await res.text().catch(() => "");
+      console.warn(`sitemap: ${label} fetch failed (${res.status}) at ${url} :: ${body.slice(0, 200)}`);
+      return null;
     }
+    return await res.json();
+  } catch (e) {
+    console.warn(`sitemap: ${label} fetch error`, e);
+    return null;
+  }
+}
+
+async function fetchSeoPages(): Promise<SitemapEntry[]> {
+  const rows = await fetchJson(
+    `${SUPABASE_URL}/rest/v1/seo_pages?select=slug,updated_at,page_type,route_path&is_indexable=eq.true`,
+    "seo_pages",
+  );
+  if (!rows) return [];
+  {
     const rows = (await res.json()) as { slug: string; updated_at: string; page_type?: string; route_path?: string }[];
     return rows.map((r) => ({
       path: r.page_type === "global" && r.route_path ? r.route_path : `/twibbon/${r.slug}`,
