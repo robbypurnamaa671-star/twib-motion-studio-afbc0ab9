@@ -21,6 +21,7 @@ import ReportsPage from "./pages/admin/ReportsPage";
 import AnalyticsPage from "./pages/admin/AnalyticsPage";
 import AuditLogsPage from "./pages/admin/AuditLogsPage";
 import SettingsPage from "./pages/admin/SettingsPage";
+import DiagnosticsPage from "./pages/admin/DiagnosticsPage";
 import TwibbonSEO from "./pages/TwibbonSEO";
 import GlobalSEO from "./pages/GlobalSEO";
 import BlogIndex from "./pages/BlogIndex";
@@ -68,6 +69,7 @@ const App = () => (
               <Route path="/admin/analytics" element={<AdminGuard><AnalyticsPage /></AdminGuard>} />
               <Route path="/admin/audit" element={<AdminGuard><AuditLogsPage /></AdminGuard>} />
               <Route path="/admin/settings" element={<AdminGuard><SettingsPage /></AdminGuard>} />
+              <Route path="/admin/diagnostics" element={<AdminGuard><DiagnosticsPage /></AdminGuard>} />
               <Route path="/admin/seo-pages" element={<AdminGuard><SeoPagesPage /></AdminGuard>} />
               <Route path="/admin/blog" element={<AdminGuard><BlogPostsPage /></AdminGuard>} />
               <Route path="*" element={<NotFound />} />
