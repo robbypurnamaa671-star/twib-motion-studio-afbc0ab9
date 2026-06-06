@@ -57,38 +57,40 @@ async function fetchSeoPages(): Promise<SitemapEntry[]> {
     "seo_pages",
   );
   if (!rows) return [];
-  {
-    const rows = (await res.json()) as { slug: string; updated_at: string; page_type?: string; route_path?: string }[];
-    return rows.map((r) => ({
-      path: r.page_type === "global" && r.route_path ? r.route_path : `/twibbon/${r.slug}`,
-      lastmod: r.updated_at?.split("T")[0],
-      changefreq: "weekly" as const,
-      priority: "0.8",
-    }));
-  } catch (e) {
-    console.warn("sitemap: seo_pages fetch error, skipping dynamic entries", e);
-    return [];
-  }
+  return (rows as { slug: string; updated_at: string; page_type?: string; route_path?: string }[]).map((r) => ({
+    path: r.page_type === "global" && r.route_path ? r.route_path : `/twibbon/${r.slug}`,
+    lastmod: r.updated_at?.split("T")[0],
+    changefreq: "weekly" as const,
+    priority: "0.8",
+  }));
 }
 
 async function fetchBlogPosts(): Promise<SitemapEntry[]> {
-  try {
-    const url = `${SUPABASE_URL}/rest/v1/blog_posts?select=slug,updated_at&is_published=eq.true`;
-    const res = await fetch(url, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } });
-    if (!res.ok) return [];
-    const rows = (await res.json()) as { slug: string; updated_at: string }[];
-    return rows.map((r) => ({ path: `/blog/${r.slug}`, lastmod: r.updated_at?.split("T")[0], changefreq: "weekly" as const, priority: "0.7" }));
-  } catch { return []; }
+  const rows = await fetchJson(
+    `${SUPABASE_URL}/rest/v1/blog_posts?select=slug,updated_at&is_published=eq.true`,
+    "blog_posts",
+  );
+  if (!rows) return [];
+  return (rows as { slug: string; updated_at: string }[]).map((r) => ({
+    path: `/blog/${r.slug}`,
+    lastmod: r.updated_at?.split("T")[0],
+    changefreq: "weekly" as const,
+    priority: "0.7",
+  }));
 }
 
 async function fetchTemplateSeo(): Promise<SitemapEntry[]> {
-  try {
-    const url = `${SUPABASE_URL}/rest/v1/template_seo?select=slug,updated_at&is_indexable=eq.true`;
-    const res = await fetch(url, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } });
-    if (!res.ok) return [];
-    const rows = (await res.json()) as { slug: string; updated_at: string }[];
-    return rows.map((r) => ({ path: `/template/${r.slug}`, lastmod: r.updated_at?.split("T")[0], changefreq: "weekly" as const, priority: "0.7" }));
-  } catch { return []; }
+  const rows = await fetchJson(
+    `${SUPABASE_URL}/rest/v1/template_seo?select=slug,updated_at&is_indexable=eq.true`,
+    "template_seo",
+  );
+  if (!rows) return [];
+  return (rows as { slug: string; updated_at: string }[]).map((r) => ({
+    path: `/template/${r.slug}`,
+    lastmod: r.updated_at?.split("T")[0],
+    changefreq: "weekly" as const,
+    priority: "0.7",
+  }));
 }
 
 function buildSitemap(entries: SitemapEntry[]) {
