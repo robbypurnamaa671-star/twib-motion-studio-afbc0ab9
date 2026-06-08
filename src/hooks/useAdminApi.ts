@@ -1,7 +1,6 @@
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, SUPABASE_PROJECT_REF } from "@/integrations/supabase/client";
 
 async function adminFetch(action: string, method = "GET", body?: unknown, query: Record<string, string> = {}) {
-  const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
   const session = await supabase.auth.getSession();
   const token = session.data.session?.access_token;
   if (!token) throw new Error("Not authenticated");
@@ -13,7 +12,7 @@ async function adminFetch(action: string, method = "GET", body?: unknown, query:
   if (body && method !== "GET") opts.body = JSON.stringify(body);
 
   const qs = new URLSearchParams({ action, ...query }).toString();
-  const res = await fetch(`https://${projectId}.supabase.co/functions/v1/admin?${qs}`, opts);
+  const res = await fetch(`https://${SUPABASE_PROJECT_REF}.supabase.co/functions/v1/admin?${qs}`, opts);
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error || "Request failed");
