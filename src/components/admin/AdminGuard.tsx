@@ -1,12 +1,13 @@
 import { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { Loader2 } from "lucide-react";
 
 export function AdminGuard({ children }: { children: ReactNode }) {
   const { user, loading: authLoading } = useAuth();
-  const { isAdmin, loading: roleLoading } = useAdminRole();
+  const { role, isAdmin, isSuperAdmin, loading: roleLoading } = useAdminRole();
+  const location = useLocation();
 
   if (authLoading || roleLoading) {
     return (
@@ -17,6 +18,17 @@ export function AdminGuard({ children }: { children: ReactNode }) {
   }
 
   if (!user || !isAdmin) {
+    // eslint-disable-next-line no-console
+    console.warn("[AdminGuard] redirect →/", {
+      path: location.pathname,
+      hasUser: !!user,
+      userId: user?.id,
+      email: user?.email,
+      role,
+      isAdmin,
+      isSuperAdmin,
+      reason: !user ? "no-session" : "not-admin",
+    });
     return <Navigate to="/" replace />;
   }
 

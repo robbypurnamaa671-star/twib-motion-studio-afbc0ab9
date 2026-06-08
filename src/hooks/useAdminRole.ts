@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, SUPABASE_PROJECT_REF } from "@/integrations/supabase/client";
 
 export function useAdminRole() {
   const { user, loading: authLoading } = useAuth();
@@ -17,16 +17,20 @@ export function useAdminRole() {
 
     const check = async () => {
       try {
-        const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
         const session = await supabase.auth.getSession();
         const token = session.data.session?.access_token;
         const res = await fetch(
-          `https://${projectId}.supabase.co/functions/v1/admin?action=check-role`,
-          { headers: { Authorization: `Bearer ${token}` } }
+          `https://${SUPABASE_PROJECT_REF}.supabase.co/functions/v1/admin?action=check-role`,
+          { headers: { Authorization: `Bearer ${token}` } },
         );
-        const json = await res.json();
-        setRole(json.role ?? "user");
-      } catch {
+        const json = await res.json().catch(() => ({}));
+        const resolved = json.role ?? "user";
+        // eslint-disable-next-line no-console
+        console.info("[useAdminRole]", { userId: user.id, email: user.email, role: resolved, httpStatus: res.status });
+        setRole(resolved);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error("[useAdminRole] check failed", e);
         setRole(null);
       } finally {
         setLoading(false);
