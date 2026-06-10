@@ -12,8 +12,6 @@ import frame7 from "@/assets/homepage-frame-7.webp";
 import frame8 from "@/assets/homepage-frame-8.webp";
 import PublicGallery from "@/components/PublicGallery";
 
-const movingTwibbonSampleUrl = "/moving-twibbon-sample.gif";
-
 const EDITOR_LINKS = {
   vertical: "/editor?ratio=9:16&w=1080&h=1920",
   square: "/editor?ratio=1:1&w=1080&h=1080",
@@ -42,6 +40,33 @@ const HomepageSEOSections = () => {
     { src: frame6, alt: "Pastel spring twibbon frame sample with rainbow and bunny illustration" },
     { src: frame7, alt: "Ocean themed twibbon frame sample with dolphin and turtle" },
     { src: frame8, alt: "Blue underwater twibbon frame sample with dolphin and whale" },
+  ];
+
+  const movingFrames = [
+    {
+      src: "/__l5e/assets-v1/1340b913-2286-44f0-b06b-6fa97e2a9313/moving-frame-1.webp",
+      alt: "Animated campaign twibbon frame preview with glowing ribbon accents",
+    },
+    {
+      src: "/__l5e/assets-v1/a3177319-2c71-4946-b208-6a0cc9ee64f4/moving-frame-2.webp",
+      alt: "Animated pink promotional twibbon frame preview with diagonal campaign banner",
+    },
+    {
+      src: "/__l5e/assets-v1/651868cb-7fe3-48bc-ad6b-13ec0f4fee2b/moving-frame-3.webp",
+      alt: "Animated blue and pink twibbon frame preview with bold call to action",
+    },
+    {
+      src: "/__l5e/assets-v1/65664b3f-c153-4957-a6a9-3d52c7ed08da/moving-frame-4.webp",
+      alt: "Animated Eid Al Adha twibbon frame preview with lanterns and mosque illustration",
+    },
+    {
+      src: "/__l5e/assets-v1/2d903819-fd9d-4091-afd2-f19a622bb364/moving-frame-5.webp",
+      alt: "Animated scout day twibbon frame preview with camp and mountain illustration",
+    },
+    {
+      src: "/__l5e/assets-v1/9bc221b4-9623-4d9e-afb8-a71b6310d863/moving-frame-6.webp",
+      alt: "Animated university orientation twibbon frame preview with bright geometric accents",
+    },
   ];
 
   const steps = [
@@ -149,14 +174,14 @@ const HomepageSEOSections = () => {
             <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-background to-transparent z-10" />
 
             <div className="homepage-frame-marquee flex w-max gap-4 px-4">
-              {Array.from({ length: 6 }).map((_, index) => (
+              {[...movingFrames, ...movingFrames].map((frame, index) => (
                 <figure
-                  key={`moving-${index}`}
+                  key={`${frame.alt}-${index}`}
                   className="w-[200px] sm:w-[240px] md:w-[280px] shrink-0 overflow-hidden rounded-md border border-primary/30 bg-background/80 shadow-sm"
                 >
                   <img
-                    src={movingTwibbonSampleUrl}
-                    alt="Animated moving twibbon frame sample — GIF/MP4 supported"
+                    src={frame.src}
+                    alt={frame.alt}
                     loading="lazy"
                     className="aspect-square w-full object-cover"
                   />
