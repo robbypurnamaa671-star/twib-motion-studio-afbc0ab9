@@ -6,6 +6,7 @@ import { ProgressiveImage } from "@/components/ProgressiveImage";
 
 type PublicTwibbon = {
   id: string;
+  slug: string | null;
   title: string | null;
   bottom_layer_url: string | null;
   preview_url: string | null;
@@ -76,7 +77,7 @@ const PublicGallery = ({ createUrl }: { createUrl: string }) => {
     (async () => {
       let query = supabase
         .from("shared_templates")
-        .select("id, title, bottom_layer_url, preview_url, canvas_ratio, category", { count: "exact" })
+        .select("id, slug, title, bottom_layer_url, preview_url, canvas_ratio, category", { count: "exact" })
         .eq("is_public", true)
         .order("created_at", { ascending: false })
         .range(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE - 1);
