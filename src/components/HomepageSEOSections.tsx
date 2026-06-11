@@ -10,6 +10,12 @@ import frame5 from "@/assets/homepage-frame-5.webp";
 import frame6 from "@/assets/homepage-frame-6.webp";
 import frame7 from "@/assets/homepage-frame-7.webp";
 import frame8 from "@/assets/homepage-frame-8.webp";
+import movingFrame1 from "@/assets/moving-frame-1.webp";
+import movingFrame2 from "@/assets/moving-frame-2.webp";
+import movingFrame3 from "@/assets/moving-frame-3.webp";
+import movingFrame4 from "@/assets/moving-frame-4.webp";
+import movingFrame5 from "@/assets/moving-frame-5.webp";
+import movingFrame6 from "@/assets/moving-frame-6.webp";
 import PublicGallery from "@/components/PublicGallery";
 
 const EDITOR_LINKS = {
@@ -44,27 +50,27 @@ const HomepageSEOSections = () => {
 
   const movingFrames = [
     {
-      src: "/__l5e/assets-v1/1340b913-2286-44f0-b06b-6fa97e2a9313/moving-frame-1.webp",
+      src: movingFrame1,
       alt: "Animated campaign twibbon frame preview with glowing ribbon accents",
     },
     {
-      src: "/__l5e/assets-v1/a3177319-2c71-4946-b208-6a0cc9ee64f4/moving-frame-2.webp",
+      src: movingFrame2,
       alt: "Animated pink promotional twibbon frame preview with diagonal campaign banner",
     },
     {
-      src: "/__l5e/assets-v1/651868cb-7fe3-48bc-ad6b-13ec0f4fee2b/moving-frame-3.webp",
+      src: movingFrame3,
       alt: "Animated blue and pink twibbon frame preview with bold call to action",
     },
     {
-      src: "/__l5e/assets-v1/65664b3f-c153-4957-a6a9-3d52c7ed08da/moving-frame-4.webp",
+      src: movingFrame4,
       alt: "Animated Eid Al Adha twibbon frame preview with lanterns and mosque illustration",
     },
     {
-      src: "/__l5e/assets-v1/2d903819-fd9d-4091-afd2-f19a622bb364/moving-frame-5.webp",
+      src: movingFrame5,
       alt: "Animated scout day twibbon frame preview with camp and mountain illustration",
     },
     {
-      src: "/__l5e/assets-v1/9bc221b4-9623-4d9e-afb8-a71b6310d863/moving-frame-6.webp",
+      src: movingFrame6,
       alt: "Animated university orientation twibbon frame preview with bright geometric accents",
     },
   ];
