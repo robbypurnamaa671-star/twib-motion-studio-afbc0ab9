@@ -16,6 +16,16 @@ type PublicTwibbon = {
 const PAGE_SIZE = 12;
 const ALL = "all";
 const CACHE_TTL_MS = 60_000;
+
+const ANIMATED_IMAGE_RE = /\.(gif|webp|apng)(\?|#|$)/i;
+const VIDEO_RE = /\.(mp4|webm|mov|m4v)(\?|#|$)/i;
+
+function isAnimatedImage(url: string | null | undefined): boolean {
+  return !!url && ANIMATED_IMAGE_RE.test(url);
+}
+function isVideo(url: string | null | undefined): boolean {
+  return !!url && VIDEO_RE.test(url);
+}
 const focusRing =
   "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
@@ -161,7 +171,27 @@ const PublicGallery = ({ createUrl }: { createUrl: string }) => {
                 aria-label={`Use public twibbon: ${tw.title ?? "Untitled"}`}
                 className={`group block aspect-square overflow-hidden rounded-lg border border-border bg-card relative ${focusRing}`}
               >
-                {(tw.preview_url || tw.bottom_layer_url) ? (
+                {isVideo(tw.bottom_layer_url) ? (
+                  <video
+                    src={tw.bottom_layer_url as string}
+                    poster={tw.preview_url ?? undefined}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    preload="metadata"
+                    aria-label={tw.title ?? "Animated public twibbon by a TwibMotion user"}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                ) : isAnimatedImage(tw.bottom_layer_url) ? (
+                  <img
+                    src={tw.bottom_layer_url as string}
+                    alt={tw.title ?? "Animated public twibbon frame by a TwibMotion user"}
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                ) : (tw.preview_url || tw.bottom_layer_url) ? (
                   <ProgressiveImage
                     src={(tw.preview_url || tw.bottom_layer_url) as string}
                     alt={tw.title ?? "Public twibbon frame by a TwibMotion user"}
