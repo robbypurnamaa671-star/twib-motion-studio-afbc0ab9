@@ -121,12 +121,12 @@ const ShareTemplateDialog = ({
           is_public: isPublic,
           preview_url: previewPublicUrl,
         } as any)
-        .select("id")
+        .select("id, slug")
         .single();
 
       if (error) throw error;
 
-      const url = `${window.location.origin}/use-template/${data.id}`;
+      const url = `${window.location.origin}/use-template/${data.slug || data.id}`;
       setShareUrl(url);
       toast({ title: t("share.shared"), description: t("share.sharedDesc") });
     } catch (err: any) {
