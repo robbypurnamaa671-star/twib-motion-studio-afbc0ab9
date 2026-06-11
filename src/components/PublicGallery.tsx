@@ -168,7 +168,7 @@ const PublicGallery = ({ createUrl }: { createUrl: string }) => {
             {rows.map((tw) => (
               <Link
                 key={tw.id}
-                to={`/use-template/${tw.id}`}
+                to={`/use-template/${tw.slug || tw.id}`}
                 aria-label={`Use public twibbon: ${tw.title ?? "Untitled"}`}
                 className={`group block aspect-square overflow-hidden rounded-lg border border-border bg-card relative ${focusRing}`}
               >
