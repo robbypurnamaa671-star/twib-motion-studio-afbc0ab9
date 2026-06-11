@@ -38,11 +38,12 @@ const UseTemplate = () => {
   useEffect(() => {
     const load = async () => {
       if (!templateId) { setError("No template ID"); setLoading(false); return; }
-      const { data, error: fetchErr } = await supabase
-        .from("shared_templates")
-        .select("*")
-        .eq("id", templateId)
-        .single();
+      // Support both UUID ids (legacy links) and human-readable slugs
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(templateId);
+      const query = supabase.from("shared_templates").select("*");
+      const { data, error: fetchErr } = await (isUuid
+        ? query.eq("id", templateId).maybeSingle()
+        : query.eq("slug", templateId).maybeSingle());
 
       if (fetchErr || !data) {
         setError("Template not found or has expired.");
