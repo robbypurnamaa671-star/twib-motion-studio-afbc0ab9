@@ -11,6 +11,7 @@ import ExportDialog from "@/components/ExportDialog";
 import { ReportTemplateDialog } from "@/components/ReportTemplateDialog";
 import { StickyHeader } from "@/components/StickyHeader";
 import { lovable } from "@/integrations/lovable";
+import SEOHead from "@/components/SEOHead";
 
 const UseTemplate = () => {
   const { user, signInWithGoogle, loading: authLoading } = useAuth();
@@ -185,6 +186,13 @@ const UseTemplate = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col lg:h-screen lg:overflow-hidden">
+      <SEOHead
+        title={`${template.title} – Free Twibbon Template | TwibMotion`}
+        description={`Create a twibbon with the "${template.title}" template on TwibMotion. Upload your photo, GIF, or video and export in seconds.`}
+        canonical={`https://twibmotion.com/use-template/${template.slug || template.id}`}
+        ogUrl={`https://twibmotion.com/use-template/${template.slug || template.id}`}
+        ogType="website"
+      />
       {/* Header */}
       <StickyHeader className="px-4 py-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">

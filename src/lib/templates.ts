@@ -20,6 +20,7 @@ export type SharedTemplate = {
   id: string;
   owner_id: string;
   title: string;
+  slug?: string | null;
   canvas_ratio: string;
   canvas_w: number;
   canvas_h: number;
