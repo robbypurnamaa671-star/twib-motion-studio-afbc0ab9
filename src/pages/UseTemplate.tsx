@@ -11,6 +11,7 @@ import ExportDialog from "@/components/ExportDialog";
 import { ReportTemplateDialog } from "@/components/ReportTemplateDialog";
 import { StickyHeader } from "@/components/StickyHeader";
 import { lovable } from "@/integrations/lovable";
+import SEOHead from "@/components/SEOHead";
 
 const UseTemplate = () => {
   const { user, signInWithGoogle, loading: authLoading } = useAuth();
