@@ -59,6 +59,14 @@ const App = () => (
               <Route path="/digital-campaign-frame-maker" element={<GlobalSEO />} />
               <Route path="/gif-twibbon-creator" element={<GlobalSEO />} />
               <Route path="/social-media-overlay-frame" element={<GlobalSEO />} />
+              <Route path="/facebook-frame-maker" element={<GlobalSEO />} />
+              <Route path="/instagram-frame-maker" element={<GlobalSEO />} />
+              <Route path="/social-media-frame-maker" element={<GlobalSEO />} />
+              <Route path="/campaign-frame-maker" element={<GlobalSEO />} />
+              <Route path="/profile-frame-maker" element={<GlobalSEO />} />
+              <Route path="/event-frame-maker" element={<GlobalSEO />} />
+              <Route path="/online-twibbon-maker" element={<GlobalSEO />} />
+              <Route path="/country/:slug" element={<GlobalSEO />} />
               <Route path="/use-template/:templateId" element={<UseTemplate />} />
               <Route path="/admin/dashboard" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
               <Route path="/admin/users" element={<AdminGuard><UsersPage /></AdminGuard>} />
