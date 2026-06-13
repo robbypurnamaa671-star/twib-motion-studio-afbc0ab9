@@ -93,6 +93,24 @@ async function fetchTemplateSeo(): Promise<SitemapEntry[]> {
   }));
 }
 
+interface PublicTemplate {
+  slug: string;
+  title: string;
+  bottom_layer_url: string;
+  preview_url: string | null;
+  canvas_w: number;
+  canvas_h: number;
+  created_at: string;
+}
+
+async function fetchPublicTemplates(): Promise<PublicTemplate[]> {
+  const rows = await fetchJson(
+    `${SUPABASE_URL}/rest/v1/shared_templates?select=slug,title,bottom_layer_url,preview_url,canvas_w,canvas_h,created_at&is_public=eq.true&slug=not.is.null`,
+    "shared_templates",
+  );
+  return (rows as PublicTemplate[]) || [];
+}
+
 function buildSitemap(entries: SitemapEntry[]) {
   const urls = entries.map((e) =>
     [
@@ -114,9 +132,57 @@ function buildSitemap(entries: SitemapEntry[]) {
   ].join("\n");
 }
 
+function xmlEscape(s: string) {
+  return s.replace(/[<>&'"]/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", '"': "&quot;" }[c]!));
+}
+
+function buildImageSitemap(templates: PublicTemplate[]) {
+  const urls = templates
+    .filter((t) => t.slug && (t.preview_url || t.bottom_layer_url))
+    .map((t) => {
+      const pageLoc = `${BASE_URL}/template/${t.slug}`;
+      const imgLoc = (t.preview_url || t.bottom_layer_url)!;
+      const alt = `Template Twibbon ${t.title}`;
+      return [
+        `  <url>`,
+        `    <loc>${pageLoc}</loc>`,
+        `    <image:image>`,
+        `      <image:loc>${xmlEscape(imgLoc)}</image:loc>`,
+        `      <image:title>${xmlEscape(alt)}</image:title>`,
+        `      <image:caption>${xmlEscape(alt)}</image:caption>`,
+        `    </image:image>`,
+        `  </url>`,
+      ].join("\n");
+    });
+  return [
+    `<?xml version="1.0" encoding="UTF-8"?>`,
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">`,
+    ...urls,
+    `</urlset>`,
+  ].join("\n");
+}
+
 (async () => {
-  const [seo, blog, tpl] = await Promise.all([fetchSeoPages(), fetchBlogPosts(), fetchTemplateSeo()]);
-  const all = [...staticEntries, ...seo, ...blog, ...tpl];
+  const [seo, blog, tpl, publicTpls] = await Promise.all([
+    fetchSeoPages(),
+    fetchBlogPosts(),
+    fetchTemplateSeo(),
+    fetchPublicTemplates(),
+  ]);
+  const publicTplEntries: SitemapEntry[] = publicTpls.map((t) => ({
+    path: `/template/${t.slug}`,
+    lastmod: t.created_at?.split("T")[0],
+    changefreq: "weekly" as const,
+    priority: "0.7",
+  }));
+  // De-duplicate against template_seo slugs
+  const seenTpl = new Set(tpl.map((e) => e.path));
+  const mergedTpl = [...tpl, ...publicTplEntries.filter((e) => !seenTpl.has(e.path))];
+  const all = [...staticEntries, ...seo, ...blog, ...mergedTpl];
   writeFileSync(resolve("public/sitemap.xml"), buildSitemap(all));
-  console.log(`sitemap.xml written (${all.length} entries: ${staticEntries.length} static + ${seo.length} SEO + ${blog.length} blog + ${tpl.length} templates)`);
+  writeFileSync(resolve("public/image-sitemap.xml"), buildImageSitemap(publicTpls));
+  console.log(
+    `sitemap.xml written (${all.length} entries: ${staticEntries.length} static + ${seo.length} SEO + ${blog.length} blog + ${mergedTpl.length} templates)`,
+  );
+  console.log(`image-sitemap.xml written (${publicTpls.length} template images)`);
 })();
