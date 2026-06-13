@@ -67,6 +67,7 @@ const App = () => (
               <Route path="/event-frame-maker" element={<GlobalSEO />} />
               <Route path="/online-twibbon-maker" element={<GlobalSEO />} />
               <Route path="/country/:slug" element={<GlobalSEO />} />
+              <Route path="/indonesia/:slug" element={<GlobalSEO />} />
               <Route path="/use-template/:templateId" element={<UseTemplate />} />
               <Route path="/admin/dashboard" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
               <Route path="/admin/users" element={<AdminGuard><UsersPage /></AdminGuard>} />
