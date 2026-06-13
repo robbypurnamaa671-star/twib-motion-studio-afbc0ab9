@@ -62,6 +62,12 @@ async function fetchSeoPages(): Promise<SitemapEntry[]> {
     lastmod: r.updated_at?.split("T")[0],
     changefreq: "weekly" as const,
     priority: "0.8",
+  })).filter((e) => !!e.path);
+  return rows.map((r: any) => ({
+    path: r.page_type === "global" && r.route_path ? r.route_path : `/twibbon/${r.slug}`,
+    lastmod: r.updated_at?.split("T")[0],
+    changefreq: "weekly" as const,
+    priority: "0.8",
   }));
 }
 
