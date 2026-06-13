@@ -1,5 +1,6 @@
-import { LogOut, User } from "lucide-react";
+import { LogOut, User, LayoutDashboard } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
 const UserMenu = () => {
@@ -27,7 +28,15 @@ const UserMenu = () => {
 
   return (
     <div className="flex items-center gap-2">
-      <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary text-sm">
+      <Link
+        to="/dashboard"
+        className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-sm font-mono hover:bg-secondary"
+        title="Dashboard"
+      >
+        <LayoutDashboard className="w-4 h-4" />
+        Dashboard
+      </Link>
+      <Link to="/dashboard/profile" className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary text-sm hover:bg-secondary/70">
         {user.user_metadata?.avatar_url ? (
           <img
             src={user.user_metadata.avatar_url}
@@ -40,7 +49,7 @@ const UserMenu = () => {
         <span className="text-foreground font-medium max-w-[120px] truncate">
           {user.user_metadata?.full_name || user.email?.split("@")[0]}
         </span>
-      </div>
+      </Link>
       <button
         onClick={signOut}
         className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"

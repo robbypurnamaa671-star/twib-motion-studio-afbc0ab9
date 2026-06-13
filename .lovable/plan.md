@@ -1,114 +1,55 @@
-## Goal
-Scale the existing programmatic SEO system into a Twibbon-focused SEO powerhouse: more page types, blog system, template SEO pages, richer content blocks, internal linking, expanded admin tools, and improved sitemap — without touching editor/export/auth/Stripe.
+# Creator Platform Upgrade
 
-## What already exists (keep & extend)
-- `seo_pages` table + `/twibbon/:keyword` route (`TwibbonSEO.tsx`)
-- Admin SEO Pages CRUD (`SeoPagesPage.tsx`)
-- `scripts/generate-sitemap.ts` (predev/prebuild)
-- `SEOHead` with JSON-LD support
-- 6 seeded keywords
+This is a large multi-phase build. I'll ship it in 4 phases so you can review after each.
 
-## 1. Database — new migration
-Add two tables + extend `seo_pages`:
+## Phase 1 — Profile foundation (DB + Settings + Public profile)
 
-**`seo_pages`** — add columns:
-- `page_type` text default `'keyword'` (`'keyword' | 'global'` — global = no `/twibbon/` prefix)
-- `route_path` text — explicit path override (for global pages like `/animated-twibbon-maker`)
-- `h1` text nullable
-- `benefits_json` jsonb default `'[]'`  (list of `{title, description}`)
-- `howto_json` jsonb default `'[]'` (list of `{step, title, description}`)
-- `category` text nullable (for grouping: graduation, religious, national, etc.)
+**Database migration**
+- Extend `profiles`: add `username` (unique, citext, regex-validated via trigger), `bio`, `website_url`, `instagram_url`, `facebook_url`, `twitter_url`, `is_disabled`. Backfill `username` from email for existing users.
+- Add unique index on `lower(username)`.
+- Add `template_favorites` table (`user_id`, `template_id`, `created_at`, unique pair) with RLS + GRANTs.
+- Add `template_views` counter columns on `shared_templates` (`view_count`, `use_count`, `download_count`, `is_featured`, `deleted_at` for soft delete, `status` enum: draft/public/private).
+- Add `creator_featured` flag on `profiles`.
+- RPC `increment_template_view(template_id)` (security definer) and `increment_template_use`, `increment_template_download`.
+- Storage: reuse `template-assets` bucket for avatars under `avatars/{user_id}/...`.
 
-**`blog_posts`** — new table:
-- slug, title, meta_description, excerpt, content_md (text), cover_image_url, category, tags text[], related_slugs text[], related_seo_slugs text[], is_published bool, published_at, updated_at
-- RLS: public read where published; admin full
-- GRANTs: anon SELECT, authenticated SELECT, service_role ALL
+**Frontend**
+- `/dashboard/profile` (settings): edit display name, username, avatar upload, bio, social URLs. Zod validation. Username uniqueness check.
+- `/creator/:username` public page: avatar, bio, socials, join date, stats, public templates grid. SEO via react-helmet-async + Person/ProfilePage JSON-LD. Indexable. Added to sitemap generator.
 
-**`template_seo`** — new table linking shared_templates to SEO metadata:
-- template_id (uuid, unique), slug, title, meta_description, intro_text, tags text[], is_indexable bool
-- public read when indexable; admin full
+## Phase 2 — Dashboard + Template Management
 
-## 2. Routes (App.tsx)
-- `/twibbon/:keyword` — existing, enhanced
-- `/p/:slug` — global SEO pages (lookup by route_path or slug where page_type='global')
-- `/blog` — blog index
-- `/blog/:slug` — blog post
-- `/template/:slug` — public template SEO page
-  
-Use `/p/` prefix for global pages to avoid conflicting with existing top-level routes; admin can set `route_path` to anything.
+- `/dashboard` overview: counts (templates, public, private, views, uses) + recent activity.
+- `/dashboard/templates`: tabs Draft / Public / Private. Cards show preview, title, dates, views, uses, status badge.
+- Per-template editor drawer: title, description, tags, category, thumbnail, public/private toggle, publish/unpublish, soft-delete.
+- `/dashboard/analytics`: aggregate + per-template charts (recharts).
+- `/dashboard/favorites`: liked templates grid.
+- Sidebar shell with Overview / Templates / Profile / Analytics / Favorites / Settings.
 
-Actually simpler: add a catch-all SEO resolver page mounted at specific known paths via the admin, OR just use `/p/:slug`. Going with `/p/:slug` for simplicity.
+## Phase 3 — Community + Discovery
 
-## 3. Enhanced TwibbonSEO page
-Add content blocks in this order:
-1. Breadcrumb (with JSON-LD BreadcrumbList)
-2. H1 + intro
-3. Template showcase (featured + category fallback from shared_templates)
-4. How-to-create steps (HowTo schema)
-5. Benefits/use cases
-6. FAQ (existing)
-7. Related categories (related_slugs → internal links)
-8. CTA section → editor
+- Community template cards (PublicGallery + TemplateSEO related grid): show creator avatar + `@username` linking to `/creator/:username`.
+- Community page filters: Newest / Most Popular (likes) / Most Used / Most Viewed.
+- Search by template name, creator username, tags (single search box, debounced).
+- Favorite/like button on cards (heart, optimistic).
+- TemplateSEO page: add creator attribution block + related creators section.
+- View tracking: call `increment_template_view` on TemplateSEO + UseTemplate mount (deduped per session).
+- Use tracking: increment on UseTemplate export. Download tracking: on export complete.
 
-Lazy-load images (`loading="lazy"`), semantic `<article>/<section>`, mobile-first.
+## Phase 4 — Admin + SEO polish
 
-## 4. New pages
-- **`BlogIndex.tsx`** — list published posts, category filter, JSON-LD `Blog`
-- **`BlogPost.tsx`** — render markdown content, Article + BreadcrumbList JSON-LD, related posts, related SEO pages, CTA
-- **`GlobalSEO.tsx`** — same block structure as TwibbonSEO but for global keywords (English-first content)
-- **`TemplateSEO.tsx`** — preview, description, "Use this template" CTA, related templates
+- Admin Users page: edit username, disable account, feature creator.
+- Admin Templates page: feature template, hard delete.
+- Sitemap generator: include all `/creator/:username` for users with ≥1 public template.
+- robots/canonical updated.
 
-## 5. Internal linking helper
-`src/lib/seo-links.ts` — utility to fetch related links (related slugs, same category, trending) used by all SEO page types.
+## Technical notes
 
-## 6. Admin extensions
-Extend `SeoPagesPage.tsx`:
-- Page type selector (keyword/global)
-- Category field
-- Benefits/howto JSON editors
-- Bulk import textarea (one keyword per line → auto-generate slug+placeholder content)
-- Publish toggle (already have `is_indexable`)
+- All new tables follow GRANT → RLS → POLICY order. `template_favorites` policies scope by `auth.uid()`.
+- Username regex: `^[a-z0-9][a-z0-9-]{1,29}$` enforced via CHECK + zod.
+- Soft delete: `deleted_at IS NULL` filter everywhere; admin can hard-delete.
+- View counters use security-definer RPC to bypass RLS for anonymous increments, with simple in-session dedup on client.
+- Avatar uploads: 2MB cap, jpeg/png/webp, stored at `template-assets/avatars/{user_id}/avatar.{ext}`.
+- Re-uses existing two-layer editor — no changes to canvas/export engine.
 
-New admin pages:
-- **`/admin/blog`** — `BlogPostsPage.tsx` CRUD
-- **`/admin/template-seo`** — `TemplateSeoPage.tsx` CRUD
-
-Add nav items to `AdminSidebar`.
-
-## 7. Sitemap upgrades
-Extend `scripts/generate-sitemap.ts` to also fetch:
-- All indexable `seo_pages` (both keyword and global page_types, using correct route prefix)
-- All published `blog_posts` → `/blog/:slug` + `/blog` index
-- All indexable `template_seo` rows → `/template/:slug`
-- Lastmod from `updated_at`
-
-## 8. Bulk keyword seed
-Insert 30+ starter Indonesian + global keywords into `seo_pages` via insert tool after migration, with sensible default copy templates (title/meta/intro/FAQ generated from keyword).
-
-## 9. Technical SEO polish
-- Add `BreadcrumbList` schema helper
-- Ensure all images `loading="lazy"`, alt text
-- Add canonical + OG to blog/template/global pages
-- `<article>` / `<section>` / `<nav>` semantic tags
-
-## Files to create
-- `supabase/migrations/<ts>_seo_expansion.sql`
-- `src/pages/BlogIndex.tsx`, `BlogPost.tsx`, `GlobalSEO.tsx`, `TemplateSEO.tsx`
-- `src/pages/admin/BlogPostsPage.tsx`, `TemplateSeoPage.tsx`
-- `src/lib/seo-links.ts`, `src/lib/seo-content.ts` (default content generators for bulk imports)
-- `src/components/seo/Breadcrumbs.tsx`, `TemplateShowcase.tsx`, `HowToSteps.tsx`, `BenefitsGrid.tsx`, `RelatedLinks.tsx`
-
-## Files to edit
-- `src/App.tsx` (add routes)
-- `src/pages/TwibbonSEO.tsx` (add new content blocks + breadcrumbs + HowTo schema)
-- `src/pages/admin/SeoPagesPage.tsx` (bulk import + new fields)
-- `src/components/admin/AdminSidebar.tsx` (Blog + Template SEO nav)
-- `scripts/generate-sitemap.ts` (blog + template + global routes)
-- `public/robots.txt` (confirm sitemap directive)
-
-## Non-goals
-- No editor / export / auth / Stripe changes
-- No removal of existing SEO functionality
-- No repositioning away from Twibbon niche — all copy stays Twibbon-focused
-
-After approval I'll: (1) run the migration, (2) seed bulk keywords, (3) write all code in parallel, (4) verify sitemap output.
+Confirm and I'll start with Phase 1 (DB migration + profile settings + public creator page).
