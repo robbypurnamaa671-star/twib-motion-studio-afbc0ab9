@@ -183,29 +183,50 @@ export type Database = {
         Row: {
           account_status: string
           avatar_url: string | null
+          bio: string | null
           created_at: string
+          creator_featured: boolean
           display_name: string | null
+          facebook_url: string | null
           id: string
+          instagram_url: string | null
+          twitter_url: string | null
           updated_at: string
           user_id: string
+          username: string | null
+          website_url: string | null
         }
         Insert: {
           account_status?: string
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string
+          creator_featured?: boolean
           display_name?: string | null
+          facebook_url?: string | null
           id?: string
+          instagram_url?: string | null
+          twitter_url?: string | null
           updated_at?: string
           user_id: string
+          username?: string | null
+          website_url?: string | null
         }
         Update: {
           account_status?: string
           avatar_url?: string | null
+          bio?: string | null
           created_at?: string
+          creator_featured?: boolean
           display_name?: string | null
+          facebook_url?: string | null
           id?: string
+          instagram_url?: string | null
+          twitter_url?: string | null
           updated_at?: string
           user_id?: string
+          username?: string | null
+          website_url?: string | null
         }
         Relationships: []
       }
@@ -281,7 +302,9 @@ export type Database = {
           canvas_w: number
           category: string | null
           created_at: string
+          deleted_at: string | null
           description: string | null
+          download_count: number
           event_type: string | null
           expires_at: string | null
           format: string | null
@@ -291,16 +314,21 @@ export type Database = {
           is_staff_pick: boolean
           is_trending: boolean
           language: string
+          like_count: number
           lock_settings: Json
           owner_id: string
           preview_url: string | null
+          published_at: string | null
           slug: string | null
           status: string
           tags: string[]
           template_type: string
           title: string
           top_layer_config: Json
+          updated_at: string
           usage_count: number
+          view_count: number
+          visibility: string
         }
         Insert: {
           bottom_layer_config?: Json
@@ -310,7 +338,9 @@ export type Database = {
           canvas_w: number
           category?: string | null
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
+          download_count?: number
           event_type?: string | null
           expires_at?: string | null
           format?: string | null
@@ -320,16 +350,21 @@ export type Database = {
           is_staff_pick?: boolean
           is_trending?: boolean
           language?: string
+          like_count?: number
           lock_settings?: Json
           owner_id: string
           preview_url?: string | null
+          published_at?: string | null
           slug?: string | null
           status?: string
           tags?: string[]
           template_type?: string
           title?: string
           top_layer_config?: Json
+          updated_at?: string
           usage_count?: number
+          view_count?: number
+          visibility?: string
         }
         Update: {
           bottom_layer_config?: Json
@@ -339,7 +374,9 @@ export type Database = {
           canvas_w?: number
           category?: string | null
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
+          download_count?: number
           event_type?: string | null
           expires_at?: string | null
           format?: string | null
@@ -349,16 +386,21 @@ export type Database = {
           is_staff_pick?: boolean
           is_trending?: boolean
           language?: string
+          like_count?: number
           lock_settings?: Json
           owner_id?: string
           preview_url?: string | null
+          published_at?: string | null
           slug?: string | null
           status?: string
           tags?: string[]
           template_type?: string
           title?: string
           top_layer_config?: Json
+          updated_at?: string
           usage_count?: number
+          view_count?: number
+          visibility?: string
         }
         Relationships: []
       }
@@ -382,6 +424,35 @@ export type Database = {
           value?: Json
         }
         Relationships: []
+      }
+      template_favorites: {
+        Row: {
+          created_at: string
+          id: string
+          template_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          template_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          template_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_favorites_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "shared_templates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       template_reports: {
         Row: {
@@ -534,6 +605,18 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_template_download: {
+        Args: { _template_id: string }
+        Returns: undefined
+      }
+      increment_template_use: {
+        Args: { _template_id: string }
+        Returns: undefined
+      }
+      increment_template_view: {
+        Args: { _template_id: string }
+        Returns: undefined
       }
       is_admin_or_super: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
