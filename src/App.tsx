@@ -28,6 +28,11 @@ import BlogIndex from "./pages/BlogIndex";
 import BlogPost from "./pages/BlogPost";
 import TemplateSEO from "./pages/TemplateSEO";
 import BlogPostsPage from "./pages/admin/BlogPostsPage";
+import CreatorProfile from "./pages/CreatorProfile";
+import Overview from "./pages/dashboard/Overview";
+import MyTemplates from "./pages/dashboard/MyTemplates";
+import ProfileSettings from "./pages/dashboard/ProfileSettings";
+import Favorites from "./pages/dashboard/Favorites";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +52,13 @@ const App = () => (
               <Route path="/blog" element={<BlogIndex />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/template/:slug" element={<TemplateSEO />} />
+              <Route path="/creator/:username" element={<CreatorProfile />} />
+              <Route path="/dashboard" element={<Overview />} />
+              <Route path="/dashboard/templates" element={<MyTemplates />} />
+              <Route path="/dashboard/profile" element={<ProfileSettings />} />
+              <Route path="/dashboard/favorites" element={<Favorites />} />
+              <Route path="/dashboard/analytics" element={<Overview />} />
+              <Route path="/dashboard/settings" element={<ProfileSettings />} />
               <Route path="/animated-twibbon-maker" element={<GlobalSEO />} />
               <Route path="/video-twibbon-maker" element={<GlobalSEO />} />
               <Route path="/gif-twibbon-maker" element={<GlobalSEO />} />
