@@ -397,7 +397,10 @@ const UseTemplate = () => {
       {/* Export */}
       <ExportDialog
         open={exportOpen}
-        onClose={() => setExportOpen(false)}
+        onClose={() => {
+          setExportOpen(false);
+          trackUse(template.id);
+        }}
         canvasW={template.canvas_w}
         canvasH={template.canvas_h}
         bottomLayer={userPhoto}
