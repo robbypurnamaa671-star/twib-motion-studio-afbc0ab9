@@ -12,6 +12,7 @@ import { ReportTemplateDialog } from "@/components/ReportTemplateDialog";
 import { StickyHeader } from "@/components/StickyHeader";
 import { lovable } from "@/integrations/lovable";
 import SEOHead from "@/components/SEOHead";
+import { trackView, trackUse } from "@/lib/view-tracking";
 
 const UseTemplate = () => {
   const { user, signInWithGoogle, loading: authLoading } = useAuth();
@@ -66,6 +67,7 @@ const UseTemplate = () => {
         top_layer_config: data.top_layer_config as unknown as Record<string, unknown>,
       } as SharedTemplate);
       setLoading(false);
+      trackView((data as { id: string }).id);
     };
     load();
   }, [templateId]);
