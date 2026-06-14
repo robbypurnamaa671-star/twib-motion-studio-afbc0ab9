@@ -1,7 +1,15 @@
-import { LogOut, User, LayoutDashboard } from "lucide-react";
+import { LogOut, User, LayoutDashboard, FolderKanban, Heart, Settings as Cog, ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const UserMenu = () => {
   const { user, loading, signInWithGoogle, signOut } = useAuth();
@@ -30,34 +38,55 @@ const UserMenu = () => {
     <div className="flex items-center gap-2">
       <Link
         to="/dashboard"
-        className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-sm font-mono hover:bg-secondary"
-        title="Dashboard"
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary/40 bg-primary/10 text-primary text-sm font-mono hover:bg-primary/20 transition-colors"
+        title="My Dashboard"
       >
         <LayoutDashboard className="w-4 h-4" />
-        Dashboard
+        <span className="hidden sm:inline">Dashboard</span>
       </Link>
-      <Link to="/dashboard/profile" className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary text-sm hover:bg-secondary/70">
-        {user.user_metadata?.avatar_url ? (
-          <img
-            src={user.user_metadata.avatar_url}
-            alt=""
-            className="w-5 h-5 rounded-full"
-          />
-        ) : (
-          <User className="w-4 h-4 text-muted-foreground" />
-        )}
-        <span className="text-foreground font-medium max-w-[120px] truncate">
-          {user.user_metadata?.full_name || user.email?.split("@")[0]}
-        </span>
-      </Link>
-      <button
-        onClick={signOut}
-        className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
-        title={t("common.signOut")}
-        aria-label={t("common.signOut")}
-      >
-        <LogOut className="w-4 h-4" />
-      </button>
+      <DropdownMenu>
+        <DropdownMenuTrigger className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-secondary text-sm hover:bg-secondary/70 outline-none">
+          {user.user_metadata?.avatar_url ? (
+            <img src={user.user_metadata.avatar_url} alt="" className="w-6 h-6 rounded-full" />
+          ) : (
+            <User className="w-4 h-4 text-muted-foreground" />
+          )}
+          <span className="text-foreground font-medium max-w-[120px] truncate hidden sm:inline">
+            {user.user_metadata?.full_name || user.email?.split("@")[0]}
+          </span>
+          <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuLabel className="font-mono text-xs text-muted-foreground truncate">
+            {user.email}
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
+            <Link to="/dashboard" className="cursor-pointer">
+              <LayoutDashboard className="w-4 h-4 mr-2" /> Dashboard
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link to="/dashboard/templates" className="cursor-pointer">
+              <FolderKanban className="w-4 h-4 mr-2" /> My Templates
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link to="/dashboard/favorites" className="cursor-pointer">
+              <Heart className="w-4 h-4 mr-2" /> Favorites
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link to="/dashboard/profile" className="cursor-pointer">
+              <Cog className="w-4 h-4 mr-2" /> Profile settings
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={signOut} className="cursor-pointer text-destructive focus:text-destructive">
+            <LogOut className="w-4 h-4 mr-2" /> {t("common.signOut")}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };
