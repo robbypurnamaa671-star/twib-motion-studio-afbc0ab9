@@ -33,6 +33,7 @@ import Overview from "./pages/dashboard/Overview";
 import MyTemplates from "./pages/dashboard/MyTemplates";
 import ProfileSettings from "./pages/dashboard/ProfileSettings";
 import Favorites from "./pages/dashboard/Favorites";
+import Analytics from "./pages/dashboard/Analytics";
 
 const queryClient = new QueryClient();
 
@@ -57,7 +58,7 @@ const App = () => (
               <Route path="/dashboard/templates" element={<MyTemplates />} />
               <Route path="/dashboard/profile" element={<ProfileSettings />} />
               <Route path="/dashboard/favorites" element={<Favorites />} />
-              <Route path="/dashboard/analytics" element={<Overview />} />
+              <Route path="/dashboard/analytics" element={<Analytics />} />
               <Route path="/dashboard/settings" element={<ProfileSettings />} />
               <Route path="/animated-twibbon-maker" element={<GlobalSEO />} />
               <Route path="/video-twibbon-maker" element={<GlobalSEO />} />
