@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import SEOHead from "@/components/SEOHead";
 import SeoShell from "@/components/seo/SeoShell";
 import { breadcrumbJsonLd } from "@/lib/seo-content";
+import { trackView } from "@/lib/view-tracking";
+import { FavoriteButton } from "@/components/community/FavoriteButton";
 
 const BASE_URL = "https://twibmotion.com";
 
@@ -21,6 +23,11 @@ type Tpl = {
   canvas_w: number;
   canvas_h: number;
   created_at: string;
+  owner_id?: string | null;
+  view_count?: number | null;
+  usage_count?: number | null;
+  like_count?: number | null;
+  profiles?: { username: string | null; display_name: string | null; avatar_url: string | null; bio: string | null } | null;
 };
 
 const TemplateSEO = () => {
@@ -37,23 +44,25 @@ const TemplateSEO = () => {
       setLoading(true);
       const { data } = await supabase
         .from("shared_templates")
-        .select("id,title,slug,description,category,tags,bottom_layer_url,preview_url,canvas_ratio,canvas_w,canvas_h,created_at")
+        .select("id,title,slug,description,category,tags,bottom_layer_url,preview_url,canvas_ratio,canvas_w,canvas_h,created_at,owner_id,view_count,usage_count,like_count,profiles:owner_id(username,display_name,avatar_url,bio)")
         .eq("slug", slug)
         .eq("is_public", true)
         .maybeSingle();
       if (!mounted) return;
       if (!data) { setNotFound(true); setLoading(false); return; }
-      setTpl(data as Tpl);
+      setTpl(data as unknown as Tpl);
+      trackView((data as { id: string }).id);
       let rq = supabase
         .from("shared_templates")
-        .select("id,title,slug,description,category,tags,bottom_layer_url,preview_url,canvas_ratio,canvas_w,canvas_h,created_at")
+        .select("id,title,slug,description,category,tags,bottom_layer_url,preview_url,canvas_ratio,canvas_w,canvas_h,created_at,profiles:owner_id(username,display_name,avatar_url)")
         .eq("is_public", true)
+        .is("deleted_at", null)
         .neq("slug", slug)
         .limit(6);
       if (data.category) rq = rq.eq("category", data.category);
       const { data: rel } = await rq;
       if (mounted) {
-        setRelated((rel as Tpl[]) || []);
+        setRelated(((rel as unknown) as Tpl[]) || []);
         setLoading(false);
       }
     })();
@@ -133,6 +142,27 @@ const TemplateSEO = () => {
           </h1>
           <p className="text-muted-foreground text-lg mb-6">{description}</p>
 
+          {tpl.profiles?.username && (
+            <Link
+              to={`/creator/${tpl.profiles.username}`}
+              className="inline-flex items-center gap-3 mb-6 p-3 rounded-lg border border-border bg-card hover:border-primary/60 transition-colors"
+            >
+              {tpl.profiles.avatar_url ? (
+                <img src={tpl.profiles.avatar_url} alt="" width={36} height={36} className="w-9 h-9 rounded-full object-cover" />
+              ) : (
+                <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center text-sm font-mono">
+                  {(tpl.profiles.display_name || tpl.profiles.username || "?").slice(0, 1).toUpperCase()}
+                </div>
+              )}
+              <div className="text-left">
+                <div className="text-xs text-muted-foreground font-mono">Dibuat oleh</div>
+                <div className="text-sm font-mono font-bold text-foreground">
+                  {tpl.profiles.display_name || `@${tpl.profiles.username}`}
+                </div>
+              </div>
+            </Link>
+          )}
+
           <figure className="mb-8">
             <img
               src={imageUrl}
@@ -161,6 +191,7 @@ const TemplateSEO = () => {
             >
               Download Preview
             </a>
+            <FavoriteButton templateId={tpl.id} size="md" />
           </div>
 
           {tpl.description && (
@@ -224,6 +255,9 @@ const TemplateSEO = () => {
                       />
                     </div>
                     <p className="text-sm font-mono text-foreground group-hover:text-primary truncate">{m.title}</p>
+                    {m.profiles?.username && (
+                      <p className="text-[11px] font-mono text-muted-foreground truncate">@{m.profiles.username}</p>
+                    )}
                   </Link>
                 ))}
               </div>
