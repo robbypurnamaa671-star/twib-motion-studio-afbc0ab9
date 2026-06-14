@@ -20,13 +20,21 @@ function writeSet(key: string, set: Set<string>) {
   }
 }
 
+async function safeRpc(fn: string, payload: Record<string, unknown>) {
+  try {
+    await supabase.rpc(fn as never, payload as never);
+  } catch {
+    /* ignore */
+  }
+}
+
 export async function trackView(templateId: string | undefined | null) {
   if (!templateId) return;
   const seen = readSet(VIEW_KEY);
   if (seen.has(templateId)) return;
   seen.add(templateId);
   writeSet(VIEW_KEY, seen);
-  await supabase.rpc("increment_template_view", { _template_id: templateId }).catch(() => undefined);
+  await safeRpc("increment_template_view", { _template_id: templateId });
 }
 
 export async function trackUse(templateId: string | undefined | null) {
@@ -35,10 +43,10 @@ export async function trackUse(templateId: string | undefined | null) {
   if (used.has(templateId)) return;
   used.add(templateId);
   writeSet(USE_KEY, used);
-  await supabase.rpc("increment_template_use", { _template_id: templateId }).catch(() => undefined);
+  await safeRpc("increment_template_use", { _template_id: templateId });
 }
 
 export async function trackDownload(templateId: string | undefined | null) {
   if (!templateId) return;
-  await supabase.rpc("increment_template_download", { _template_id: templateId }).catch(() => undefined);
+  await safeRpc("increment_template_download", { _template_id: templateId });
 }
