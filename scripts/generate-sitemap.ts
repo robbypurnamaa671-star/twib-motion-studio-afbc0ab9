@@ -111,6 +111,28 @@ async function fetchPublicTemplates(): Promise<PublicTemplate[]> {
   return (rows as PublicTemplate[]) || [];
 }
 
+async function fetchCreatorUsernames(): Promise<SitemapEntry[]> {
+  const rows = await fetchJson(
+    `${SUPABASE_URL}/rest/v1/shared_templates?select=profiles:owner_id(username,updated_at)&is_public=eq.true`,
+    "creators",
+  );
+  if (!rows) return [];
+  const map = new Map<string, string | undefined>();
+  for (const r of rows as Array<{ profiles?: { username?: string | null; updated_at?: string } | null }>) {
+    const u = r.profiles?.username;
+    if (!u) continue;
+    const prev = map.get(u);
+    const cand = r.profiles?.updated_at;
+    if (!prev || (cand && cand > prev)) map.set(u, cand);
+  }
+  return Array.from(map.entries()).map(([username, updated]) => ({
+    path: `/creator/${username}`,
+    lastmod: updated?.split("T")[0],
+    changefreq: "weekly" as const,
+    priority: "0.6",
+  }));
+}
+
 function buildSitemap(entries: SitemapEntry[]) {
   const urls = entries.map((e) =>
     [
@@ -163,11 +185,12 @@ function buildImageSitemap(templates: PublicTemplate[]) {
 }
 
 (async () => {
-  const [seo, blog, tpl, publicTpls] = await Promise.all([
+  const [seo, blog, tpl, publicTpls, creators] = await Promise.all([
     fetchSeoPages(),
     fetchBlogPosts(),
     fetchTemplateSeo(),
     fetchPublicTemplates(),
+    fetchCreatorUsernames(),
   ]);
   const publicTplEntries: SitemapEntry[] = publicTpls.map((t) => ({
     path: `/template/${t.slug}`,
@@ -178,11 +201,11 @@ function buildImageSitemap(templates: PublicTemplate[]) {
   // De-duplicate against template_seo slugs
   const seenTpl = new Set(tpl.map((e) => e.path));
   const mergedTpl = [...tpl, ...publicTplEntries.filter((e) => !seenTpl.has(e.path))];
-  const all = [...staticEntries, ...seo, ...blog, ...mergedTpl];
+  const all = [...staticEntries, ...seo, ...blog, ...mergedTpl, ...creators];
   writeFileSync(resolve("public/sitemap.xml"), buildSitemap(all));
   writeFileSync(resolve("public/image-sitemap.xml"), buildImageSitemap(publicTpls));
   console.log(
-    `sitemap.xml written (${all.length} entries: ${staticEntries.length} static + ${seo.length} SEO + ${blog.length} blog + ${mergedTpl.length} templates)`,
+    `sitemap.xml written (${all.length} entries: ${staticEntries.length} static + ${seo.length} SEO + ${blog.length} blog + ${mergedTpl.length} templates + ${creators.length} creators)`,
   );
   console.log(`image-sitemap.xml written (${publicTpls.length} template images)`);
 })();
