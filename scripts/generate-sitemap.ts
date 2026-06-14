@@ -112,22 +112,24 @@ async function fetchPublicTemplates(): Promise<PublicTemplate[]> {
 }
 
 async function fetchCreatorUsernames(): Promise<SitemapEntry[]> {
-  const rows = await fetchJson(
-    `${SUPABASE_URL}/rest/v1/shared_templates?select=profiles:owner_id(username,updated_at)&is_public=eq.true`,
-    "creators",
+  const owners = await fetchJson(
+    `${SUPABASE_URL}/rest/v1/shared_templates?select=owner_id&is_public=eq.true`,
+    "shared_templates.owners",
   );
-  if (!rows) return [];
-  const map = new Map<string, string | undefined>();
-  for (const r of rows as Array<{ profiles?: { username?: string | null; updated_at?: string } | null }>) {
-    const u = r.profiles?.username;
-    if (!u) continue;
-    const prev = map.get(u);
-    const cand = r.profiles?.updated_at;
-    if (!prev || (cand && cand > prev)) map.set(u, cand);
-  }
-  return Array.from(map.entries()).map(([username, updated]) => ({
-    path: `/creator/${username}`,
-    lastmod: updated?.split("T")[0],
+  if (!owners) return [];
+  const ownerIds = Array.from(
+    new Set((owners as { owner_id: string | null }[]).map((r) => r.owner_id).filter(Boolean)),
+  ) as string[];
+  if (ownerIds.length === 0) return [];
+  const inList = ownerIds.map((id) => `"${id}"`).join(",");
+  const profiles = await fetchJson(
+    `${SUPABASE_URL}/rest/v1/profiles?select=username,updated_at&user_id=in.(${inList})&username=not.is.null`,
+    "profiles",
+  );
+  if (!profiles) return [];
+  return (profiles as { username: string; updated_at: string }[]).map((p) => ({
+    path: `/creator/${p.username}`,
+    lastmod: p.updated_at?.split("T")[0],
     changefreq: "weekly" as const,
     priority: "0.6",
   }));
