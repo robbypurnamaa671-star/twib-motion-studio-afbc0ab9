@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Sparkles, Users, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight, Sparkles, Users, ChevronLeft, ChevronRight, Search, Heart, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProgressiveImage } from "@/components/ProgressiveImage";
+import { FavoriteButton } from "@/components/community/FavoriteButton";
 
 type PublicTwibbon = {
   id: string;
@@ -12,6 +13,11 @@ type PublicTwibbon = {
   preview_url: string | null;
   canvas_ratio: string | null;
   category: string | null;
+  owner_id: string | null;
+  view_count: number | null;
+  usage_count: number | null;
+  like_count: number | null;
+  profiles?: { username: string | null; display_name: string | null; avatar_url: string | null } | null;
 };
 
 const PAGE_SIZE = 12;
@@ -47,22 +53,45 @@ const RATIO_FILTERS: { value: string; label: string }[] = [
   { value: "16:9", label: "Landscape 16:9" },
 ];
 
+type Sort = "newest" | "popular" | "used" | "viewed";
+const SORT_FILTERS: { value: Sort; label: string }[] = [
+  { value: "newest", label: "Newest" },
+  { value: "popular", label: "Most liked" },
+  { value: "used", label: "Most used" },
+  { value: "viewed", label: "Most viewed" },
+];
+
+const SORT_COL: Record<Sort, string> = {
+  newest: "created_at",
+  popular: "like_count",
+  used: "usage_count",
+  viewed: "view_count",
+};
+
 type CacheEntry = { ts: number; rows: PublicTwibbon[]; count: number };
 const memoryCache = new Map<string, CacheEntry>();
 
-function cacheKey(category: string, ratio: string, page: number) {
-  return `${category}|${ratio}|${page}`;
+function cacheKey(category: string, ratio: string, sort: Sort, q: string, page: number) {
+  return `${category}|${ratio}|${sort}|${q}|${page}`;
 }
 
 const PublicGallery = ({ createUrl }: { createUrl: string }) => {
   const [category, setCategory] = useState<string>(ALL);
   const [ratio, setRatio] = useState<string>(ALL);
+  const [sort, setSort] = useState<Sort>("newest");
+  const [query, setQuery] = useState("");
+  const [debouncedQ, setDebouncedQ] = useState("");
   const [page, setPage] = useState(0);
   const [rows, setRows] = useState<PublicTwibbon[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  const key = cacheKey(category, ratio, page);
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedQ(query.trim()), 300);
+    return () => clearTimeout(id);
+  }, [query]);
+
+  const key = cacheKey(category, ratio, sort, debouncedQ, page);
 
   useEffect(() => {
     let active = true;
@@ -75,19 +104,27 @@ const PublicGallery = ({ createUrl }: { createUrl: string }) => {
     }
     setLoading(true);
     (async () => {
-      let query = supabase
+      let q = supabase
         .from("shared_templates")
-        .select("id, slug, title, bottom_layer_url, preview_url, canvas_ratio, category", { count: "exact" })
+        .select(
+          "id, slug, title, bottom_layer_url, preview_url, canvas_ratio, category, owner_id, view_count, usage_count, like_count, profiles:owner_id(username, display_name, avatar_url)",
+          { count: "exact" },
+        )
         .eq("is_public", true)
-        .order("created_at", { ascending: false })
+        .is("deleted_at", null)
+        .order(SORT_COL[sort], { ascending: false })
         .range(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE - 1);
 
-      if (category !== ALL) query = query.eq("category", category);
-      if (ratio !== ALL) query = query.eq("canvas_ratio", ratio);
+      if (category !== ALL) q = q.eq("category", category);
+      if (ratio !== ALL) q = q.eq("canvas_ratio", ratio);
+      if (debouncedQ) {
+        const esc = debouncedQ.replace(/[,%]/g, " ");
+        q = q.or(`title.ilike.%${esc}%,description.ilike.%${esc}%`);
+      }
 
-      const { data, count } = await query;
+      const { data, count } = await q;
       if (!active) return;
-      const safeRows = (data ?? []) as PublicTwibbon[];
+      const safeRows = (data ?? []) as unknown as PublicTwibbon[];
       const safeCount = count ?? 0;
       memoryCache.set(key, { ts: Date.now(), rows: safeRows, count: safeCount });
       setRows(safeRows);
@@ -97,12 +134,12 @@ const PublicGallery = ({ createUrl }: { createUrl: string }) => {
     return () => {
       active = false;
     };
-  }, [key, category, ratio, page]);
+  }, [key, category, ratio, sort, debouncedQ, page]);
 
   // Reset to page 0 when filters change
   useEffect(() => {
     setPage(0);
-  }, [category, ratio]);
+  }, [category, ratio, sort, debouncedQ]);
 
   const totalPages = useMemo(
     () => Math.max(1, Math.ceil(totalCount / PAGE_SIZE)),
@@ -128,6 +165,19 @@ const PublicGallery = ({ createUrl }: { createUrl: string }) => {
 
       {/* Filters */}
       <div className="space-y-3 mb-6">
+        <div className="flex justify-center">
+          <div className="relative w-full max-w-md">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search templates, creators, or themes…"
+              aria-label="Search community templates"
+              className={`w-full pl-9 pr-3 py-2 rounded-full text-sm bg-card border border-border focus:border-primary outline-none ${focusRing}`}
+            />
+          </div>
+        </div>
         <FilterRow
           label="Category"
           options={CATEGORY_FILTERS}
@@ -139,6 +189,12 @@ const PublicGallery = ({ createUrl }: { createUrl: string }) => {
           options={RATIO_FILTERS}
           value={ratio}
           onChange={setRatio}
+        />
+        <FilterRow
+          label="Sort"
+          options={SORT_FILTERS}
+          value={sort}
+          onChange={(v) => setSort(v as Sort)}
         />
       </div>
 
@@ -166,6 +222,7 @@ const PublicGallery = ({ createUrl }: { createUrl: string }) => {
         <>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {rows.map((tw) => (
+              <div key={tw.id} className="relative group">
               <Link
                 key={tw.id}
                 to={`/use-template/${tw.slug || tw.id}`}
@@ -230,8 +287,23 @@ const PublicGallery = ({ createUrl }: { createUrl: string }) => {
                   <p className="text-xs font-mono text-foreground truncate">
                     {tw.title ?? "Untitled twibbon"}
                   </p>
+                  <div className="flex items-center justify-between text-[10px] font-mono text-muted-foreground mt-0.5">
+                    {tw.profiles?.username ? (
+                      <span className="truncate">@{tw.profiles.username}</span>
+                    ) : <span />}
+                    <span className="inline-flex items-center gap-2 shrink-0">
+                      {(tw.like_count ?? 0) > 0 && (
+                        <span className="inline-flex items-center gap-0.5"><Heart className="w-3 h-3" /> {tw.like_count}</span>
+                      )}
+                      {(tw.view_count ?? 0) > 0 && (
+                        <span className="inline-flex items-center gap-0.5"><Eye className="w-3 h-3" /> {tw.view_count}</span>
+                      )}
+                    </span>
+                  </div>
                 </div>
               </Link>
+              <FavoriteButton templateId={tw.id} className="absolute top-2 right-2 z-20" />
+              </div>
             ))}
           </div>
 
