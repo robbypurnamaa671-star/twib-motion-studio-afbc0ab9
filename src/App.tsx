@@ -28,12 +28,19 @@ import BlogIndex from "./pages/BlogIndex";
 import BlogPost from "./pages/BlogPost";
 import TemplateSEO from "./pages/TemplateSEO";
 import BlogPostsPage from "./pages/admin/BlogPostsPage";
+import AdminCollectionsPage from "./pages/admin/CollectionsPage";
 import CreatorProfile from "./pages/CreatorProfile";
 import Overview from "./pages/dashboard/Overview";
 import MyTemplates from "./pages/dashboard/MyTemplates";
 import ProfileSettings from "./pages/dashboard/ProfileSettings";
 import Favorites from "./pages/dashboard/Favorites";
 import Analytics from "./pages/dashboard/Analytics";
+import CommunityHub from "./pages/community/CommunityHub";
+import CommunityCategory from "./pages/community/CommunityCategory";
+import CollectionsIndex from "./pages/community/CollectionsIndex";
+import CollectionPage from "./pages/community/CollectionPage";
+import CreatorLeaderboard from "./pages/community/CreatorLeaderboard";
+import Discovery from "./pages/community/Discovery";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +61,16 @@ const App = () => (
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/template/:slug" element={<TemplateSEO />} />
               <Route path="/creator/:username" element={<CreatorProfile />} />
+              <Route path="/community" element={<CommunityHub />} />
+              <Route path="/community/category/:slug" element={<CommunityCategory />} />
+              <Route path="/collections" element={<CollectionsIndex />} />
+              <Route path="/collections/:slug" element={<CollectionPage />} />
+              <Route path="/creators" element={<CreatorLeaderboard />} />
+              <Route path="/trending" element={<Discovery kind="trending" />} />
+              <Route path="/new" element={<Discovery kind="new" />} />
+              <Route path="/popular" element={<Discovery kind="popular" />} />
+              <Route path="/featured" element={<Discovery kind="featured" />} />
+              <Route path="/favorites" element={<Discovery kind="favorites" />} />
               <Route path="/dashboard" element={<Overview />} />
               <Route path="/dashboard/templates" element={<MyTemplates />} />
               <Route path="/dashboard/profile" element={<ProfileSettings />} />
@@ -94,6 +111,7 @@ const App = () => (
               <Route path="/admin/diagnostics" element={<AdminGuard><DiagnosticsPage /></AdminGuard>} />
               <Route path="/admin/seo-pages" element={<AdminGuard><SeoPagesPage /></AdminGuard>} />
               <Route path="/admin/blog" element={<AdminGuard><BlogPostsPage /></AdminGuard>} />
+              <Route path="/admin/collections" element={<AdminGuard><AdminCollectionsPage /></AdminGuard>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

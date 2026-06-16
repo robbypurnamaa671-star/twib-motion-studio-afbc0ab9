@@ -13,6 +13,9 @@ export default function SeoShell({ children }: { children: React.ReactNode }) {
             <span className="font-mono font-bold text-lg text-foreground tracking-tight">TwibMotion</span>
           </Link>
           <div className="flex items-center gap-3">
+            <Link to="/community" className="text-sm font-mono text-muted-foreground hover:text-primary">Community</Link>
+            <Link to="/collections" className="hidden sm:inline text-sm font-mono text-muted-foreground hover:text-primary">Collections</Link>
+            <Link to="/creators" className="hidden sm:inline text-sm font-mono text-muted-foreground hover:text-primary">Creators</Link>
             <Link to="/blog" className="text-sm font-mono text-muted-foreground hover:text-primary">Blog</Link>
             <UserMenu />
           </div>

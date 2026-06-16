@@ -34,6 +34,14 @@ const staticEntries: SitemapEntry[] = [
   { path: "/create/vertical-9-16", changefreq: "weekly", priority: "0.9" },
   { path: "/create/square-1-1", changefreq: "weekly", priority: "0.9" },
   { path: "/create/landscape-16-9", changefreq: "weekly", priority: "0.9" },
+  { path: "/community", changefreq: "daily", priority: "0.9" },
+  { path: "/collections", changefreq: "weekly", priority: "0.8" },
+  { path: "/creators", changefreq: "daily", priority: "0.8" },
+  { path: "/trending", changefreq: "daily", priority: "0.8" },
+  { path: "/new", changefreq: "daily", priority: "0.8" },
+  { path: "/popular", changefreq: "daily", priority: "0.8" },
+  { path: "/featured", changefreq: "weekly", priority: "0.7" },
+  { path: "/favorites", changefreq: "daily", priority: "0.7" },
 ];
 
 async function fetchJson(url: string, label: string): Promise<any[] | null> {
@@ -135,6 +143,35 @@ async function fetchCreatorUsernames(): Promise<SitemapEntry[]> {
   }));
 }
 
+async function fetchCollectionEntries(): Promise<SitemapEntry[]> {
+  const rows = await fetchJson(
+    `${SUPABASE_URL}/rest/v1/template_collections?select=slug,updated_at&is_published=eq.true&is_indexable=eq.true`,
+    "template_collections",
+  );
+  if (!rows) return [];
+  return (rows as { slug: string; updated_at: string }[]).map((r) => ({
+    path: `/collections/${r.slug}`,
+    lastmod: r.updated_at?.split("T")[0],
+    changefreq: "weekly" as const,
+    priority: "0.7",
+  }));
+}
+
+async function fetchCommunityCategoryEntries(): Promise<SitemapEntry[]> {
+  const rows = await fetchJson(
+    `${SUPABASE_URL}/rest/v1/shared_templates?select=category&is_public=eq.true&category=not.is.null`,
+    "shared_templates.categories",
+  );
+  if (!rows) return [];
+  const set = new Set<string>();
+  (rows as { category: string | null }[]).forEach((r) => { if (r.category) set.add(r.category); });
+  return Array.from(set).map((cat) => ({
+    path: `/community/category/${cat}`,
+    changefreq: "weekly" as const,
+    priority: "0.6",
+  }));
+}
+
 function buildSitemap(entries: SitemapEntry[]) {
   const urls = entries.map((e) =>
     [
@@ -187,12 +224,14 @@ function buildImageSitemap(templates: PublicTemplate[]) {
 }
 
 (async () => {
-  const [seo, blog, tpl, publicTpls, creators] = await Promise.all([
+  const [seo, blog, tpl, publicTpls, creators, collections, commCats] = await Promise.all([
     fetchSeoPages(),
     fetchBlogPosts(),
     fetchTemplateSeo(),
     fetchPublicTemplates(),
     fetchCreatorUsernames(),
+    fetchCollectionEntries(),
+    fetchCommunityCategoryEntries(),
   ]);
   const publicTplEntries: SitemapEntry[] = publicTpls.map((t) => ({
     path: `/template/${t.slug}`,
@@ -203,11 +242,19 @@ function buildImageSitemap(templates: PublicTemplate[]) {
   // De-duplicate against template_seo slugs
   const seenTpl = new Set(tpl.map((e) => e.path));
   const mergedTpl = [...tpl, ...publicTplEntries.filter((e) => !seenTpl.has(e.path))];
-  const all = [...staticEntries, ...seo, ...blog, ...mergedTpl, ...creators];
+  const all = [
+    ...staticEntries,
+    ...seo,
+    ...blog,
+    ...mergedTpl,
+    ...creators,
+    ...collections,
+    ...commCats,
+  ];
   writeFileSync(resolve("public/sitemap.xml"), buildSitemap(all));
   writeFileSync(resolve("public/image-sitemap.xml"), buildImageSitemap(publicTpls));
   console.log(
-    `sitemap.xml written (${all.length} entries: ${staticEntries.length} static + ${seo.length} SEO + ${blog.length} blog + ${mergedTpl.length} templates + ${creators.length} creators)`,
+    `sitemap.xml written (${all.length} entries: ${staticEntries.length} static + ${seo.length} SEO + ${blog.length} blog + ${mergedTpl.length} templates + ${creators.length} creators + ${collections.length} collections + ${commCats.length} community-categories)`,
   );
   console.log(`image-sitemap.xml written (${publicTpls.length} template images)`);
 })();

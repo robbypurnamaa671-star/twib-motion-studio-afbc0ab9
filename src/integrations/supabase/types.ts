@@ -190,6 +190,7 @@ export type Database = {
           facebook_url: string | null
           id: string
           instagram_url: string | null
+          is_featured_creator: boolean
           twitter_url: string | null
           updated_at: string
           user_id: string
@@ -206,6 +207,7 @@ export type Database = {
           facebook_url?: string | null
           id?: string
           instagram_url?: string | null
+          is_featured_creator?: boolean
           twitter_url?: string | null
           updated_at?: string
           user_id: string
@@ -222,6 +224,7 @@ export type Database = {
           facebook_url?: string | null
           id?: string
           instagram_url?: string | null
+          is_featured_creator?: boolean
           twitter_url?: string | null
           updated_at?: string
           user_id?: string
@@ -422,6 +425,51 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
           value?: Json
+        }
+        Relationships: []
+      }
+      template_collections: {
+        Row: {
+          cover_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_indexable: boolean
+          is_published: boolean
+          match_category: string | null
+          match_tags: string[]
+          slug: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_indexable?: boolean
+          is_published?: boolean
+          match_category?: string | null
+          match_tags?: string[]
+          slug: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_indexable?: boolean
+          is_published?: boolean
+          match_category?: string | null
+          match_tags?: string[]
+          slug?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }

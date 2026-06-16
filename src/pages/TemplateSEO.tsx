@@ -7,6 +7,8 @@ import SeoShell from "@/components/seo/SeoShell";
 import { breadcrumbJsonLd } from "@/lib/seo-content";
 import { trackView } from "@/lib/view-tracking";
 import { FavoriteButton } from "@/components/community/FavoriteButton";
+import { StatBadges } from "@/components/community/StatBadges";
+import { RelatedRail } from "@/components/community/RelatedRail";
 
 const BASE_URL = "https://twibmotion.com";
 
@@ -27,6 +29,7 @@ type Tpl = {
   view_count?: number | null;
   usage_count?: number | null;
   like_count?: number | null;
+  download_count?: number | null;
   profiles?: { username: string | null; display_name: string | null; avatar_url: string | null; bio: string | null } | null;
 };
 
@@ -44,7 +47,7 @@ const TemplateSEO = () => {
       setLoading(true);
       const { data } = await supabase
         .from("shared_templates")
-        .select("id,title,slug,description,category,tags,bottom_layer_url,preview_url,canvas_ratio,canvas_w,canvas_h,created_at,owner_id,view_count,usage_count,like_count,profiles:owner_id(username,display_name,avatar_url,bio)")
+        .select("id,title,slug,description,category,tags,bottom_layer_url,preview_url,canvas_ratio,canvas_w,canvas_h,created_at,owner_id,view_count,usage_count,like_count,download_count,profiles:owner_id(username,display_name,avatar_url,bio)")
         .eq("slug", slug)
         .eq("is_public", true)
         .maybeSingle();
@@ -76,6 +79,9 @@ const TemplateSEO = () => {
     : undefined;
   const imageUrl = tpl?.preview_url || tpl?.bottom_layer_url || "";
   const altText = tpl ? `Template Twibbon ${tpl.title}` : "";
+  const ogAlt = tpl
+    ? `Template Twibbon ${tpl.title}${tpl.profiles?.username ? ` oleh @${tpl.profiles.username}` : ""}`
+    : altText;
   const downloadName = tpl ? `template-twibbon-${tpl.slug}.png` : "template.png";
 
   const jsonLd = useMemo(() => {
@@ -118,7 +124,18 @@ const TemplateSEO = () => {
 
   return (
     <SeoShell>
-      <SEOHead title={title} description={description} canonical={canonical} ogUrl={canonical} ogType="article" jsonLd={jsonLd} />
+      <SEOHead
+        title={title}
+        description={description}
+        canonical={canonical}
+        ogUrl={canonical}
+        ogType="article"
+        ogImage={imageUrl || undefined}
+        ogImageAlt={ogAlt}
+        ogImageWidth={tpl?.canvas_w || undefined}
+        ogImageHeight={tpl?.canvas_h || undefined}
+        jsonLd={jsonLd}
+      />
       {loading || !tpl ? (
         <div className="flex justify-center py-20"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
       ) : (
@@ -141,6 +158,14 @@ const TemplateSEO = () => {
             Template Twibbon {tpl.title}
           </h1>
           <p className="text-muted-foreground text-lg mb-6">{description}</p>
+
+          <StatBadges
+            views={tpl.view_count}
+            uses={tpl.usage_count}
+            downloads={tpl.download_count}
+            likes={tpl.like_count}
+            publishedAt={tpl.created_at}
+          />
 
           {tpl.profiles?.username && (
             <Link
@@ -266,6 +291,14 @@ const TemplateSEO = () => {
               </p>
             </section>
           )}
+
+          <RelatedRail
+            templateId={tpl.id}
+            ownerId={tpl.owner_id ?? null}
+            category={tpl.category}
+            tags={tpl.tags}
+            creatorUsername={tpl.profiles?.username ?? null}
+          />
         </>
       )}
     </SeoShell>
