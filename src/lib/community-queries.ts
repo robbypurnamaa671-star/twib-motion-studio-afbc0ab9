@@ -275,11 +275,11 @@ export async function fetchTopFavorited(limit = 24): Promise<CommunityTemplate[]
 export async function fetchRelatedBlogPosts(tags: string[] | null, limit = 3) {
   let q = supabase
     .from("blog_posts")
-    .select("slug,title,excerpt,featured_image_url,published_at")
+    .select("slug,title,excerpt,cover_image_url,published_at")
     .eq("is_published", true)
     .order("published_at", { ascending: false })
     .limit(limit);
   if (tags && tags.length > 0) q = q.overlaps("tags", tags);
   const { data } = await q;
-  return (data as { slug: string; title: string; excerpt: string | null; featured_image_url: string | null; published_at: string | null }[]) || [];
+  return (data as { slug: string; title: string; excerpt: string | null; cover_image_url: string | null; published_at: string | null }[]) || [];
 }

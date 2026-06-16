@@ -12,7 +12,7 @@ type BlogPost = {
   slug: string;
   title: string;
   excerpt: string | null;
-  featured_image_url: string | null;
+  cover_image_url: string | null;
   published_at: string | null;
 };
 
