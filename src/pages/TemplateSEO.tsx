@@ -7,6 +7,8 @@ import SeoShell from "@/components/seo/SeoShell";
 import { breadcrumbJsonLd } from "@/lib/seo-content";
 import { trackView } from "@/lib/view-tracking";
 import { FavoriteButton } from "@/components/community/FavoriteButton";
+import { StatBadges } from "@/components/community/StatBadges";
+import { RelatedRail } from "@/components/community/RelatedRail";
 
 const BASE_URL = "https://twibmotion.com";
 
@@ -27,6 +29,8 @@ type Tpl = {
   view_count?: number | null;
   usage_count?: number | null;
   like_count?: number | null;
+  download_count?: number | null;
+  tags?: string[] | null;
   profiles?: { username: string | null; display_name: string | null; avatar_url: string | null; bio: string | null } | null;
 };
 
@@ -44,7 +48,7 @@ const TemplateSEO = () => {
       setLoading(true);
       const { data } = await supabase
         .from("shared_templates")
-        .select("id,title,slug,description,category,tags,bottom_layer_url,preview_url,canvas_ratio,canvas_w,canvas_h,created_at,owner_id,view_count,usage_count,like_count,profiles:owner_id(username,display_name,avatar_url,bio)")
+        .select("id,title,slug,description,category,tags,bottom_layer_url,preview_url,canvas_ratio,canvas_w,canvas_h,created_at,owner_id,view_count,usage_count,like_count,download_count,profiles:owner_id(username,display_name,avatar_url,bio)")
         .eq("slug", slug)
         .eq("is_public", true)
         .maybeSingle();
