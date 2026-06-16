@@ -28,6 +28,7 @@ import BlogIndex from "./pages/BlogIndex";
 import BlogPost from "./pages/BlogPost";
 import TemplateSEO from "./pages/TemplateSEO";
 import BlogPostsPage from "./pages/admin/BlogPostsPage";
+import AdminCollectionsPage from "./pages/admin/CollectionsPage";
 import CreatorProfile from "./pages/CreatorProfile";
 import Overview from "./pages/dashboard/Overview";
 import MyTemplates from "./pages/dashboard/MyTemplates";
@@ -110,6 +111,7 @@ const App = () => (
               <Route path="/admin/diagnostics" element={<AdminGuard><DiagnosticsPage /></AdminGuard>} />
               <Route path="/admin/seo-pages" element={<AdminGuard><SeoPagesPage /></AdminGuard>} />
               <Route path="/admin/blog" element={<AdminGuard><BlogPostsPage /></AdminGuard>} />
+              <Route path="/admin/collections" element={<AdminGuard><AdminCollectionsPage /></AdminGuard>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, FileImage, LogOut, Layers, Crown, Search, BookOpen, Flag, BarChart3, History, Settings, CreditCard, Stethoscope } from "lucide-react";
+import { LayoutDashboard, Users, FileImage, LogOut, Layers, Crown, Search, BookOpen, Flag, BarChart3, History, Settings, CreditCard, Stethoscope, FolderHeart } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -25,6 +25,7 @@ const items = [
   { title: "Analytics", url: "/admin/analytics", icon: BarChart3 },
   { title: "SEO Pages", url: "/admin/seo-pages", icon: Search },
   { title: "Blog", url: "/admin/blog", icon: BookOpen },
+  { title: "Collections", url: "/admin/collections", icon: FolderHeart },
 ];
 const superItems = [
   { title: "Audit Logs", url: "/admin/audit", icon: History },
