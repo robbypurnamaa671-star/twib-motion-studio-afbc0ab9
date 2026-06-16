@@ -7,13 +7,17 @@ interface SEOHeadProps {
   noindex?: boolean;
   ogUrl?: string;
   ogType?: string;
+  ogImage?: string;
+  ogImageAlt?: string;
+  ogImageWidth?: number;
+  ogImageHeight?: number;
   jsonLd?: object | object[];
 }
 
 const DEFAULT_TITLE = "TwibMotion – Free Twibbon Maker for Photos, GIFs, and Videos";
 const DEFAULT_DESC = "TwibMotion is a free online twibbon maker that lets you create twibbons by layering frames over photos, GIFs, or videos. Export high-quality twibbons for campaigns, social media, Reels, and events in seconds.";
 
-const SEOHead = ({ title, description, canonical, noindex, ogUrl, ogType, jsonLd }: SEOHeadProps) => {
+const SEOHead = ({ title, description, canonical, noindex, ogUrl, ogType, ogImage, ogImageAlt, ogImageWidth, ogImageHeight, jsonLd }: SEOHeadProps) => {
   useEffect(() => {
     const t = title || DEFAULT_TITLE;
     const d = description || DEFAULT_DESC;
@@ -38,6 +42,18 @@ const SEOHead = ({ title, description, canonical, noindex, ogUrl, ogType, jsonLd
     setMeta("name", "twitter:card", "summary_large_image");
     if (ogUrl || canonical) setMeta("property", "og:url", ogUrl || canonical || "");
     setMeta("property", "og:type", ogType || "website");
+
+    if (ogImage) {
+      setMeta("property", "og:image", ogImage);
+      setMeta("property", "og:image:secure_url", ogImage);
+      setMeta("name", "twitter:image", ogImage);
+      if (ogImageAlt) {
+        setMeta("property", "og:image:alt", ogImageAlt);
+        setMeta("name", "twitter:image:alt", ogImageAlt);
+      }
+      if (ogImageWidth) setMeta("property", "og:image:width", String(ogImageWidth));
+      if (ogImageHeight) setMeta("property", "og:image:height", String(ogImageHeight));
+    }
 
     if (canonical) {
       let link = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
@@ -68,7 +84,7 @@ const SEOHead = ({ title, description, canonical, noindex, ogUrl, ogType, jsonLd
         document.head.appendChild(s);
       });
     }
-  }, [title, description, canonical, noindex, ogUrl, ogType, jsonLd]);
+  }, [title, description, canonical, noindex, ogUrl, ogType, ogImage, ogImageAlt, ogImageWidth, ogImageHeight, jsonLd]);
 
   return null;
 };
