@@ -1,55 +1,88 @@
-# Creator Platform Upgrade
+## Priority 5 — Community SEO Engine
 
-This is a large multi-phase build. I'll ship it in 4 phases so you can review after each.
+Turn the community into a self-growing SEO surface. All new pages indexable, sitemapped, and cross-linked.
 
-## Phase 1 — Profile foundation (DB + Settings + Public profile)
+### 1. New routes (all in `src/App.tsx`)
 
-**Database migration**
-- Extend `profiles`: add `username` (unique, citext, regex-validated via trigger), `bio`, `website_url`, `instagram_url`, `facebook_url`, `twitter_url`, `is_disabled`. Backfill `username` from email for existing users.
-- Add unique index on `lower(username)`.
-- Add `template_favorites` table (`user_id`, `template_id`, `created_at`, unique pair) with RLS + GRANTs.
-- Add `template_views` counter columns on `shared_templates` (`view_count`, `use_count`, `download_count`, `is_featured`, `deleted_at` for soft delete, `status` enum: draft/public/private).
-- Add `creator_featured` flag on `profiles`.
-- RPC `increment_template_view(template_id)` (security definer) and `increment_template_use`, `increment_template_download`.
-- Storage: reuse `template-assets` bucket for avatars under `avatars/{user_id}/...`.
+```text
+/community                       → CommunityHub (trending, most used, most viewed, new, featured creators, popular categories)
+/community/category/:slug        → CommunityCategory (top + new templates, featured creators)
+/collections                     → CollectionsIndex
+/collections/:slug               → CollectionPage (auto-aggregated by tag/category match)
+/creators                        → CreatorLeaderboard (popular / most used / most templates / fastest growing tabs)
+/trending                        → Discovery: trending today/week/month
+/new                             → Discovery: newest
+/popular                         → Discovery: most-liked
+/featured                        → Discovery: admin-featured
+/favorites                       → Public favorites feed (top-favorited templates)
+```
 
-**Frontend**
-- `/dashboard/profile` (settings): edit display name, username, avatar upload, bio, social URLs. Zod validation. Username uniqueness check.
-- `/creator/:username` public page: avatar, bio, socials, join date, stats, public templates grid. SEO via react-helmet-async + Person/ProfilePage JSON-LD. Indexable. Added to sitemap generator.
+`/dashboard/favorites` (existing) stays as the user's private list.
 
-## Phase 2 — Dashboard + Template Management
+### 2. Data model additions (one migration)
 
-- `/dashboard` overview: counts (templates, public, private, views, uses) + recent activity.
-- `/dashboard/templates`: tabs Draft / Public / Private. Cards show preview, title, dates, views, uses, status badge.
-- Per-template editor drawer: title, description, tags, category, thumbnail, public/private toggle, publish/unpublish, soft-delete.
-- `/dashboard/analytics`: aggregate + per-template charts (recharts).
-- `/dashboard/favorites`: liked templates grid.
-- Sidebar shell with Overview / Templates / Profile / Analytics / Favorites / Settings.
+- `shared_templates.is_featured boolean default false` (admin-controlled).
+- `profiles.is_featured_creator boolean default false`.
+- `template_collections` table: `slug, title, description, cover_url, match_tags text[], match_category text, is_indexable, is_published, updated_at` + admin RLS, public read.
+- `template_collection_items` (optional manual override) — skip for v1, use `match_tags`/`match_category` auto-aggregation.
+- View / RPC `get_trending_templates(_window text)` returning ranked list using weighted score: `usage*3 + favorites*2 + views*1` over a time window on `created_at` / recent activity. Implement as SQL functions returning `setof shared_templates`.
+- RPC `get_featured_creators(_limit int)` → profiles joined with template counts and total uses, ordered by `is_featured_creator desc, total_uses desc`.
+- RPC `get_creator_leaderboard(_sort text, _limit int)` for the four leaderboard sorts.
 
-## Phase 3 — Community + Discovery
+GRANTs to `anon` + `authenticated` for new tables/functions (public reads). Admin write policies via `is_admin_or_super`.
 
-- Community template cards (PublicGallery + TemplateSEO related grid): show creator avatar + `@username` linking to `/creator/:username`.
-- Community page filters: Newest / Most Popular (likes) / Most Used / Most Viewed.
-- Search by template name, creator username, tags (single search box, debounced).
-- Favorite/like button on cards (heart, optimistic).
-- TemplateSEO page: add creator attribution block + related creators section.
-- View tracking: call `increment_template_view` on TemplateSEO + UseTemplate mount (deduped per session).
-- Use tracking: increment on UseTemplate export. Download tracking: on export complete.
+### 3. Components & shared building blocks
 
-## Phase 4 — Admin + SEO polish
+- `src/components/community/TemplateGrid.tsx` — reusable card grid (image, title, creator, stats badges Views/Uses/Likes).
+- `src/components/community/CreatorCard.tsx` — avatar, username, templates count, total uses, link to `/creator/:username`.
+- `src/components/community/StatBadges.tsx` — small badges shown on template pages ("Used 248 times • Viewed 1,524 times").
+- `src/components/community/RelatedRail.tsx` — wraps Related Templates / More from Creator / Related Categories / Related Blog Posts blocks for `TemplateSEO`.
+- `src/lib/community-queries.ts` — typed wrappers around the RPCs + plain Supabase queries (trending, newest, most-used, most-viewed, by-collection, by-category, leaderboard, featured creators, related-for-template).
 
-- Admin Users page: edit username, disable account, feature creator.
-- Admin Templates page: feature template, hard delete.
-- Sitemap generator: include all `/creator/:username` for users with ≥1 public template.
-- robots/canonical updated.
+### 4. Page implementations (frontend)
 
-## Technical notes
+- Use existing `SeoShell` + `SEOHead` for every new page. Each page sets canonical, og:url, og:type=`website`/`profile`, JSON-LD (`CollectionPage` or `ItemList` + `BreadcrumbList`), and an H1.
+- `TemplateSEO.tsx` extensions: add `StatBadges` (views/uses/downloads/favorites + publish date), `RelatedRail` (related templates by tag/category, more-from-creator, related categories as tag chips, latest 3 blog posts whose tags intersect template tags).
+- `CommunityHub` shows: hero + tabs (Trending Today/Week/Month) + Most Used + Most Viewed + Newest + Featured Creators + Popular Categories (derived from `shared_templates.category` counts).
+- Collection pages: pull templates whose `category = match_category` OR `tags && match_tags`.
+- Category pages: similar to collections but keyed on `category`.
+- Leaderboard `/creators`: tabs with the four sorts.
+- Discovery `/trending`, `/new`, `/popular`, `/featured`, `/favorites` — thin pages that reuse `TemplateGrid` + correct sort, each with unique title/description/canonical and `ItemList` JSON-LD.
 
-- All new tables follow GRANT → RLS → POLICY order. `template_favorites` policies scope by `auth.uid()`.
-- Username regex: `^[a-z0-9][a-z0-9-]{1,29}$` enforced via CHECK + zod.
-- Soft delete: `deleted_at IS NULL` filter everywhere; admin can hard-delete.
-- View counters use security-definer RPC to bypass RLS for anonymous increments, with simple in-session dedup on client.
-- Avatar uploads: 2MB cap, jpeg/png/webp, stored at `template-assets/avatars/{user_id}/avatar.{ext}`.
-- Re-uses existing two-layer editor — no changes to canvas/export engine.
+### 5. Internal linking
 
-Confirm and I'll start with Phase 1 (DB migration + profile settings + public creator page).
+- Add CommunityHub link to header nav + `UserMenu`.
+- Footer (or `HomepageSEOSections`) gets: Trending, New, Popular, Creators, Collections.
+- `TemplateSEO` already links to creator + category; add Collections this template belongs to (any collection whose match rules hit) and 3 related blog posts.
+
+### 6. Open Graph for templates
+
+Set `og:image` on `TemplateSEO` to `preview_url || bottom_layer_url`, plus `og:image:width/height`, `twitter:card=summary_large_image`, and `og:image:alt = "Template Twibbon {title} oleh @{username}"`. Extend `SEOHead` to accept an `ogImage` prop (current version doesn't emit one). No dynamic OG render server — we ship the template preview itself, which already shows title text in-image.
+
+### 7. Sitemap (`scripts/generate-sitemap.ts`)
+
+Add fetchers + entries for:
+- `/community`, `/trending`, `/new`, `/popular`, `/featured`, `/favorites`, `/creators`, `/collections` (static, weekly).
+- `/community/category/:slug` — derive from distinct `shared_templates.category` where `is_public=true`.
+- `/collections/:slug` — from `template_collections` where `is_indexable=true and is_published=true`.
+
+Image sitemap already covers public templates; no change needed.
+
+### 8. Admin
+
+Extend `admin/TemplatesPage` with a "Featured" toggle (sets `is_featured`). Extend `admin/UsersPage` with "Feature creator" toggle. New `admin/CollectionsPage` for CRUD on `template_collections` (slug, title, description, cover, match rules, publish + indexable flags). Add to `AdminSidebar`.
+
+### Out of scope (deferred)
+
+- Server-side rendered OG image composer (would need an edge function with canvas). We use the template preview image itself as the OG image — covers the "creator username + title" requirement because templates already contain that info in-frame.
+- Manual collection curation UI (auto-aggregation via tags/category is enough for v1).
+
+### Order of execution
+
+1. Migration (collections table, featured flags, RPCs, GRANTs).
+2. `src/lib/community-queries.ts` + shared community components.
+3. Routes + pages.
+4. Extend `TemplateSEO` (stats, related rail, OG image).
+5. Sitemap script update.
+6. Admin extensions (collections + featured toggles).
+7. Header/footer internal linking.
