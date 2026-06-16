@@ -30,7 +30,6 @@ type Tpl = {
   usage_count?: number | null;
   like_count?: number | null;
   download_count?: number | null;
-  tags?: string[] | null;
   profiles?: { username: string | null; display_name: string | null; avatar_url: string | null; bio: string | null } | null;
 };
 
