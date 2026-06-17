@@ -75,7 +75,7 @@ export function useNotifications(limit = 20) {
   }, [fetchNow]);
 
   const markAllRead = useCallback(async () => {
-    await supabase.rpc("mark_notifications_read", { _ids: null });
+    await supabase.rpc("mark_notifications_read", { _ids: null as unknown as string[] });
     setItems((prev) => prev.map((n) => ({ ...n, read_at: n.read_at ?? new Date().toISOString() })));
   }, []);
 
