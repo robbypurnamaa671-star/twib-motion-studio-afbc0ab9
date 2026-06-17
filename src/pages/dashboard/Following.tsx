@@ -29,8 +29,13 @@ export default function Following() {
         .from("profiles")
         .select("user_id, username, display_name, avatar_url, follower_count")
         .in("user_id", ids);
-      const map = new Map((profs ?? []).map((p: { user_id: string }) => [p.user_id, p]));
-      setRows(ids.map((id) => ({ creator_id: id, profile: (map.get(id) as Row["profile"]) ?? null })));
+      const map = new Map<string, Row["profile"]>(
+        ((profs ?? []) as Array<{ user_id: string } & NonNullable<Row["profile"]>>).map((p) => [
+          p.user_id,
+          { username: p.username, display_name: p.display_name, avatar_url: p.avatar_url, follower_count: p.follower_count },
+        ])
+      );
+      setRows(ids.map((id) => ({ creator_id: id, profile: map.get(id) ?? null })));
       setLoading(false);
     })();
   }, [user]);
