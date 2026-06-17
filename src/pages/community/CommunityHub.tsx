@@ -170,6 +170,9 @@ export default function CommunityHub() {
           </div>
         )}
       </Section>
+      <div className="mb-8">
+        <NewsletterSignup source="community" />
+      </div>
     </SeoShell>
   );
 }
