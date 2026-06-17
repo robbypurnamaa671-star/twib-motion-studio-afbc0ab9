@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { LayoutDashboard, FolderKanban, User, BarChart3, Heart, Settings as Cog, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, FolderKanban, User, BarChart3, Heart, Settings as Cog, ArrowLeft, Users, Bell, Gift } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import SEOHead from "@/components/SEOHead";
@@ -11,6 +11,9 @@ const NAV = [
   { to: "/dashboard/profile", label: "Profile", icon: User },
   { to: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/dashboard/favorites", label: "Favorites", icon: Heart },
+  { to: "/dashboard/following", label: "Following", icon: Users },
+  { to: "/dashboard/notifications", label: "Notifications", icon: Bell },
+  { to: "/dashboard/referrals", label: "Referrals", icon: Gift },
   { to: "/dashboard/settings", label: "Settings", icon: Cog },
 ];
 

@@ -42,6 +42,7 @@ const staticEntries: SitemapEntry[] = [
   { path: "/popular", changefreq: "daily", priority: "0.8" },
   { path: "/featured", changefreq: "weekly", priority: "0.7" },
   { path: "/favorites", changefreq: "daily", priority: "0.7" },
+  { path: "/top-creators", changefreq: "weekly", priority: "0.7" },
 ];
 
 async function fetchJson(url: string, label: string): Promise<any[] | null> {

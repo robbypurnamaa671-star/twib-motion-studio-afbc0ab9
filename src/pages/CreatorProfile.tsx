@@ -5,6 +5,8 @@ import SEOHead from "@/components/SEOHead";
 import { ProgressiveImage } from "@/components/ProgressiveImage";
 import { Globe, Instagram, Facebook, Twitter, Loader2 } from "lucide-react";
 import NotFound from "./NotFound";
+import { FollowButton } from "@/components/community/FollowButton";
+import { ShareBar } from "@/components/share/ShareBar";
 
 interface CreatorProfile {
   user_id: string;
@@ -17,6 +19,8 @@ interface CreatorProfile {
   facebook_url: string | null;
   twitter_url: string | null;
   created_at: string;
+  follower_count?: number;
+  following_count?: number;
 }
 
 interface TemplateCard {
@@ -44,7 +48,7 @@ export default function CreatorProfile() {
       setLoading(true);
       const { data: p } = await supabase
         .from("profiles")
-        .select("user_id, display_name, username, avatar_url, bio, website_url, instagram_url, facebook_url, twitter_url, created_at")
+        .select("user_id, display_name, username, avatar_url, bio, website_url, instagram_url, facebook_url, twitter_url, created_at, follower_count, following_count")
         .ilike("username", username)
         .maybeSingle();
       if (!p) {
@@ -168,8 +172,20 @@ export default function CreatorProfile() {
 
             <div className="flex gap-6 mt-6 text-sm font-mono">
               <Stat label="Templates" value={stats.total} />
+              <Stat label="Followers" value={profile.follower_count ?? 0} />
+              <Stat label="Following" value={profile.following_count ?? 0} />
               <Stat label="Views" value={stats.views} />
               <Stat label="Uses" value={stats.uses} />
+            </div>
+
+            <div className="flex flex-wrap gap-2 mt-5">
+              <FollowButton creatorId={profile.user_id} />
+              <ShareBar
+                url={`https://twibmotion.com/creator/${profile.username}`}
+                title={`Check out @${profile.username} on TwibMotion`}
+                refUsername={profile.username}
+                compact
+              />
             </div>
           </div>
         </section>

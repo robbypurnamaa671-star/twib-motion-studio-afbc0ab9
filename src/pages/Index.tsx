@@ -7,6 +7,9 @@ import SEOHead from "@/components/SEOHead";
 import HomepageSEOSections from "@/components/HomepageSEOSections";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { StickyHeader } from "@/components/StickyHeader";
+import StatsStrip from "@/components/community/StatsStrip";
+import NewsletterSignup from "@/components/community/NewsletterSignup";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   const [selected, setSelected] = useState(1);
@@ -132,6 +135,15 @@ const Index = () => {
 
         {/* SEO Content Sections */}
         <HomepageSEOSections />
+
+        <section className="w-full max-w-5xl px-6 py-12">
+          <h2 className="text-xl font-mono font-bold mb-4 text-center">Powering the campaign creator economy</h2>
+          <StatsStrip />
+        </section>
+
+        <section className="w-full max-w-2xl px-6 pb-16">
+          <NewsletterSignup source="homepage" />
+        </section>
       </main>
 
       {/* Footer */}
@@ -139,6 +151,10 @@ const Index = () => {
         <p className="text-xs text-muted-foreground">{t("footer.tagline")}</p>
         <nav className="flex justify-center gap-4 text-xs text-muted-foreground" aria-label={t("nav.footer")}>
           <a href="/" className="hover:text-primary transition-colors">{t("nav.home")}</a>
+          <Link to="/community" className="hover:text-primary transition-colors">Community</Link>
+          <Link to="/trending" className="hover:text-primary transition-colors">Trending</Link>
+          <Link to="/creators" className="hover:text-primary transition-colors">Creators</Link>
+          <Link to="/collections" className="hover:text-primary transition-colors">Collections</Link>
         </nav>
         <LanguageSwitcher />
       </footer>

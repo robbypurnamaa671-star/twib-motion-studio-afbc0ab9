@@ -35,6 +35,10 @@ import MyTemplates from "./pages/dashboard/MyTemplates";
 import ProfileSettings from "./pages/dashboard/ProfileSettings";
 import Favorites from "./pages/dashboard/Favorites";
 import Analytics from "./pages/dashboard/Analytics";
+import Following from "./pages/dashboard/Following";
+import NotificationsPage from "./pages/dashboard/Notifications";
+import Referrals from "./pages/dashboard/Referrals";
+import EmbedTemplate from "./pages/EmbedTemplate";
 import CommunityHub from "./pages/community/CommunityHub";
 import CommunityCategory from "./pages/community/CommunityCategory";
 import CollectionsIndex from "./pages/community/CollectionsIndex";
@@ -77,6 +81,11 @@ const App = () => (
               <Route path="/dashboard/favorites" element={<Favorites />} />
               <Route path="/dashboard/analytics" element={<Analytics />} />
               <Route path="/dashboard/settings" element={<ProfileSettings />} />
+              <Route path="/dashboard/following" element={<Following />} />
+              <Route path="/dashboard/notifications" element={<NotificationsPage />} />
+              <Route path="/dashboard/referrals" element={<Referrals />} />
+              <Route path="/embed/:slug" element={<EmbedTemplate />} />
+              <Route path="/top-creators" element={<CreatorLeaderboard />} />
               <Route path="/animated-twibbon-maker" element={<GlobalSEO />} />
               <Route path="/video-twibbon-maker" element={<GlobalSEO />} />
               <Route path="/gif-twibbon-maker" element={<GlobalSEO />} />

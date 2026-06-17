@@ -5,6 +5,8 @@ import SEOHead from "@/components/SEOHead";
 import SeoShell from "@/components/seo/SeoShell";
 import { TemplateGrid } from "@/components/community/TemplateGrid";
 import { CreatorCard } from "@/components/community/CreatorCard";
+import StatsStrip from "@/components/community/StatsStrip";
+import NewsletterSignup from "@/components/community/NewsletterSignup";
 import { breadcrumbJsonLd } from "@/lib/seo-content";
 import {
   fetchTrending,
@@ -73,6 +75,9 @@ export default function CommunityHub() {
         <p className="text-muted-foreground max-w-2xl">
           Trending, paling banyak dipakai, paling banyak dilihat, dan kreator unggulan — semua template publik dari komunitas TwibMotion.
         </p>
+        <div className="mt-6">
+          <StatsStrip />
+        </div>
         <nav className="flex flex-wrap gap-2 mt-5 text-xs font-mono" aria-label="Discovery">
           {[
             { to: "/trending", label: "Trending", Icon: Flame },
@@ -165,6 +170,9 @@ export default function CommunityHub() {
           </div>
         )}
       </Section>
+      <div className="mb-8">
+        <NewsletterSignup source="community" />
+      </div>
     </SeoShell>
   );
 }

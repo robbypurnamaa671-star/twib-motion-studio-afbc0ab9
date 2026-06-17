@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { trackReferralEvent } from "./referrals";
 
 const VIEW_KEY = "twibmotion.viewed_templates";
 const USE_KEY = "twibmotion.used_templates";
@@ -44,6 +45,7 @@ export async function trackUse(templateId: string | undefined | null) {
   used.add(templateId);
   writeSet(USE_KEY, used);
   await safeRpc("increment_template_use", { _template_id: templateId });
+  void trackReferralEvent("template_use");
 }
 
 export async function trackDownload(templateId: string | undefined | null) {

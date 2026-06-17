@@ -9,6 +9,11 @@ import { trackView } from "@/lib/view-tracking";
 import { FavoriteButton } from "@/components/community/FavoriteButton";
 import { StatBadges } from "@/components/community/StatBadges";
 import { RelatedRail } from "@/components/community/RelatedRail";
+import { ShareBar } from "@/components/share/ShareBar";
+import { CloneButton } from "@/components/share/CloneButton";
+import { EmbedCodeDialog } from "@/components/share/EmbedCodeDialog";
+import { BadgeChip, computeBadges } from "@/components/community/BadgeChip";
+import { useAuth } from "@/contexts/AuthContext";
 
 const BASE_URL = "https://twibmotion.com";
 
@@ -35,10 +40,18 @@ type Tpl = {
 
 const TemplateSEO = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { user } = useAuth();
   const [tpl, setTpl] = useState<Tpl | null>(null);
   const [related, setRelated] = useState<Tpl[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [meUsername, setMeUsername] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!user) { setMeUsername(null); return; }
+    supabase.from("profiles").select("username").eq("user_id", user.id).maybeSingle()
+      .then(({ data }) => setMeUsername((data as { username: string | null } | null)?.username ?? null));
+  }, [user]);
 
   useEffect(() => {
     if (!slug) return;
@@ -159,6 +172,20 @@ const TemplateSEO = () => {
           </h1>
           <p className="text-muted-foreground text-lg mb-6">{description}</p>
 
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {computeBadges({
+              is_trending: undefined,
+              is_featured: undefined,
+              is_staff_pick: undefined,
+              usage_count: tpl.usage_count,
+              view_count: tpl.view_count,
+              like_count: tpl.like_count,
+              created_at: tpl.created_at,
+            }).map((b) => (
+              <BadgeChip key={b} kind={b} />
+            ))}
+          </div>
+
           <StatBadges
             views={tpl.view_count}
             uses={tpl.usage_count}
@@ -209,6 +236,7 @@ const TemplateSEO = () => {
             >
               Gunakan Template Ini <ArrowRight className="w-4 h-4" />
             </Link>
+            <CloneButton templateId={tpl.id} slug={tpl.slug} />
             <a
               href={imageUrl}
               download={downloadName}
@@ -217,6 +245,11 @@ const TemplateSEO = () => {
               Download Preview
             </a>
             <FavoriteButton templateId={tpl.id} size="md" />
+            <EmbedCodeDialog slug={tpl.slug} />
+          </div>
+
+          <div className="mb-8">
+            <ShareBar url={canonical} title={`Template Twibbon ${tpl.title} on TwibMotion`} refUsername={meUsername} />
           </div>
 
           {tpl.description && (

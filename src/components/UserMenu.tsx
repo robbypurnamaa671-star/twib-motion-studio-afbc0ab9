@@ -1,7 +1,8 @@
-import { LogOut, User, LayoutDashboard, FolderKanban, Heart, Settings as Cog, ChevronDown } from "lucide-react";
+import { LogOut, User, LayoutDashboard, FolderKanban, Heart, Settings as Cog, ChevronDown, Users, Gift } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { NotificationBell } from "@/components/community/NotificationBell";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,6 +37,7 @@ const UserMenu = () => {
 
   return (
     <div className="flex items-center gap-2">
+      <NotificationBell />
       <Link
         to="/dashboard"
         className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary/40 bg-primary/10 text-primary text-sm font-mono hover:bg-primary/20 transition-colors"
@@ -74,6 +76,16 @@ const UserMenu = () => {
           <DropdownMenuItem asChild>
             <Link to="/dashboard/favorites" className="cursor-pointer">
               <Heart className="w-4 h-4 mr-2" /> Favorites
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link to="/dashboard/following" className="cursor-pointer">
+              <Users className="w-4 h-4 mr-2" /> Following
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link to="/dashboard/referrals" className="cursor-pointer">
+              <Gift className="w-4 h-4 mr-2" /> Referrals
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
