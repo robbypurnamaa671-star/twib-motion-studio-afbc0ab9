@@ -1,88 +1,99 @@
-## Priority 5 — Community SEO Engine
+# Priority 6 — Growth Loop & Viral Distribution
 
-Turn the community into a self-growing SEO surface. All new pages indexable, sitemapped, and cross-linked.
+Turn every user action into a growth lever: sharing, cloning, following, notifications, referrals, embeds, email, and social proof.
 
-### 1. New routes (all in `src/App.tsx`)
+## 1. Database (one migration)
 
-```text
-/community                       → CommunityHub (trending, most used, most viewed, new, featured creators, popular categories)
-/community/category/:slug        → CommunityCategory (top + new templates, featured creators)
-/collections                     → CollectionsIndex
-/collections/:slug               → CollectionPage (auto-aggregated by tag/category match)
-/creators                        → CreatorLeaderboard (popular / most used / most templates / fastest growing tabs)
-/trending                        → Discovery: trending today/week/month
-/new                             → Discovery: newest
-/popular                         → Discovery: most-liked
-/featured                        → Discovery: admin-featured
-/favorites                       → Public favorites feed (top-favorited templates)
-```
+- `template_clones` (source_template_id, cloned_template_id, user_id, created_at) — analytics.
+- `creator_follows` (follower_id, creator_id, created_at, PK on pair).
+  - Triggers update denormalized `profiles.follower_count` / `following_count`.
+- `notifications` (id, user_id, type enum [`template_used`, `template_favorited`, `new_follower`, `template_trending`], actor_id, template_id?, read_at, created_at). RLS: user reads own.
+- `newsletter_subscribers` (email unique, source, ref_username?, created_at, confirmed_at?).
+- `referrals` (id, ref_username, visitor_session, event [`visit`,`signup`,`template_use`], target_user_id?, created_at).
+- `profiles`: add `follower_count int`, `following_count int`, `referral_code text unique` (default = username).
+- `shared_templates`: add `badge text[]` (computed via scheduled job — Trending/Popular/New/Editor's Pick) + keep existing `is_featured`.
+- RPCs: `toggle_follow(_creator_id)`, `clone_template(_template_id)`, `mark_notifications_read(_ids uuid[])`, `get_unread_notification_count()`, `get_public_stats()` (cached counts), `track_referral(_ref text, _event text, _target uuid?)`.
+- GRANTs to `authenticated`/`anon` per policy; `service_role` for edge function writes.
 
-`/dashboard/favorites` (existing) stays as the user's private list.
+## 2. Share system (`/template/:slug`)
 
-### 2. Data model additions (one migration)
+- New `src/components/share/ShareBar.tsx`: WhatsApp, Facebook, X, Telegram, LinkedIn, Copy Link buttons using share URLs + tracked with `?ref=<username>` when current user is logged in.
+- Mount on `TemplateSEO`, `CreatorProfile`, and post-export success dialog in `ExportDialog`.
+- Add `OpenGraph` already covered in P5.
 
-- `shared_templates.is_featured boolean default false` (admin-controlled).
-- `profiles.is_featured_creator boolean default false`.
-- `template_collections` table: `slug, title, description, cover_url, match_tags text[], match_category text, is_indexable, is_published, updated_at` + admin RLS, public read.
-- `template_collection_items` (optional manual override) — skip for v1, use `match_tags`/`match_category` auto-aggregation.
-- View / RPC `get_trending_templates(_window text)` returning ranked list using weighted score: `usage*3 + favorites*2 + views*1` over a time window on `created_at` / recent activity. Implement as SQL functions returning `setof shared_templates`.
-- RPC `get_featured_creators(_limit int)` → profiles joined with template counts and total uses, ordered by `is_featured_creator desc, total_uses desc`.
-- RPC `get_creator_leaderboard(_sort text, _limit int)` for the four leaderboard sorts.
+## 3. Use + Clone
 
-GRANTs to `anon` + `authenticated` for new tables/functions (public reads). Admin write policies via `is_admin_or_super`.
+- `TemplateSEO` already has "Use This Template". Add **"Clone This Template"** button → calls `clone_template` RPC which inserts a new `shared_templates` row owned by current user (is_public=false by default), copies asset URLs (no re-upload), then navigates to `/dashboard/templates/:newId/edit` (existing editor route) for further changes.
+- Auth gate: redirect to `/auth?next=clone:<slug>`.
 
-### 3. Components & shared building blocks
+## 4. Creator follow
 
-- `src/components/community/TemplateGrid.tsx` — reusable card grid (image, title, creator, stats badges Views/Uses/Likes).
-- `src/components/community/CreatorCard.tsx` — avatar, username, templates count, total uses, link to `/creator/:username`.
-- `src/components/community/StatBadges.tsx` — small badges shown on template pages ("Used 248 times • Viewed 1,524 times").
-- `src/components/community/RelatedRail.tsx` — wraps Related Templates / More from Creator / Related Categories / Related Blog Posts blocks for `TemplateSEO`.
-- `src/lib/community-queries.ts` — typed wrappers around the RPCs + plain Supabase queries (trending, newest, most-used, most-viewed, by-collection, by-category, leaderboard, featured creators, related-for-template).
+- `useFollow(creatorId)` hook → `toggle_follow` RPC.
+- `FollowButton` component on `CreatorProfile` and `CreatorCard`.
+- `CreatorProfile`: add follower / following / templates / total uses tiles.
+- New `/dashboard/following` page listing creators + latest templates feed.
 
-### 4. Page implementations (frontend)
+## 5. Notifications
 
-- Use existing `SeoShell` + `SEOHead` for every new page. Each page sets canonical, og:url, og:type=`website`/`profile`, JSON-LD (`CollectionPage` or `ItemList` + `BreadcrumbList`), and an H1.
-- `TemplateSEO.tsx` extensions: add `StatBadges` (views/uses/downloads/favorites + publish date), `RelatedRail` (related templates by tag/category, more-from-creator, related categories as tag chips, latest 3 blog posts whose tags intersect template tags).
-- `CommunityHub` shows: hero + tabs (Trending Today/Week/Month) + Most Used + Most Viewed + Newest + Featured Creators + Popular Categories (derived from `shared_templates.category` counts).
-- Collection pages: pull templates whose `category = match_category` OR `tags && match_tags`.
-- Category pages: similar to collections but keyed on `category`.
-- Leaderboard `/creators`: tabs with the four sorts.
-- Discovery `/trending`, `/new`, `/popular`, `/featured`, `/favorites` — thin pages that reuse `TemplateGrid` + correct sort, each with unique title/description/canonical and `ItemList` JSON-LD.
+- Triggers on `template_favorites` INSERT → notify template owner.
+- Trigger on `shared_templates.usage_count` increment via `increment_template_use` RPC extension → insert notification (rate-limited: max 1 per actor per template per day).
+- Trigger on `creator_follows` INSERT → notify creator.
+- Daily cron (pg_cron + pg_net hitting an edge function `compute-badges`) recalculates trending and inserts `template_trending` notifications + updates `badge` field.
+- Header bell `NotificationBell` (UserMenu) shows unread count + dropdown last 10. `/dashboard/notifications` full list.
 
-### 5. Internal linking
+## 6. Featured badges
 
-- Add CommunityHub link to header nav + `UserMenu`.
-- Footer (or `HomepageSEOSections`) gets: Trending, New, Popular, Creators, Collections.
-- `TemplateSEO` already links to creator + category; add Collections this template belongs to (any collection whose match rules hit) and 3 related blog posts.
+- `BadgeChip` component renders icons for `trending|popular|featured|new|editors_pick`.
+- Compute rules in `compute-badges` edge function: New (< 7 days), Trending (top 20 by 7-day score), Popular (top 50 all-time score), Featured (`is_featured=true`), Editor's Pick (admin toggle `is_editors_pick` — small admin addition).
+- Render in `TemplateGrid`, `TemplateSEO`.
 
-### 6. Open Graph for templates
+## 7. Referral system
 
-Set `og:image` on `TemplateSEO` to `preview_url || bottom_layer_url`, plus `og:image:width/height`, `twitter:card=summary_large_image`, and `og:image:alt = "Template Twibbon {title} oleh @{username}"`. Extend `SEOHead` to accept an `ogImage` prop (current version doesn't emit one). No dynamic OG render server — we ship the template preview itself, which already shows title text in-image.
+- Each profile gets `referral_code = username`. Shareable link: `https://twibmotion.com/?ref=<code>`.
+- `src/lib/referrals.ts`: parses `?ref=`, stores in localStorage 30 days, calls `track_referral` on landing, on signup (in `AuthContext`), and on `increment_template_use`.
+- `/dashboard/referrals`: visits / signups / template uses, copyable link, share buttons.
 
-### 7. Sitemap (`scripts/generate-sitemap.ts`)
+## 8. Embed system
 
-Add fetchers + entries for:
-- `/community`, `/trending`, `/new`, `/popular`, `/featured`, `/favorites`, `/creators`, `/collections` (static, weekly).
-- `/community/category/:slug` — derive from distinct `shared_templates.category` where `is_public=true`.
-- `/collections/:slug` — from `template_collections` where `is_indexable=true and is_published=true`.
+- Public route `/embed/:slug` → minimalist `<iframe>`-friendly page: template preview, title, creator handle, CTA "Use on TwibMotion". `X-Frame-Options` not blocked (Vite/Vercel default allows; we don't set CSP frame-ancestors).
+- `EmbedCodeDialog` on `TemplateSEO` providing `<iframe src=".../embed/<slug>" width="400" height="500" frameborder="0"></iframe>` snippet + copy button.
 
-Image sitemap already covers public templates; no change needed.
+## 9. Email (newsletter + transactional)
 
-### 8. Admin
+Use **Resend connector** (gateway). Two edge functions:
+- `newsletter-subscribe` (public): validates email, inserts into `newsletter_subscribers`, sends confirmation via Resend.
+- `notify` (service-role, called from triggers via pg_net): sends transactional emails for `new_follower`, `new_favorite`, `template_used` (digest, max 1 per 24h per recipient via dedup column), `template_trending`.
+- `NewsletterSignup` component embedded in homepage footer, blog, community hub.
+- Note: requires user to connect Resend. If not connected, in-app notifications still work; we skip email send gracefully.
 
-Extend `admin/TemplatesPage` with a "Featured" toggle (sets `is_featured`). Extend `admin/UsersPage` with "Feature creator" toggle. New `admin/CollectionsPage` for CRUD on `template_collections` (slug, title, description, cover, match rules, publish + indexable flags). Add to `AdminSidebar`.
+## 10. Public stats + social proof
 
-### Out of scope (deferred)
+- Edge function or simple SQL view `public_stats` (cached 5m in memory in `community-queries`): totals templates / creators / uses / downloads.
+- `StatsStrip` component on homepage + `/community` showing the four counters with animated count-up.
+- Homepage (`Index.tsx`) gets three new sections via `HomepageSEOSections` extension: Trending Templates, Featured Creators, Recently Used — pulling from `community-queries`.
 
-- Server-side rendered OG image composer (would need an edge function with canvas). We use the template preview image itself as the OG image — covers the "creator username + title" requirement because templates already contain that info in-frame.
-- Manual collection curation UI (auto-aggregation via tags/category is enough for v1).
+## 11. Growth pages
 
-### Order of execution
+`/trending`, `/popular`, `/new`, `/top-creators` already exist (P5) — verify and add `/top-creators` as alias to `/creators?sort=popular`. All indexable & in sitemap (already wired). Add `/top-creators` and `/following` to sitemap script (following = noindex, dashboard).
 
-1. Migration (collections table, featured flags, RPCs, GRANTs).
-2. `src/lib/community-queries.ts` + shared community components.
-3. Routes + pages.
-4. Extend `TemplateSEO` (stats, related rail, OG image).
-5. Sitemap script update.
-6. Admin extensions (collections + featured toggles).
-7. Header/footer internal linking.
+## Out of scope (deferred)
+
+- Real-time WebSocket notifications (we poll on focus / interval 60s).
+- Per-event email preferences UI (single global opt-out via newsletter table).
+- Server-rendered OG image composer (template preview already covers).
+
+## Order of execution
+
+1. Migration (all schema + RPCs + triggers + GRANTs).
+2. Edge functions: `compute-badges`, `newsletter-subscribe`, `notify`.
+3. Schedule `compute-badges` via pg_cron (insert tool, daily 03:00 UTC).
+4. Shared components: `ShareBar`, `FollowButton`, `BadgeChip`, `NotificationBell`, `EmbedCodeDialog`, `NewsletterSignup`, `StatsStrip`.
+5. Page wiring: `TemplateSEO`, `CreatorProfile`, `Index`, `CommunityHub`, `UserMenu`, `AuthContext`.
+6. New routes: `/embed/:slug`, `/dashboard/following`, `/dashboard/notifications`, `/dashboard/referrals`, `/top-creators`.
+7. Sitemap + nav linking.
+
+## Decisions I need from you
+
+1. **Resend connection** — emails require connecting Resend (free tier covers ~100/day). OK to add the connector now, or skip emails for v1 and only ship in-app notifications?
+2. **Clone behavior** — clone creates a *private* draft owned by the cloner that they can edit & republish, OK? (Original creator keeps attribution via `cloned_from` link.)
+3. **Notifications delivery** — poll every 60s when tab focused (cheap, no realtime cost), or enable Supabase Realtime on `notifications` (slightly higher cost, instant)?
