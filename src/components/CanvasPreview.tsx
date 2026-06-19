@@ -57,7 +57,7 @@ const CanvasPreview = ({
         tx: transform.x,
         ty: transform.y,
       };
-      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+      try { overlayRef.current?.setPointerCapture(e.pointerId); } catch {}
     },
     [bottomLayer, transform]
   );
@@ -99,13 +99,15 @@ const CanvasPreview = ({
     <div
       ref={containerRef}
       className="w-full h-full flex items-center justify-center"
+      style={{ touchAction: "none" }}
     >
       <div
-        className="relative overflow-hidden canvas-grid"
+        className="relative overflow-hidden canvas-grid select-none"
         style={{
           width: displaySize.w,
           height: displaySize.h,
           borderRadius: 4,
+          touchAction: "none",
         }}
       >
         {/* Bottom Layer (User photo) — draggable, scalable */}
