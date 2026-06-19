@@ -1,0 +1,1 @@
+ALTER TABLE public.shared_templates ADD CONSTRAINT shared_templates_owner_profile_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(user_id) ON DELETE CASCADE;
