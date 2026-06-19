@@ -57,7 +57,7 @@ const CanvasPreview = ({
         tx: transform.x,
         ty: transform.y,
       };
-      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+      try { overlayRef.current?.setPointerCapture(e.pointerId); } catch {}
     },
     [bottomLayer, transform]
   );
