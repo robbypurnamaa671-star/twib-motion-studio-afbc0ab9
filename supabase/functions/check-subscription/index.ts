@@ -43,6 +43,42 @@ serve(async (req) => {
     const user = userData.user;
     logStep("User authenticated", { email: user.email });
 
+    // Admin bypass: admins & super_admins always get unlimited premium
+    const { data: adminRow } = await supabaseAdmin
+      .from("admin_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    const { data: roleRow } = await supabaseAdmin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .maybeSingle();
+    const isAdmin = !!adminRow || !!roleRow;
+
+    if (isAdmin) {
+      logStep("Admin user - granting unlimited premium");
+      await supabaseAdmin
+        .from("user_subscriptions")
+        .upsert({
+          user_id: user.id,
+          subscription_status: "premium",
+          credit_points: 999999,
+          premium_started_at: new Date().toISOString(),
+          premium_expires_at: "2999-12-31T00:00:00Z",
+        }, { onConflict: "user_id" });
+      return new Response(JSON.stringify({
+        subscribed: true,
+        subscription_status: "premium",
+        credit_points: 999999,
+        subscription_end: "2999-12-31T00:00:00Z",
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2023-10-16",
     });
