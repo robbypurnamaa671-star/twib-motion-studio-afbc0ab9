@@ -92,8 +92,8 @@ const Editor = () => {
 
       {/* Main area */}
       <div className="flex-1 flex flex-col lg:flex-row min-h-0">
-        {/* Sidebar */}
-        <aside className="lg:w-80 border-b lg:border-b-0 lg:border-r border-border p-4 flex flex-col gap-4 overflow-y-auto shrink-0">
+        {/* Sidebar — appears below canvas on mobile, left on desktop */}
+        <aside className="order-2 lg:order-1 lg:w-80 border-t lg:border-t-0 lg:border-r border-border p-4 flex flex-col gap-4 overflow-y-auto shrink-0">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <div className="w-5 h-5 rounded bg-secondary flex items-center justify-center text-xs font-mono font-bold text-secondary-foreground">1</div>
@@ -128,7 +128,7 @@ const Editor = () => {
         </aside>
 
         {/* Canvas */}
-        <main className="flex-1 bg-secondary/30 p-4 min-h-0">
+        <main className="order-1 lg:order-2 flex-1 bg-secondary/30 p-4 min-h-0 min-h-[60vh] lg:min-h-0">
           <CanvasPreview
             canvasW={canvasW}
             canvasH={canvasH}
