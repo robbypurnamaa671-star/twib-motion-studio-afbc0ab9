@@ -71,6 +71,11 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://twibmotion.com/top-creators</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://twibmotion.com/twibbon/school</loc>
     <lastmod>2026-06-12</lastmod>
     <changefreq>weekly</changefreq>
@@ -5555,8 +5560,26 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://twibmotion.com/template/template-twibbon-piala-dunia</loc>
+    <lastmod>2026-06-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/template/template-twibbon-piala-dunia-9d613d</loc>
+    <lastmod>2026-06-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://twibmotion.com/creator/robby-purnama</loc>
     <lastmod>2026-06-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/creator/ryan-gabriel</loc>
+    <lastmod>2026-06-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>

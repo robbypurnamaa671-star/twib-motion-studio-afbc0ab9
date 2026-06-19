@@ -120,6 +120,7 @@ const CanvasPreview = ({
               transform: `translate(-50%, -50%) translate(${transform.x * scaleRatio}px, ${transform.y * scaleRatio}px) scale(${transform.scale}) rotate(${transform.rotation}deg)`,
               width: displaySize.w,
               height: displaySize.h,
+              touchAction: "none",
             }}
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}
