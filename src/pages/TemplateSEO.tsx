@@ -70,8 +70,7 @@ const TemplateSEO = () => {
       setTpl(data as unknown as Tpl);
       trackView((data as { id: string }).id);
       if (!(data as Tpl).is_public) {
-        setRelated([]);
-        setLoading(false);
+        window.location.replace(`/use-template/${(data as Tpl).slug}`);
         return;
       }
       let rq = supabase
