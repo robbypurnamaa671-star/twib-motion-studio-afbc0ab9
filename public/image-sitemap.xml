@@ -73,14 +73,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://twibmotion.com/template/template-mpls-2026-sekolah-dasar-sd-siap-pakai</loc>
-    <image:image>
-      <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/96fa3622-0eed-4273-8ac5-da379f33fde8/preview-d79e9004-41bf-4f04-a071-fe18bdd50267.jpg</image:loc>
-      <image:title>Template Twibbon Template MPLS 2026 Sekolah Dasar (SD) Siap Pakai</image:title>
-      <image:caption>Template Twibbon Template MPLS 2026 Sekolah Dasar (SD) Siap Pakai</image:caption>
-    </image:image>
-  </url>
-  <url>
     <loc>https://twibmotion.com/template/pkkmb-fh-2026-siap-maju-bergerak</loc>
     <image:image>
       <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/746fea90-7d94-4b66-923b-dbd905d90096/preview-8783c9be-a0a4-4ba0-9922-bc26cc45b30e.jpg</image:loc>
@@ -118,6 +110,22 @@
       <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/487c1b2a-cd41-472a-9c30-4c0861d3570d/f6f37a53-2b25-4b39-a357-f9bac596eec1.png</image:loc>
       <image:title>Template Twibbon Saya Siap Mengikuti MPLS Ramah &quot;SD No. 2 Sibanggede&quot;</image:title>
       <image:caption>Template Twibbon Saya Siap Mengikuti MPLS Ramah &quot;SD No. 2 Sibanggede&quot;</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/template/template-mpls-2026-sekolah-dasar-sd-siap-pakai</loc>
+    <image:image>
+      <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/96fa3622-0eed-4273-8ac5-da379f33fde8/preview-d79e9004-41bf-4f04-a071-fe18bdd50267.jpg</image:loc>
+      <image:title>Template Twibbon Template MPLS 2026 Sekolah Dasar (SD) Siap Pakai</image:title>
+      <image:caption>Template Twibbon Template MPLS 2026 Sekolah Dasar (SD) Siap Pakai</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/template/twibbon-ulang-tahun-anak-perempuan</loc>
+    <image:image>
+      <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/96fa3622-0eed-4273-8ac5-da379f33fde8/preview-2dee7346-b2a0-4cf6-92f0-136bcbdcb0a2.jpg</image:loc>
+      <image:title>Template Twibbon Twibbon Ulang Tahun Anak Perempuan</image:title>
+      <image:caption>Template Twibbon Twibbon Ulang Tahun Anak Perempuan</image:caption>
     </image:image>
   </url>
 </urlset>
