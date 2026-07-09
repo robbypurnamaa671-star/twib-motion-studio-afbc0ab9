@@ -55,13 +55,17 @@ async function resolveMeta(path: string): Promise<Meta> {
   if (m) {
     const slug = decodeURIComponent(m[1]);
     const canonicalTemplate = `${SITE}/template/${slug}`;
-    const { data } = await admin
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
+    const q = admin
       .from("shared_templates")
       .select("id,title,slug,description,category,profiles:owner_id(username,display_name)")
-      .or(`slug.eq.${slug},id.eq.${slug}`)
       .eq("is_public", true)
-      .is("deleted_at", null)
-      .maybeSingle();
+      .is("deleted_at", null);
+    const { data, error } = isUuid
+      ? await q.eq("id", slug).maybeSingle()
+      : await q.eq("slug", slug).maybeSingle();
+    if (error) console.error("og-html template lookup error", slug, error);
+    console.log("og-html template lookup", { slug, found: !!data });
     if (data) {
       const t: any = data;
       const creator = t.profiles?.username ? ` by @${t.profiles.username}` : "";
