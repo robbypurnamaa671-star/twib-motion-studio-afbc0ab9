@@ -30,4 +30,6 @@ export type SharedTemplate = {
   lock_settings: LockSettings;
   created_at: string;
   expires_at: string | null;
+  is_public?: boolean;
+  visibility?: string;
 };
