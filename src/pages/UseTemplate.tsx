@@ -410,7 +410,7 @@ const UseTemplate = () => {
         bottomLayer={userPhoto}
         topLayer={twibbonMedia}
         transform={transform}
-        forceWatermark
+        forceWatermark={!!template.is_public}
       />
     </div>
   );
