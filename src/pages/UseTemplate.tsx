@@ -192,9 +192,10 @@ const UseTemplate = () => {
       <SEOHead
         title={`${template.title} – Free Twibbon Template | TwibMotion`}
         description={`Create a twibbon with the "${template.title}" template on TwibMotion. Upload your photo, GIF, or video and export in seconds.`}
-        canonical={`https://twibmotion.com/use-template/${template.slug || template.id}`}
-        ogUrl={`https://twibmotion.com/use-template/${template.slug || template.id}`}
-        ogType="website"
+        canonical={`https://twibmotion.com/template/${template.slug || template.id}`}
+        ogUrl={`https://twibmotion.com/template/${template.slug || template.id}`}
+        ogType="article"
+        noindex
       />
       {/* Header */}
       <StickyHeader className="px-4 py-3 flex items-center justify-between shrink-0">
