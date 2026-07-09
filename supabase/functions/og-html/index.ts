@@ -51,13 +51,14 @@ async function resolveMeta(path: string): Promise<Meta> {
     ogType: "website",
   };
 
-  const m = path.match(/^\/template\/([^/?#]+)/);
+  const m = path.match(/^\/(?:template|use-template)\/([^/?#]+)/);
   if (m) {
     const slug = decodeURIComponent(m[1]);
+    const canonicalTemplate = `${SITE}/template/${slug}`;
     const { data } = await admin
       .from("shared_templates")
       .select("id,title,slug,description,category,profiles:owner_id(username,display_name)")
-      .eq("slug", slug)
+      .or(`slug.eq.${slug},id.eq.${slug}`)
       .eq("is_public", true)
       .is("deleted_at", null)
       .maybeSingle();
@@ -69,8 +70,8 @@ async function resolveMeta(path: string): Promise<Meta> {
         description:
           t.description?.trim() ||
           `Use the "${t.title}" twibbon template${creator} online for free on TwibMotion. Upload your photo, GIF, or video and export in HD.`,
-        canonical,
-        ogImage: `${OG_FN}?type=template&id=${encodeURIComponent(slug)}`,
+        canonical: canonicalTemplate,
+        ogImage: `${OG_FN}?type=template&id=${encodeURIComponent(t.slug || slug)}`,
         ogType: "article",
       };
     }

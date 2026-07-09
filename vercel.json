@@ -1,7 +1,7 @@
 {
   "rewrites": [
     {
-      "source": "/:path(template|creator|collections|blog)/:slug",
+      "source": "/:path(template|use-template|creator|collections|blog)/:slug",
       "has": [
         {
           "type": "header",
