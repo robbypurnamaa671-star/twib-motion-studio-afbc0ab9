@@ -1,6 +1,28 @@
 {
   "rewrites": [
     {
+      "source": "/:path(template|creator|collections|blog)/:slug",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(facebookexternalhit|Facebot|WhatsApp|Twitterbot|Slackbot|TelegramBot|Discordbot|LinkedInBot|Applebot|Pinterest|redditbot|Embedly|SkypeUriPreview|vkShare|W3C_Validator|Iframely|GoogleBot|bingbot|DuckDuckBot|Baiduspider|YandexBot).*"
+        }
+      ],
+      "destination": "https://xfybnitxislnuetlltaz.supabase.co/functions/v1/og-html?path=/:path/:slug"
+    },
+    {
+      "source": "/community/category/:slug",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(facebookexternalhit|Facebot|WhatsApp|Twitterbot|Slackbot|TelegramBot|Discordbot|LinkedInBot|Applebot|Pinterest|redditbot|Embedly|SkypeUriPreview|vkShare|W3C_Validator|Iframely|GoogleBot|bingbot|DuckDuckBot|Baiduspider|YandexBot).*"
+        }
+      ],
+      "destination": "https://xfybnitxislnuetlltaz.supabase.co/functions/v1/og-html?path=/community/category/:slug"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
