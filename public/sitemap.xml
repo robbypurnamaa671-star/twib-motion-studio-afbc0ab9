@@ -5596,7 +5596,13 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://twibmotion.com/template/saya-siap-mengikuti-mpls-ramah-sd-no-2-sibanggede-5092e9</loc>
+    <loc>https://twibmotion.com/template/twibbon-ulang-tahun-anak-perempuan</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/template/mpls-smk-negeri-1-syamtalira-aron</loc>
     <lastmod>2026-07-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -5608,13 +5614,19 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://twibmotion.com/template/saya-siap-mengikuti-mpls-ramah-sd-no-2-sibanggede-5092e9</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://twibmotion.com/template/template-mpls-2026-sekolah-dasar-sd-siap-pakai</loc>
     <lastmod>2026-07-08</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://twibmotion.com/template/twibbon-ulang-tahun-anak-perempuan</loc>
+    <loc>https://twibmotion.com/template/mpls-smk-negeri-1-syamtalira-aron-6efed3</loc>
     <lastmod>2026-07-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -5634,6 +5646,12 @@
   <url>
     <loc>https://twibmotion.com/creator/wina-fafa</loc>
     <lastmod>2026-06-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/creator/badraufe</loc>
+    <lastmod>2026-06-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -5678,5 +5696,10 @@
     <lastmod>2026-06-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/community/category/MPLS</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
   </url>
 </urlset>
