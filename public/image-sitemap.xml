@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
-    <loc>https://twibmotion.com/template/my-twibbon-template-c984f5</loc>
-    <image:image>
-      <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/746fea90-7d94-4b66-923b-dbd905d90096/47d88b8f-8727-4be1-8256-2e370fa9bbcf.png</image:loc>
-      <image:title>Template Twibbon My Twibbon Template</image:title>
-      <image:caption>Template Twibbon My Twibbon Template</image:caption>
-    </image:image>
-  </url>
-  <url>
     <loc>https://twibmotion.com/template/my-twibbon-template-cb3dcd</loc>
     <image:image>
       <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/746fea90-7d94-4b66-923b-dbd905d90096/preview-614299cc-4911-4fd9-9aa4-d006ede19bcf.jpg</image:loc>
@@ -25,6 +17,14 @@
     </image:image>
   </url>
   <url>
+    <loc>https://twibmotion.com/template/my-twibbon-template-c984f5</loc>
+    <image:image>
+      <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/746fea90-7d94-4b66-923b-dbd905d90096/47d88b8f-8727-4be1-8256-2e370fa9bbcf.png</image:loc>
+      <image:title>Template Twibbon My Twibbon Template</image:title>
+      <image:caption>Template Twibbon My Twibbon Template</image:caption>
+    </image:image>
+  </url>
+  <url>
     <loc>https://twibmotion.com/template/twibmotion-general-template</loc>
     <image:image>
       <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/746fea90-7d94-4b66-923b-dbd905d90096/preview-5b1db11a-9a59-4f52-a519-a6408be0212c.jpg</image:loc>
@@ -33,11 +33,51 @@
     </image:image>
   </url>
   <url>
+    <loc>https://twibmotion.com/template/eid-mubarak-twibbon-templates-free</loc>
+    <image:image>
+      <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/746fea90-7d94-4b66-923b-dbd905d90096/preview-0de03412-73a8-4142-b78b-32ac83bcbf89.jpg</image:loc>
+      <image:title>Template Twibbon Eid Mubarak Twibbon Templates Free</image:title>
+      <image:caption>Template Twibbon Eid Mubarak Twibbon Templates Free</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/template/template-twibbon-piala-dunia</loc>
+    <image:image>
+      <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/12b04589-b3f0-44f2-bccd-5690f75f5485/preview-cf2aa923-9853-4f9e-ba3c-eb860f104240.jpg</image:loc>
+      <image:title>Template Twibbon Template Twibbon Piala Dunia</image:title>
+      <image:caption>Template Twibbon Template Twibbon Piala Dunia</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/template/mother-s-days-twibbon-frame-template</loc>
+    <image:image>
+      <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/b1b5ea94-791b-4882-864d-eeb8dbfe7eaa/preview-5a787b4f-9fff-419f-801d-c1b253f660a3.jpg</image:loc>
+      <image:title>Template Twibbon Mother&apos;s Days Twibbon Frame Template</image:title>
+      <image:caption>Template Twibbon Mother&apos;s Days Twibbon Frame Template</image:caption>
+    </image:image>
+  </url>
+  <url>
     <loc>https://twibmotion.com/template/siap-sambut-hari-pramuka</loc>
     <image:image>
       <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/746fea90-7d94-4b66-923b-dbd905d90096/preview-0d420df5-fa11-433f-b820-4bfc16e8fafe.jpg</image:loc>
       <image:title>Template Twibbon Siap Sambut Hari Pramuka</image:title>
       <image:caption>Template Twibbon Siap Sambut Hari Pramuka</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/template/frame-twibbon-mpls-2026-smp-siap-pakai</loc>
+    <image:image>
+      <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/96fa3622-0eed-4273-8ac5-da379f33fde8/preview-6a7e5c88-121c-4c4a-ab57-cdb24211efdf.jpg</image:loc>
+      <image:title>Template Twibbon Frame Twibbon MPLS 2026 SMP Siap Pakai</image:title>
+      <image:caption>Template Twibbon Frame Twibbon MPLS 2026 SMP Siap Pakai</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/template/template-mpls-2026-sekolah-dasar-sd-siap-pakai</loc>
+    <image:image>
+      <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/96fa3622-0eed-4273-8ac5-da379f33fde8/preview-d79e9004-41bf-4f04-a071-fe18bdd50267.jpg</image:loc>
+      <image:title>Template Twibbon Template MPLS 2026 Sekolah Dasar (SD) Siap Pakai</image:title>
+      <image:caption>Template Twibbon Template MPLS 2026 Sekolah Dasar (SD) Siap Pakai</image:caption>
     </image:image>
   </url>
   <url>
@@ -57,11 +97,27 @@
     </image:image>
   </url>
   <url>
-    <loc>https://twibmotion.com/template/template-twibbon-piala-dunia</loc>
+    <loc>https://twibmotion.com/template/template-twibbon-piala-dunia-2026</loc>
     <image:image>
-      <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/12b04589-b3f0-44f2-bccd-5690f75f5485/preview-cf2aa923-9853-4f9e-ba3c-eb860f104240.jpg</image:loc>
-      <image:title>Template Twibbon Template Twibbon Piala Dunia</image:title>
-      <image:caption>Template Twibbon Template Twibbon Piala Dunia</image:caption>
+      <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/746fea90-7d94-4b66-923b-dbd905d90096/preview-57143591-dcf8-4150-b4aa-872c0b0a260c.jpg</image:loc>
+      <image:title>Template Twibbon Template Twibbon Piala Dunia 2026</image:title>
+      <image:caption>Template Twibbon Template Twibbon Piala Dunia 2026</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/template/saya-siap-mengikuti-mpls-ramah-sd-no-2-sibanggede-5092e9</loc>
+    <image:image>
+      <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/487c1b2a-cd41-472a-9c30-4c0861d3570d/27d2e37e-61b5-452e-b80d-a514f57025c4.png</image:loc>
+      <image:title>Template Twibbon Saya Siap Mengikuti MPLS Ramah &quot;SD No. 2 Sibanggede&quot;</image:title>
+      <image:caption>Template Twibbon Saya Siap Mengikuti MPLS Ramah &quot;SD No. 2 Sibanggede&quot;</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/template/saya-siap-mengikuti-mpls-ramah-sd-no-2-sibanggede</loc>
+    <image:image>
+      <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/487c1b2a-cd41-472a-9c30-4c0861d3570d/f6f37a53-2b25-4b39-a357-f9bac596eec1.png</image:loc>
+      <image:title>Template Twibbon Saya Siap Mengikuti MPLS Ramah &quot;SD No. 2 Sibanggede&quot;</image:title>
+      <image:caption>Template Twibbon Saya Siap Mengikuti MPLS Ramah &quot;SD No. 2 Sibanggede&quot;</image:caption>
     </image:image>
   </url>
 </urlset>
