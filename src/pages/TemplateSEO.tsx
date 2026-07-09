@@ -35,6 +35,7 @@ type Tpl = {
   usage_count?: number | null;
   like_count?: number | null;
   download_count?: number | null;
+  is_public?: boolean | null;
   profiles?: { username: string | null; display_name: string | null; avatar_url: string | null; bio: string | null } | null;
 };
 
@@ -60,14 +61,19 @@ const TemplateSEO = () => {
       setLoading(true);
       const { data } = await supabase
         .from("shared_templates")
-        .select("id,title,slug,description,category,tags,bottom_layer_url,preview_url,canvas_ratio,canvas_w,canvas_h,created_at,owner_id,view_count,usage_count,like_count,download_count,profiles:owner_id(username,display_name,avatar_url,bio)")
+        .select("id,title,slug,description,category,tags,bottom_layer_url,preview_url,canvas_ratio,canvas_w,canvas_h,created_at,owner_id,view_count,usage_count,like_count,download_count,is_public,profiles:owner_id(username,display_name,avatar_url,bio)")
         .eq("slug", slug)
-        .eq("is_public", true)
+        .is("deleted_at", null)
         .maybeSingle();
       if (!mounted) return;
       if (!data) { setNotFound(true); setLoading(false); return; }
       setTpl(data as unknown as Tpl);
       trackView((data as { id: string }).id);
+      if (!(data as Tpl).is_public) {
+        setRelated([]);
+        setLoading(false);
+        return;
+      }
       let rq = supabase
         .from("shared_templates")
         .select("id,title,slug,description,category,tags,bottom_layer_url,preview_url,canvas_ratio,canvas_w,canvas_h,created_at,profiles:owner_id(username,display_name,avatar_url)")
@@ -148,6 +154,7 @@ const TemplateSEO = () => {
         ogImageWidth={tpl?.canvas_w || undefined}
         ogImageHeight={tpl?.canvas_h || undefined}
         jsonLd={jsonLd}
+        noindex={tpl ? !tpl.is_public : undefined}
       />
       {loading || !tpl ? (
         <div className="flex justify-center py-20"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
