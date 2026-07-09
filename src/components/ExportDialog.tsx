@@ -7,6 +7,7 @@ import { exportAnimated } from "@/lib/export-animated";
 import { useToast } from "@/hooks/use-toast";
 import { useSubscription } from "@/contexts/SubscriptionContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAdminRole } from "@/hooks/useAdminRole";
 import { UpgradeModal } from "@/components/UpgradeModal";
 
 interface ExportDialogProps {
@@ -66,7 +67,8 @@ const ExportDialog = ({
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
-  const { canExport, deductCredits, status, creditPoints } = useSubscription();
+  const { canExport, deductCredits, status, creditPoints, loading: subLoading } = useSubscription();
+  const { isAdmin } = useAdminRole();
   const { t } = useTranslation();
 
   const animated = hasAnimation(bottomLayer, topLayer);
@@ -76,10 +78,16 @@ const ExportDialog = ({
   const animatedFormats: AnimatedFormat[] = ["mp4", "gif"];
   const availableFormats: ExportFormat[] = animated ? animatedFormats : staticFormats;
 
+  const isPremium = status === "premium" || isAdmin;
   const baseCheck = canExport(effectiveFormat as any);
-  const exportCheck = forceWatermark && status !== "premium"
-    ? { ...baseCheck, watermark: true }
-    : baseCheck;
+  // Premium users (including admins) never get watermarks. Only force watermark
+  // for confirmed free users after subscription status has loaded, so we don't
+  // accidentally watermark a premium user during the initial fetch.
+  const exportCheck = isPremium
+    ? { ...baseCheck, watermark: false }
+    : forceWatermark && !subLoading && status === "free"
+      ? { ...baseCheck, watermark: true }
+      : baseCheck;
 
   const handleExport = async () => {
     if (!user) {
