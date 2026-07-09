@@ -126,7 +126,7 @@ const ShareTemplateDialog = ({
 
       if (error) throw error;
 
-      const url = `${window.location.origin}/use-template/${data.slug || data.id}`;
+      const url = `${window.location.origin}/template/${data.slug || data.id}`;
       setShareUrl(url);
       toast({ title: t("share.shared"), description: t("share.sharedDesc") });
     } catch (err: any) {
