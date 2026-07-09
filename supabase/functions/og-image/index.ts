@@ -12,7 +12,19 @@
 // to title/preview/owner/category invalidates the cache without manual purge.
 
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { Resvg } from "npm:@resvg/resvg-js@2.6.2";
+import { Resvg, initWasm } from "https://esm.sh/@resvg/resvg-wasm@2.6.2";
+
+let wasmReady: Promise<void> | null = null;
+function ensureWasm(): Promise<void> {
+  if (!wasmReady) {
+    wasmReady = (async () => {
+      const res = await fetch("https://esm.sh/@resvg/resvg-wasm@2.6.2/index_bg.wasm");
+      const buf = await res.arrayBuffer();
+      await initWasm(buf);
+    })();
+  }
+  return wasmReady;
+}
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -148,10 +160,11 @@ function renderSvg(card: Card): string {
 
 async function renderPng(card: Card): Promise<Uint8Array> {
   const svg = renderSvg(card);
+  await ensureWasm();
   const resvg = new Resvg(svg, {
     fitTo: { mode: "width", value: 1200 },
     background: "#071018",
-    font: { loadSystemFonts: true },
+    font: { loadSystemFonts: false, defaultFontFamily: "sans-serif" },
   });
   const pngData = resvg.render().asPng();
   return pngData;
