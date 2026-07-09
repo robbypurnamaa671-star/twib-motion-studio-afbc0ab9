@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Download, Loader2, Upload, Image, Film, X, ZoomIn, ZoomOut, RotateCw, RotateCcw, LogIn } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -198,8 +199,10 @@ const UseTemplate = () => {
       {/* Header */}
       <StickyHeader className="px-4 py-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="TwibMotion logo" width={24} height={24} className="w-6 h-6 rounded" />
-          <span className="font-mono font-bold text-sm text-foreground">TwibMotion</span>
+          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity" aria-label="Back to TwibMotion home">
+            <img src="/logo.png" alt="TwibMotion logo" width={24} height={24} className="w-6 h-6 rounded" />
+            <span className="font-mono font-bold text-sm text-foreground">TwibMotion</span>
+          </Link>
           <span className="text-xs font-mono px-2 py-1 rounded bg-secondary text-secondary-foreground ml-2">
             {template.canvas_ratio}
           </span>
