@@ -12,7 +12,7 @@ import NewsletterSignup from "@/components/community/NewsletterSignup";
 import { Link } from "react-router-dom";
 
 const Index = () => {
-  const [selected, setSelected] = useState(4);
+  const [selected, setSelected] = useState(3);
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -75,11 +75,11 @@ const Index = () => {
           </div>
 
           {/* Ratio Selection */}
-          <div className="w-full max-w-lg animate-fade-in" style={{ animationDelay: "0.3s" }}>
+          <div className="w-full max-w-lg md:max-w-4xl animate-fade-in" style={{ animationDelay: "0.3s" }}>
             <p className="text-sm text-muted-foreground font-mono mb-4 text-center uppercase tracking-widest">
               {t("home.selectRatio")}
             </p>
-            <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
+            <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
               {RATIOS.map((r, i) => (
                 <button
                   key={r.label}
