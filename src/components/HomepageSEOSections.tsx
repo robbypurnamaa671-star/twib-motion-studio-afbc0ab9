@@ -109,23 +109,25 @@ const HomepageSEOSections = () => {
         <h2 className="text-2xl md:text-3xl font-mono font-bold text-foreground text-center mb-10">
           {t("seoSections.howTitle")}
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-3 gap-3 md:gap-8">
           {steps.map((s, i) => (
-            <article key={i} className="flex flex-col items-center text-center gap-3">
-              <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
-                <s.icon className="w-7 h-7 text-primary" />
+            <article key={i} className="flex flex-col items-center text-center gap-2 md:gap-3">
+              <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl bg-primary/10 flex items-center justify-center">
+                <s.icon className="w-5 h-5 md:w-7 md:h-7 text-primary" />
               </div>
-              <span className="text-xs font-mono text-muted-foreground uppercase tracking-widest">
+              <span className="hidden md:block text-xs font-mono text-muted-foreground uppercase tracking-widest">
                 {t("seoSections.step")} {i + 1}
               </span>
-              <h3 className="font-mono font-semibold text-foreground text-lg">{s.title}</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">{s.desc}</p>
+              <h3 className="font-mono font-semibold text-foreground text-xs md:text-lg leading-tight">{s.title}</h3>
+              <p className="hidden md:block text-muted-foreground text-sm leading-relaxed">{s.desc}</p>
               <Link
                 to={s.href}
                 aria-label={`${s.cta}: ${s.title}`}
-                className={`text-primary text-sm font-mono inline-flex items-center gap-1 hover:underline rounded-sm ${focusRing}`}
+                className={`text-primary text-xs md:text-sm font-mono inline-flex items-center gap-1 hover:underline rounded-sm ${focusRing}`}
               >
-                {s.cta} <ArrowRight className="w-3 h-3" aria-hidden="true" />
+                <span className="hidden md:inline">{s.cta}</span>
+                <span className="md:hidden">{t("seoSections.stepCtaShort")}</span>
+                <ArrowRight className="w-3 h-3" aria-hidden="true" />
               </Link>
             </article>
           ))}
