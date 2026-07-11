@@ -12,13 +12,14 @@ import NewsletterSignup from "@/components/community/NewsletterSignup";
 import { Link } from "react-router-dom";
 
 const Index = () => {
-  const [selected, setSelected] = useState(3);
+  const [selected, setSelected] = useState(4);
   const navigate = useNavigate();
   const { t } = useTranslation();
 
   const RATIOS = [
     { label: "9:16", desc: t("home.ratioVerticalDesc"), w: 1080, h: 1920 },
     { label: "4:5", desc: t("home.ratioPortraitDesc"), w: 1080, h: 1350 },
+    { label: "3:4", desc: t("home.ratioThreeFourDesc"), w: 1080, h: 1440 },
     { label: "Custom", desc: t("home.ratioCustomDesc"), w: 0, h: 0 },
     { label: "1:1", desc: t("home.ratioSquareDesc"), w: 1080, h: 1080 },
     { label: "16:9", desc: t("home.ratioLandscapeDesc"), w: 1920, h: 1080 },

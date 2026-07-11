@@ -38,6 +38,7 @@
     "selectRatio": "Select Canvas Ratio",
     "ratioVerticalDesc": "Vertical / Stories",
     "ratioPortraitDesc": "Portrait / IG Feed",
+    "ratioThreeFourDesc": "Portrait / IG Classic",
     "ratioCustomDesc": "Match Frame Size",
     "ratioCustomHint": "Follows frame",
     "ratioSquareDesc": "Square / Feed",
