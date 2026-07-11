@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Sparkles, Users, ChevronLeft, ChevronRight, Search, Heart, Eye } from "lucide-react";
+import { ArrowRight, Sparkles, Users, Search, Heart, Eye, Play, Image as ImageIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProgressiveImage } from "@/components/ProgressiveImage";
 import { FavoriteButton } from "@/components/community/FavoriteButton";
@@ -20,7 +20,7 @@ type PublicTwibbon = {
   profiles?: { username: string | null; display_name: string | null; avatar_url: string | null } | null;
 };
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 20;
 const ALL = "all";
 const CACHE_TTL_MS = 60_000;
 
@@ -68,12 +68,18 @@ const SORT_COL: Record<Sort, string> = {
   viewed: "view_count",
 };
 
-type CacheEntry = { ts: number; rows: PublicTwibbon[]; count: number };
+type TwibbonType = "moving" | "static";
+
+type CacheEntry = { ts: number; rows: PublicTwibbon[] };
 const memoryCache = new Map<string, CacheEntry>();
 
-function cacheKey(category: string, ratio: string, sort: Sort, q: string, page: number) {
-  return `${category}|${ratio}|${sort}|${q}|${page}`;
+function cacheKey(type: TwibbonType, category: string, ratio: string, sort: Sort, q: string) {
+  return `${type}|${category}|${ratio}|${sort}|${q}`;
 }
+
+// Patterns used to detect animated/video bottom layers server-side.
+const MOVING_EXTS = ["mp4", "webm", "mov", "m4v", "gif", "apng"];
+const MOVING_OR = MOVING_EXTS.map((ext) => `bottom_layer_url.ilike.%.${ext}%`).join(",");
 
 const PublicGallery = ({ createUrl }: { createUrl: string }) => {
   const [category, setCategory] = useState<string>(ALL);
@@ -81,70 +87,11 @@ const PublicGallery = ({ createUrl }: { createUrl: string }) => {
   const [sort, setSort] = useState<Sort>("newest");
   const [query, setQuery] = useState("");
   const [debouncedQ, setDebouncedQ] = useState("");
-  const [page, setPage] = useState(0);
-  const [rows, setRows] = useState<PublicTwibbon[]>([]);
-  const [totalCount, setTotalCount] = useState(0);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const id = setTimeout(() => setDebouncedQ(query.trim()), 300);
     return () => clearTimeout(id);
   }, [query]);
-
-  const key = cacheKey(category, ratio, sort, debouncedQ, page);
-
-  useEffect(() => {
-    let active = true;
-    const cached = memoryCache.get(key);
-    if (cached && Date.now() - cached.ts < CACHE_TTL_MS) {
-      setRows(cached.rows);
-      setTotalCount(cached.count);
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    (async () => {
-      let q = supabase
-        .from("shared_templates")
-        .select(
-          "id, slug, title, bottom_layer_url, preview_url, canvas_ratio, category, owner_id, view_count, usage_count, like_count, profiles:owner_id(username, display_name, avatar_url)",
-          { count: "exact" },
-        )
-        .eq("is_public", true)
-        .is("deleted_at", null)
-        .order(SORT_COL[sort], { ascending: false })
-        .range(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE - 1);
-
-      if (category !== ALL) q = q.eq("category", category);
-      if (ratio !== ALL) q = q.eq("canvas_ratio", ratio);
-      if (debouncedQ) {
-        const esc = debouncedQ.replace(/[,%]/g, " ");
-        q = q.or(`title.ilike.%${esc}%,description.ilike.%${esc}%`);
-      }
-
-      const { data, count } = await q;
-      if (!active) return;
-      const safeRows = (data ?? []) as unknown as PublicTwibbon[];
-      const safeCount = count ?? 0;
-      memoryCache.set(key, { ts: Date.now(), rows: safeRows, count: safeCount });
-      setRows(safeRows);
-      setTotalCount(safeCount);
-      setLoading(false);
-    })();
-    return () => {
-      active = false;
-    };
-  }, [key, category, ratio, sort, debouncedQ, page]);
-
-  // Reset to page 0 when filters change
-  useEffect(() => {
-    setPage(0);
-  }, [category, ratio, sort, debouncedQ]);
-
-  const totalPages = useMemo(
-    () => Math.max(1, Math.ceil(totalCount / PAGE_SIZE)),
-    [totalCount],
-  );
 
   return (
     <section
@@ -159,7 +106,7 @@ const PublicGallery = ({ createUrl }: { createUrl: string }) => {
           Twibbons created by our users
         </h2>
         <p className="text-muted-foreground text-sm max-w-2xl mx-auto">
-          Real public twibbons made by people just like you on TwibMotion. Filter by category or ratio and browse the latest community frames.
+          Real public twibbons from the TwibMotion community — split into <strong className="text-foreground">moving</strong> (video/GIF) and <strong className="text-foreground">static</strong> frames so you can see we support both.
         </p>
       </div>
 
@@ -198,33 +145,141 @@ const PublicGallery = ({ createUrl }: { createUrl: string }) => {
         />
       </div>
 
-      {/* Grid */}
+      <TypeSection
+        type="moving"
+        title="Moving Twibbons"
+        subtitle="Animated frames — video (MP4/WebM) and GIF."
+        icon={<Play className="w-4 h-4 text-primary" />}
+        category={category}
+        ratio={ratio}
+        sort={sort}
+        query={debouncedQ}
+      />
+
+      <div className="my-10 border-t border-border" />
+
+      <TypeSection
+        type="static"
+        title="Static Twibbons"
+        subtitle="Classic still frames — PNG and JPG."
+        icon={<ImageIcon className="w-4 h-4 text-primary" />}
+        category={category}
+        ratio={ratio}
+        sort={sort}
+        query={debouncedQ}
+      />
+
+      <div className="text-center mt-10">
+        <Link
+          to={createUrl}
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/40 text-primary font-mono text-sm hover:bg-primary/10 ${focusRing}`}
+        >
+          Make yours and join the gallery <ArrowRight className="w-3.5 h-3.5" />
+        </Link>
+      </div>
+    </section>
+  );
+};
+
+const TypeSection = ({
+  type,
+  title,
+  subtitle,
+  icon,
+  category,
+  ratio,
+  sort,
+  query,
+}: {
+  type: TwibbonType;
+  title: string;
+  subtitle: string;
+  icon: React.ReactNode;
+  category: string;
+  ratio: string;
+  sort: Sort;
+  query: string;
+}) => {
+  const [rows, setRows] = useState<PublicTwibbon[]>([]);
+  const [loading, setLoading] = useState(true);
+  const key = cacheKey(type, category, ratio, sort, query);
+
+  useEffect(() => {
+    let active = true;
+    const cached = memoryCache.get(key);
+    if (cached && Date.now() - cached.ts < CACHE_TTL_MS) {
+      setRows(cached.rows);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    (async () => {
+      let q = supabase
+        .from("shared_templates")
+        .select(
+          "id, slug, title, bottom_layer_url, preview_url, canvas_ratio, category, owner_id, view_count, usage_count, like_count, profiles:owner_id(username, display_name, avatar_url)",
+        )
+        .eq("is_public", true)
+        .is("deleted_at", null)
+        .order(SORT_COL[sort], { ascending: false })
+        .limit(PAGE_SIZE);
+
+      if (category !== ALL) q = q.eq("category", category);
+      if (ratio !== ALL) q = q.eq("canvas_ratio", ratio);
+      if (query) {
+        const esc = query.replace(/[,%]/g, " ");
+        q = q.or(`title.ilike.%${esc}%,description.ilike.%${esc}%`);
+      }
+      if (type === "moving") {
+        q = q.or(MOVING_OR);
+      } else {
+        for (const ext of MOVING_EXTS) {
+          q = q.not("bottom_layer_url", "ilike", `%.${ext}%`);
+        }
+      }
+
+      const { data } = await q;
+      if (!active) return;
+      const safeRows = (data ?? []) as unknown as PublicTwibbon[];
+      memoryCache.set(key, { ts: Date.now(), rows: safeRows });
+      setRows(safeRows);
+      setLoading(false);
+    })();
+    return () => {
+      active = false;
+    };
+  }, [key, category, ratio, sort, query, type]);
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-4 gap-3 flex-wrap">
+        <div>
+          <h3 className="font-mono font-bold text-foreground text-lg inline-flex items-center gap-2">
+            {icon} {title}
+            <span className="text-xs font-normal text-muted-foreground">({rows.length})</span>
+          </h3>
+          <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
+        </div>
+      </div>
+
       {loading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+          {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="aspect-square rounded-lg bg-muted/40 animate-pulse" />
           ))}
         </div>
       ) : rows.length === 0 ? (
         <div className="text-center py-10 border border-dashed border-border rounded-xl">
-          <Sparkles className="w-6 h-6 text-primary mx-auto mb-3" />
-          <p className="text-sm text-muted-foreground mb-4">
-            No public twibbons match these filters yet. Try a different category or be the first to share one.
+          <Sparkles className="w-5 h-5 text-primary mx-auto mb-2" />
+          <p className="text-sm text-muted-foreground">
+            No {type} twibbons match these filters yet.
           </p>
-          <Link
-            to={createUrl}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground font-mono text-sm hover:opacity-90 ${focusRing}`}
-          >
-            Create your twibbon <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
         </div>
       ) : (
-        <>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {rows.map((tw) => (
-              <div key={tw.id} className="relative group">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          {rows.map((tw) => (
+            <div key={tw.id} className="relative group">
               <Link
-                key={tw.id}
                 to={`/use-template/${tw.slug || tw.id}`}
                 aria-label={`Use public twibbon: ${tw.title ?? "Untitled"}`}
                 className={`group block aspect-square overflow-hidden rounded-lg border border-border bg-card relative ${focusRing}`}
@@ -303,46 +358,11 @@ const PublicGallery = ({ createUrl }: { createUrl: string }) => {
                 </div>
               </Link>
               <FavoriteButton templateId={tw.id} className="absolute top-2 right-2 z-20" />
-              </div>
-            ))}
-          </div>
-
-          {/* Pagination */}
-          <div className="flex items-center justify-center gap-2 mt-8">
-            <button
-              type="button"
-              onClick={() => setPage((p) => Math.max(0, p - 1))}
-              disabled={page === 0}
-              aria-label="Previous page"
-              className={`p-2 rounded-md border border-border text-foreground hover:bg-secondary disabled:opacity-40 disabled:cursor-not-allowed ${focusRing}`}
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <span className="text-xs font-mono text-muted-foreground px-3">
-              Page {page + 1} of {totalPages} · {totalCount} twibbon{totalCount === 1 ? "" : "s"}
-            </span>
-            <button
-              type="button"
-              onClick={() => setPage((p) => (p + 1 < totalPages ? p + 1 : p))}
-              disabled={page + 1 >= totalPages}
-              aria-label="Next page"
-              className={`p-2 rounded-md border border-border text-foreground hover:bg-secondary disabled:opacity-40 disabled:cursor-not-allowed ${focusRing}`}
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-
-          <div className="text-center mt-6">
-            <Link
-              to={createUrl}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/40 text-primary font-mono text-sm hover:bg-primary/10 ${focusRing}`}
-            >
-              Make yours and join the gallery <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-        </>
+            </div>
+          ))}
+        </div>
       )}
-    </section>
+    </div>
   );
 };
 
