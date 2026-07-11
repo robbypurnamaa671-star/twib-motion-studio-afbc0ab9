@@ -12,12 +12,14 @@ import NewsletterSignup from "@/components/community/NewsletterSignup";
 import { Link } from "react-router-dom";
 
 const Index = () => {
-  const [selected, setSelected] = useState(1);
+  const [selected, setSelected] = useState(3);
   const navigate = useNavigate();
   const { t } = useTranslation();
 
   const RATIOS = [
     { label: "9:16", desc: t("home.ratioVerticalDesc"), w: 1080, h: 1920 },
+    { label: "4:5", desc: t("home.ratioPortraitDesc"), w: 1080, h: 1350 },
+    { label: "Custom", desc: t("home.ratioCustomDesc"), w: 0, h: 0 },
     { label: "1:1", desc: t("home.ratioSquareDesc"), w: 1080, h: 1080 },
     { label: "16:9", desc: t("home.ratioLandscapeDesc"), w: 1920, h: 1080 },
   ] as const;
@@ -76,7 +78,7 @@ const Index = () => {
             <p className="text-sm text-muted-foreground font-mono mb-4 text-center uppercase tracking-widest">
               {t("home.selectRatio")}
             </p>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
               {RATIOS.map((r, i) => (
                 <button
                   key={r.label}
@@ -89,6 +91,16 @@ const Index = () => {
                   }`}
                 >
                   <div className="flex items-center justify-center h-16">
+                    {r.label === "Custom" ? (
+                      <div
+                        className={`border-2 border-dashed rounded-sm transition-colors flex items-center justify-center ${
+                          selected === i ? "border-primary text-primary" : "border-muted-foreground/30 text-muted-foreground/50"
+                        }`}
+                        style={{ width: 48, height: 48 }}
+                      >
+                        <Monitor className="w-6 h-6" aria-hidden="true" />
+                      </div>
+                    ) : (
                     <div
                       className={`border-2 rounded-sm transition-colors ${
                         selected === i ? "border-primary" : "border-muted-foreground/30"
@@ -105,6 +117,7 @@ const Index = () => {
                         aria-hidden="true"
                       />
                     </div>
+                    )}
                   </div>
                   <span
                     className={`font-mono font-bold text-lg ${
@@ -114,7 +127,9 @@ const Index = () => {
                     {r.label}
                   </span>
                   <span className="text-xs text-muted-foreground">{r.desc}</span>
-                  <span className="text-xs text-muted-foreground/60">{r.w}×{r.h}</span>
+                  <span className="text-xs text-muted-foreground/60">
+                    {r.w && r.h ? `${r.w}×${r.h}` : t("home.ratioCustomHint")}
+                  </span>
                 </button>
               ))}
             </div>
@@ -124,7 +139,7 @@ const Index = () => {
           <button
             onClick={() => {
               const r = RATIOS[selected];
-              navigate(`/editor?ratio=${r.label}&w=${r.w}&h=${r.h}`);
+              navigate(`/editor?ratio=${encodeURIComponent(r.label)}&w=${r.w}&h=${r.h}`);
             }}
             className="animate-fade-in px-8 py-3 rounded-lg bg-primary text-primary-foreground font-mono font-semibold text-base hover:opacity-90 transition-opacity glow-border"
             style={{ animationDelay: "0.45s" }}
