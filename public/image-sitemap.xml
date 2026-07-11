@@ -105,14 +105,6 @@
     </image:image>
   </url>
   <url>
-    <loc>https://twibmotion.com/template/mpls-smk-negeri-1-syamtalira-aron</loc>
-    <image:image>
-      <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/9bf81fef-ff04-4c4d-9512-a61ef5a12c78/2783c8f9-9cea-4bbf-b39a-a42321abfc63.png</image:loc>
-      <image:title>Template Twibbon MPLS SMK Negeri 1 Syamtalira Aron</image:title>
-      <image:caption>Template Twibbon MPLS SMK Negeri 1 Syamtalira Aron</image:caption>
-    </image:image>
-  </url>
-  <url>
     <loc>https://twibmotion.com/template/saya-siap-mengikuti-mpls-ramah-sd-no-2-sibanggede</loc>
     <image:image>
       <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/487c1b2a-cd41-472a-9c30-4c0861d3570d/f6f37a53-2b25-4b39-a357-f9bac596eec1.png</image:loc>
@@ -142,6 +134,30 @@
       <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/746fea90-7d94-4b66-923b-dbd905d90096/8d39a1a3-ae13-4cdb-b0c0-a881c2461784.png</image:loc>
       <image:title>Template Twibbon MPLS SMK Negeri 1 Syamtalira Aron</image:title>
       <image:caption>Template Twibbon MPLS SMK Negeri 1 Syamtalira Aron</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/template/mpls-smk-negri-1-syamtalira-aron</loc>
+    <image:image>
+      <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/746fea90-7d94-4b66-923b-dbd905d90096/715a66ee-f038-4d05-9299-cfbb2d9bc6df.png</image:loc>
+      <image:title>Template Twibbon MPLS SMK Negri 1 Syamtalira Aron </image:title>
+      <image:caption>Template Twibbon MPLS SMK Negri 1 Syamtalira Aron </image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/template/mpls-smk-negeri-1-syamtalira-aron</loc>
+    <image:image>
+      <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/9bf81fef-ff04-4c4d-9512-a61ef5a12c78/2783c8f9-9cea-4bbf-b39a-a42321abfc63.png</image:loc>
+      <image:title>Template Twibbon MPLS SMK Negeri 1 Syamtalira Aron</image:title>
+      <image:caption>Template Twibbon MPLS SMK Negeri 1 Syamtalira Aron</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/template/mpls-2627-an-najah</loc>
+    <image:image>
+      <image:loc>https://xfybnitxislnuetlltaz.supabase.co/storage/v1/object/public/template-assets/6a5971e1-9ec5-451c-8b5a-f5a66f76769f/2115663a-24d8-429b-85a8-dcf8a631c33d.png</image:loc>
+      <image:title>Template Twibbon MPLS 2627 an najah</image:title>
+      <image:caption>Template Twibbon MPLS 2627 an najah</image:caption>
     </image:image>
   </url>
 </urlset>

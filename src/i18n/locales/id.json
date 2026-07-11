@@ -37,6 +37,9 @@
     "featHD": "Ekspor HD",
     "selectRatio": "Pilih Rasio Kanvas",
     "ratioVerticalDesc": "Vertikal / Stories",
+    "ratioPortraitDesc": "Portrait / Feed IG",
+    "ratioCustomDesc": "Ikuti Ukuran Frame",
+    "ratioCustomHint": "Ikut frame",
     "ratioSquareDesc": "Persegi / Feed",
     "ratioLandscapeDesc": "Lanskap / Video",
     "openEditorCta": "Buka Editor →"
