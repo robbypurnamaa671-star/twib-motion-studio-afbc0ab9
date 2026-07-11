@@ -37,6 +37,9 @@
     "featHD": "HD Export",
     "selectRatio": "Select Canvas Ratio",
     "ratioVerticalDesc": "Vertical / Stories",
+    "ratioPortraitDesc": "Portrait / IG Feed",
+    "ratioCustomDesc": "Match Frame Size",
+    "ratioCustomHint": "Follows frame",
     "ratioSquareDesc": "Square / Feed",
     "ratioLandscapeDesc": "Landscape / Video",
     "openEditorCta": "Open Editor →"
