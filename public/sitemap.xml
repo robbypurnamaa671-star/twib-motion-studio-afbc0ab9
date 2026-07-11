@@ -5602,12 +5602,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://twibmotion.com/template/mpls-smk-negeri-1-syamtalira-aron</loc>
-    <lastmod>2026-07-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://twibmotion.com/template/saya-siap-mengikuti-mpls-ramah-sd-no-2-sibanggede</loc>
     <lastmod>2026-07-09</lastmod>
     <changefreq>weekly</changefreq>
@@ -5628,6 +5622,24 @@
   <url>
     <loc>https://twibmotion.com/template/mpls-smk-negeri-1-syamtalira-aron-6efed3</loc>
     <lastmod>2026-07-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/template/mpls-smk-negri-1-syamtalira-aron</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/template/mpls-smk-negeri-1-syamtalira-aron</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/template/mpls-2627-an-najah</loc>
+    <lastmod>2026-07-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -5664,6 +5676,12 @@
   <url>
     <loc>https://twibmotion.com/creator/nata-wibawa</loc>
     <lastmod>2026-07-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/creator/leena-showrovsky</loc>
+    <lastmod>2026-07-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
