@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Download, Share2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -21,12 +21,39 @@ const Editor = () => {
   const { t } = useTranslation();
 
   const ratio = searchParams.get("ratio") || "1:1";
-  const canvasW = parseInt(searchParams.get("w") || "1080");
-  const canvasH = parseInt(searchParams.get("h") || "1080");
+  const isCustom = ratio.toLowerCase() === "custom";
+  const initialW = parseInt(searchParams.get("w") || "1080") || 1080;
+  const initialH = parseInt(searchParams.get("h") || "1080") || 1080;
 
   // Bottom layer = User photo, Top layer = Twibbon overlay
   const [bottomLayer, setBottomLayer] = useState<LayerMedia | null>(null);
   const [topLayer, setTopLayer] = useState<LayerMedia | null>(null);
+  const [customSize, setCustomSize] = useState<{ w: number; h: number } | null>(null);
+
+  const canvasW = isCustom && customSize ? customSize.w : initialW;
+  const canvasH = isCustom && customSize ? customSize.h : initialH;
+
+  // For custom ratio, derive canvas dims from uploaded twibbon (top layer) natural size
+  useEffect(() => {
+    if (!isCustom || !topLayer) return;
+    let cancelled = false;
+    const apply = (w: number, h: number) => {
+      if (cancelled || !w || !h) return;
+      setCustomSize({ w, h });
+    };
+    if (topLayer.type === "video") {
+      const v = document.createElement("video");
+      v.preload = "metadata";
+      v.onloadedmetadata = () => apply(v.videoWidth, v.videoHeight);
+      v.src = topLayer.url;
+    } else {
+      const img = new window.Image();
+      img.onload = () => apply(img.naturalWidth, img.naturalHeight);
+      img.src = topLayer.url;
+    }
+    return () => { cancelled = true; };
+  }, [isCustom, topLayer]);
+
   const [transform, setTransform] = useState<TopLayerTransform>({
     x: 0, y: 0, scale: 1, rotation: 0,
   });
