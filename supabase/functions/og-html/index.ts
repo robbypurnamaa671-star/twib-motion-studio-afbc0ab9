@@ -4,7 +4,7 @@
 // the real SPA instead.
 //
 // IMPORTANT: this shell must NOT contain a self-referencing
-// <meta http-equiv="refresh"> to its own canonical URL. Googlebot treats a
+// meta-refresh tag pointing to its own canonical URL. Googlebot treats such a
 // meta refresh as a redirect, and a refresh pointing at the same URL it just
 // fetched is an infinite redirect loop -> Search Console "Redirect error".
 // A browser that lands here is bounced with a guarded client-side script that
