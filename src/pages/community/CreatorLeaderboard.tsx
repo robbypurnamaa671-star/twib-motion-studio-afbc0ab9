@@ -7,7 +7,7 @@ import { CreatorCard } from "@/components/community/CreatorCard";
 import { breadcrumbJsonLd } from "@/lib/seo-content";
 import { fetchCreatorLeaderboard, type FeaturedCreator, type LeaderboardSort } from "@/lib/community-queries";
 
-const BASE = "https://twib-motion-studio.lovable.app";
+const BASE = "https://twibmotion.com";
 
 const TABS: { value: LeaderboardSort; label: string }[] = [
   { value: "popular", label: "Most Popular" },

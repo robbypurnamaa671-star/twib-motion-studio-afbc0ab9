@@ -5,7 +5,7 @@ import SeoShell from "@/components/seo/SeoShell";
 import { breadcrumbJsonLd } from "@/lib/seo-content";
 import { fetchCollections, type Collection } from "@/lib/community-queries";
 
-const BASE = "https://twib-motion-studio.lovable.app";
+const BASE = "https://twibmotion.com";
 
 export default function CollectionsIndex() {
   const [cols, setCols] = useState<Collection[]>([]);

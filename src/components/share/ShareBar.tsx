@@ -11,7 +11,7 @@ type Props = {
 
 function withRef(url: string, ref?: string | null) {
   if (!ref) return url;
-  const u = new URL(url, typeof window !== "undefined" ? window.location.origin : "https://twibmotion.com");
+  const u = new URL(url, "https://twibmotion.com");
   if (!u.searchParams.has("ref")) u.searchParams.set("ref", ref);
   return u.toString();
 }

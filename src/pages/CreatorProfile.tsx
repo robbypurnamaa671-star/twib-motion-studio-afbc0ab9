@@ -33,7 +33,7 @@ interface TemplateCard {
   usage_count: number;
 }
 
-const BASE = "https://twib-motion-studio.lovable.app";
+const BASE = "https://twibmotion.com";
 
 export default function CreatorProfile() {
   const { username } = useParams<{ username: string }>();

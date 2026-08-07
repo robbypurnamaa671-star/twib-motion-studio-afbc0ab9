@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { isPreviewHost } from "@/lib/site";
 
 interface SEOHeadProps {
   title?: string;
@@ -65,7 +66,8 @@ const SEOHead = ({ title, description, canonical, noindex, ogUrl, ogType, ogImag
       link.setAttribute("href", canonical);
     }
 
-    if (noindex) {
+    // Preview environments (*.lovable.app, localhost) must never compete with production SEO.
+    if (noindex || isPreviewHost()) {
       setMeta("name", "robots", "noindex, nofollow");
     } else {
       const robotsMeta = document.querySelector('meta[name="robots"]');

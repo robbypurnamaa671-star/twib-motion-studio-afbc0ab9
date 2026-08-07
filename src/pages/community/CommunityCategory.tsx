@@ -12,7 +12,7 @@ import {
   type FeaturedCreator,
 } from "@/lib/community-queries";
 
-const BASE = "https://twib-motion-studio.lovable.app";
+const BASE = "https://twibmotion.com";
 
 export default function CommunityCategory() {
   const { slug = "" } = useParams<{ slug: string }>();

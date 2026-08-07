@@ -18,6 +18,19 @@
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#1cb5d6" />
 
+    <!-- Environment-aware indexing: preview hosts (*.lovable.app) are never indexable. -->
+    <script>
+      (function () {
+        var h = location.hostname.toLowerCase();
+        if (h !== "twibmotion.com" && h !== "www.twibmotion.com") {
+          var m = document.createElement("meta");
+          m.name = "robots";
+          m.content = "noindex, nofollow";
+          document.head.appendChild(m);
+        }
+      })();
+    </script>
+
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="TwibMotion" />
