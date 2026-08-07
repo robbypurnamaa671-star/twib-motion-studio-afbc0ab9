@@ -1,8 +1,14 @@
-// Serves a lightweight HTML shell with proper Open Graph tags for social
-// crawlers (WhatsApp, Facebook, Telegram, Discord, LinkedIn, X, etc.).
-// Real user browsers get redirected via <meta http-equiv="refresh"> to the
-// actual SPA route so this endpoint is safe if a crawler UA rule accidentally
-// matches a browser.
+// Serves a lightweight HTML shell with proper Open Graph tags for SOCIAL
+// PREVIEW crawlers only (WhatsApp, Facebook, Telegram, Discord, LinkedIn, X).
+// Search engines (Googlebot/bingbot/etc.) must NEVER be routed here — they get
+// the real SPA instead.
+//
+// IMPORTANT: this shell must NOT contain a self-referencing
+// <meta http-equiv="refresh"> to its own canonical URL. Googlebot treats a
+// meta refresh as a redirect, and a refresh pointing at the same URL it just
+// fetched is an infinite redirect loop -> Search Console "Redirect error".
+// A browser that lands here is bounced with a guarded client-side script that
+// only navigates when the current location differs from the target.
 //
 // Query params:
 //   path = /template/:slug | /creator/:username | /collections/:slug |
@@ -181,12 +187,14 @@ function renderHtml(meta: Meta): string {
 <meta name="twitter:title" content="${esc(title)}" />
 <meta name="twitter:description" content="${esc(description)}" />
 <meta name="twitter:image" content="${esc(ogImage)}" />
-<meta http-equiv="refresh" content="0; url=${esc(canonical)}" />
 </head>
 <body>
 <h1>${esc(title)}</h1>
 <p>${esc(description)}</p>
 <p><a href="${esc(canonical)}">Continue to TwibMotion →</a></p>
+<script>
+(function(){try{var t=${JSON.stringify(canonical)};if(window.location.href!==t&&window.location.pathname.indexOf("/api/og")===0){window.location.replace(t);}}catch(e){}})();
+</script>
 </body>
 </html>`;
 }
