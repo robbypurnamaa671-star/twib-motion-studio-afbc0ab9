@@ -3,6 +3,7 @@ import { X, Share2, Copy, Check, Loader2, Lock, Unlock, Globe, EyeOff } from "lu
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { SITE_URL } from "@/lib/site";
 import { useToast } from "@/hooks/use-toast";
 import { LayerMedia, TopLayerTransform } from "@/lib/media";
 import { DEFAULT_LOCK_SETTINGS, LockSettings } from "@/lib/templates";
@@ -126,7 +127,7 @@ const ShareTemplateDialog = ({
 
       if (error) throw error;
 
-      const url = `${window.location.origin}/template/${data.slug || data.id}`;
+      const url = `${SITE_URL}/template/${data.slug || data.id}`;
       setShareUrl(url);
       toast({ title: t("share.shared"), description: t("share.sharedDesc") });
     } catch (err: any) {
