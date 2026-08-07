@@ -20,7 +20,7 @@ import {
   type TrendingWindow,
 } from "@/lib/community-queries";
 
-const BASE = "https://twib-motion-studio.lovable.app";
+const BASE = "https://twibmotion.com";
 
 export default function CommunityHub() {
   const [trendingWindow, setTrendingWindow] = useState<TrendingWindow>("week");

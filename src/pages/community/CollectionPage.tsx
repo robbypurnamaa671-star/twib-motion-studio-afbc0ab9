@@ -12,7 +12,7 @@ import {
   type CommunityTemplate,
 } from "@/lib/community-queries";
 
-const BASE = "https://twib-motion-studio.lovable.app";
+const BASE = "https://twibmotion.com";
 
 export default function CollectionPage() {
   const { slug = "" } = useParams<{ slug: string }>();
