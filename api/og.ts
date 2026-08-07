@@ -31,8 +31,12 @@ export default async function handler(req: Request): Promise<Response> {
       },
     });
   } catch (e) {
+    // No meta refresh here: a refresh to the same canonical URL is treated as a
+    // redirect loop by search crawlers ("Redirect error" in Search Console).
     return new Response(
-      `<!doctype html><title>TwibMotion</title><meta http-equiv="refresh" content="0;url=https://twibmotion.com${path}">`,
+      `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>TwibMotion</title>` +
+        `<link rel="canonical" href="https://twibmotion.com${path}"></head>` +
+        `<body><a href="https://twibmotion.com${path}">Continue to TwibMotion</a></body></html>`,
       { status: 200, headers: { "Content-Type": "text/html; charset=utf-8" } },
     );
   }

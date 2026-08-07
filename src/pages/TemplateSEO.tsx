@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams, Navigate } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import SEOHead from "@/components/SEOHead";
@@ -14,6 +14,7 @@ import { CloneButton } from "@/components/share/CloneButton";
 import { EmbedCodeDialog } from "@/components/share/EmbedCodeDialog";
 import { BadgeChip, computeBadges } from "@/components/community/BadgeChip";
 import { useAuth } from "@/contexts/AuthContext";
+import NotFound from "@/pages/NotFound";
 
 const BASE_URL = "https://twibmotion.com";
 
@@ -138,7 +139,9 @@ const TemplateSEO = () => {
     ];
   }, [tpl, canonical, slug, description, imageUrl, altText]);
 
-  if (notFound) return <Navigate to="/" replace />;
+  // Missing templates must render a real 404 page — never redirect to the
+  // homepage (Google reports that as a soft-404 / redirect error).
+  if (notFound) return <NotFound />;
 
   return (
     <SeoShell>
