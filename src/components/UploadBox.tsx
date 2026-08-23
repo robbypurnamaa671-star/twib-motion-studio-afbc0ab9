@@ -116,7 +116,7 @@ const UploadBox = ({ label, sublabel, media, onMediaChange, icon }: UploadBoxPro
       <input
         ref={inputRef}
         type="file"
-        accept=".jpg,.jpeg,.png,.gif,.mp4"
+        accept=".jpg,.jpeg,.png,.gif,.mp4,.mov,video/quicktime"
         className="hidden"
         onChange={(e) => {
           const file = e.target.files?.[0];

@@ -5548,20 +5548,14 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://twibmotion.com/template/pkkmb-fh-2026-siap-maju-bergerak</loc>
-    <lastmod>2026-06-11</lastmod>
+    <loc>https://twibmotion.com/template/mother-s-days-twibbon-frame-template</loc>
+    <lastmod>2026-06-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://twibmotion.com/template/siap-sambut-hari-pramuka</loc>
     <lastmod>2026-06-11</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://twibmotion.com/template/template-twibbon-piala-dunia</loc>
-    <lastmod>2026-06-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -5584,7 +5578,13 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://twibmotion.com/template/mother-s-days-twibbon-frame-template</loc>
+    <loc>https://twibmotion.com/template/pkkmb-fh-2026-siap-maju-bergerak</loc>
+    <lastmod>2026-06-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/template/template-twibbon-piala-dunia</loc>
     <lastmod>2026-06-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -5656,12 +5656,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://twibmotion.com/template/twibbon-hari-konstitusi-republik-indonesia</loc>
-    <lastmod>2026-07-13</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://twibmotion.com/template/frame-twibbon-hari-sumpah-pemuda</loc>
     <lastmod>2026-07-13</lastmod>
     <changefreq>weekly</changefreq>
@@ -5676,6 +5670,12 @@
   <url>
     <loc>https://twibmotion.com/template/twibbon-masa-orientasi-pramuka</loc>
     <lastmod>2026-07-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/template/twibbon-hari-konstitusi-republik-indonesia</loc>
+    <lastmod>2026-07-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -5698,19 +5698,19 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://twibmotion.com/template/twibbon-hut-ri-81-tahun-2026</loc>
-    <lastmod>2026-08-07</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://twibmotion.com/template/plazabpjamsostek</loc>
     <lastmod>2026-08-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://twibmotion.com/template/twibbon-17-agustus-2026-terbaru</loc>
+    <loc>https://twibmotion.com/template/twibbon-hut-ri-81-tahun-2026</loc>
+    <lastmod>2026-08-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/template/twibbon-kemerdekaan-indonesia-2026-desain-hut-ri-ke-81</loc>
     <lastmod>2026-08-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -5734,7 +5734,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://twibmotion.com/template/twibbon-kemerdekaan-indonesia-2026-desain-hut-ri-ke-81</loc>
+    <loc>https://twibmotion.com/template/twibbon-17-agustus-2026-terbaru</loc>
     <lastmod>2026-08-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
