@@ -4,6 +4,7 @@
 // public/safe to commit.
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
+import { brokeredPreviewStorage } from './previewAuthStorage';
 
 const PROJECT_REF = 'xfybnitxislnuetlltaz';
 const FALLBACK_URL = `https://${PROJECT_REF}.supabase.co`;
@@ -30,7 +31,7 @@ if (envUrl && !envUrl.includes(PROJECT_REF)) {
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
-    storage: localStorage,
+    storage: brokeredPreviewStorage(),
     persistSession: true,
     autoRefreshToken: true,
   },
