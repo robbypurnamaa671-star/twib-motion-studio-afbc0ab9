@@ -124,6 +124,7 @@ const App = () => (
               <Route path="/admin/collections" element={<AdminGuard><AdminCollectionsPage /></AdminGuard>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <VercelAnalytics />
           </BrowserRouter>
         </TooltipProvider>
       </SubscriptionProvider>
