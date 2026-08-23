@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AdminGuard } from "@/components/admin/AdminGuard";
 import { SubscriptionProvider } from "@/contexts/SubscriptionContext";
@@ -123,6 +124,7 @@ const App = () => (
               <Route path="/admin/collections" element={<AdminGuard><AdminCollectionsPage /></AdminGuard>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+            <VercelAnalytics />
           </BrowserRouter>
         </TooltipProvider>
       </SubscriptionProvider>
