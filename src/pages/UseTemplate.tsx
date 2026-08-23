@@ -316,7 +316,7 @@ const UseTemplate = () => {
             <input
               ref={inputRef}
               type="file"
-              accept=".jpg,.jpeg,.png,.gif,.mp4"
+              accept=".jpg,.jpeg,.png,.gif,.mp4,.mov,video/quicktime"
               className="hidden"
               onChange={(e) => {
                 const f = e.target.files?.[0];
