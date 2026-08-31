@@ -320,9 +320,7 @@ const TypeSection = ({
                         aria-hidden="true"
                         loading="lazy"
                         decoding="async"
-                        width={400}
-                        height={400}
-                        className="absolute inset-0 w-full h-full object-cover"
+                        className="absolute inset-0 w-full h-full object-contain"
                       />
                     )}
                     <video
@@ -334,7 +332,7 @@ const TypeSection = ({
                       preload="none"
                       poster={thumbUrl(tw.preview_url)}
                       aria-label={tw.title ?? "Animated public twibbon by a TwibMotion user"}
-                      className="absolute inset-0 w-full h-full object-cover"
+                      className="absolute inset-0 w-full h-full object-contain"
                     />
                   </div>
                 ) : isAnimatedImage(tw.bottom_layer_url) ? (
@@ -346,9 +344,7 @@ const TypeSection = ({
                         aria-hidden="true"
                         loading="lazy"
                         decoding="async"
-                        width={400}
-                        height={400}
-                        className="absolute inset-0 w-full h-full object-cover"
+                        className="absolute inset-0 w-full h-full object-contain"
                       />
                     )}
                     <img
@@ -356,15 +352,17 @@ const TypeSection = ({
                       alt={tw.title ?? "Animated public twibbon frame by a TwibMotion user"}
                       loading="lazy"
                       decoding="async"
-                      className="absolute inset-0 w-full h-full object-cover"
+                      className="absolute inset-0 w-full h-full object-contain"
                     />
                   </div>
                 ) : (tw.preview_url || tw.bottom_layer_url) ? (
                   <ProgressiveImage
                     src={thumbUrl((tw.preview_url || tw.bottom_layer_url) as string) as string}
                     alt={tw.title ?? "Public twibbon frame by a TwibMotion user"}
+                    fit="contain"
                     className="transition-transform duration-500 group-hover:scale-105"
                   />
+
 
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
