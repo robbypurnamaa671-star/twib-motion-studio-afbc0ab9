@@ -404,6 +404,21 @@ const TypeSection = ({
           ))}
         </div>
       )}
+
+      {!loading && hasMore && (
+        <div className="text-center mt-5">
+          <button
+            type="button"
+            onClick={() => setPage((p) => p + 1)}
+            disabled={loadingMore}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border text-sm font-mono hover:border-primary/60 hover:text-primary disabled:opacity-60 ${focusRing}`}
+          >
+            {loadingMore ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+            {loadingMore ? "Loading…" : `Load more ${type} twibbons`}
+          </button>
+        </div>
+      )}
+
     </div>
   );
 };
