@@ -88,7 +88,7 @@ export const ProgressiveImage = ({
             setLoaded(true);
             markLoaded(src);
           }}
-          className={`w-full h-full object-cover transition-opacity duration-500 ${loaded ? "opacity-100" : "opacity-0"}`}
+          className={`w-full h-full ${fit === "contain" ? "object-contain" : "object-cover"} transition-opacity duration-500 ${loaded ? "opacity-100" : "opacity-0"}`}
         />
       )}
     </div>
