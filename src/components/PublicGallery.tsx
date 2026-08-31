@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Sparkles, Users, Search, Heart, Eye, Play, Image as ImageIcon } from "lucide-react";
+import { ArrowRight, Sparkles, Users, Search, Heart, Eye, Play, Image as ImageIcon, LayoutGrid, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProgressiveImage } from "@/components/ProgressiveImage";
 import { FavoriteButton } from "@/components/community/FavoriteButton";
