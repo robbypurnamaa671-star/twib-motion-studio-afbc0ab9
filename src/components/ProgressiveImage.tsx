@@ -27,7 +27,10 @@ interface ProgressiveImageProps {
   alt: string;
   className?: string;
   rootMargin?: string;
+  /** "contain" shows the whole frame without cropping. Defaults to "cover". */
+  fit?: "cover" | "contain";
 }
+
 
 /**
  * Lazy-loads images via IntersectionObserver and fades them in.
