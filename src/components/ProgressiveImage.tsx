@@ -42,7 +42,9 @@ export const ProgressiveImage = ({
   alt,
   className = "",
   rootMargin = "200px",
+  fit = "cover",
 }: ProgressiveImageProps) => {
+
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const cachedRef = useRef<boolean>(readCache().has(src));
   const [inView, setInView] = useState(cachedRef.current);
