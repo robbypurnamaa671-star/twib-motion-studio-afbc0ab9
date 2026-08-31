@@ -223,17 +223,29 @@ const TypeSection = ({
 }) => {
   const [rows, setRows] = useState<PublicTwibbon[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [page, setPage] = useState(0);
   const key = cacheKey(type, category, ratio, sort, query);
+
+  // Reset paging when the filters change
+  useEffect(() => {
+    setPage(0);
+  }, [key]);
 
   useEffect(() => {
     let active = true;
-    const cached = memoryCache.get(key);
+    const cacheId = `${key}|${page}`;
+    const cached = memoryCache.get(cacheId);
     if (cached && Date.now() - cached.ts < CACHE_TTL_MS) {
-      setRows(cached.rows);
+      setRows((prev) => (page === 0 ? cached.rows : [...prev, ...cached.rows]));
+      setHasMore(cached.rows.length === PAGE_SIZE);
       setLoading(false);
+      setLoadingMore(false);
       return;
     }
-    setLoading(true);
+    if (page === 0) setLoading(true);
+    else setLoadingMore(true);
     (async () => {
       let q = supabase
         .from("shared_templates")
@@ -243,7 +255,7 @@ const TypeSection = ({
         .eq("is_public", true)
         .is("deleted_at", null)
         .order(SORT_COL[sort], { ascending: false })
-        .limit(PAGE_SIZE);
+        .range(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE - 1);
 
       if (category !== ALL) q = q.eq("category", category);
       if (ratio !== ALL) q = q.eq("canvas_ratio", ratio);
@@ -262,14 +274,17 @@ const TypeSection = ({
       const { data } = await q;
       if (!active) return;
       const safeRows = (data ?? []) as unknown as PublicTwibbon[];
-      memoryCache.set(key, { ts: Date.now(), rows: safeRows });
-      setRows(safeRows);
+      memoryCache.set(cacheId, { ts: Date.now(), rows: safeRows });
+      setRows((prev) => (page === 0 ? safeRows : [...prev, ...safeRows]));
+      setHasMore(safeRows.length === PAGE_SIZE);
       setLoading(false);
+      setLoadingMore(false);
     })();
     return () => {
       active = false;
     };
-  }, [key, category, ratio, sort, query, type]);
+  }, [key, page, category, ratio, sort, query, type]);
+
 
   return (
     <div>
