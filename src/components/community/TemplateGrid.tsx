@@ -2,7 +2,9 @@ import { Link } from "react-router-dom";
 import { Eye, Heart, Sparkles } from "lucide-react";
 import { ProgressiveImage } from "@/components/ProgressiveImage";
 import { FavoriteButton } from "@/components/community/FavoriteButton";
+import { thumbUrl } from "@/lib/image-thumb";
 import type { CommunityTemplate } from "@/lib/community-queries";
+
 
 export function TemplateGrid({ items, emptyText }: { items: CommunityTemplate[]; emptyText?: string }) {
   if (items.length === 0) {
@@ -27,8 +29,9 @@ export function TemplateGrid({ items, emptyText }: { items: CommunityTemplate[];
               aria-label={alt}
             >
               {img ? (
-                <ProgressiveImage src={img} alt={alt} className="transition-transform duration-500 group-hover:scale-105" />
+                <ProgressiveImage src={thumbUrl(img) as string} alt={alt} fit="contain" className="transition-transform duration-500 group-hover:scale-105" />
               ) : null}
+
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-background/90 to-transparent p-2 z-10">
                 <p className="text-xs font-mono text-foreground truncate">{t.title}</p>
                 <div className="flex items-center justify-between text-[10px] font-mono text-muted-foreground mt-0.5">

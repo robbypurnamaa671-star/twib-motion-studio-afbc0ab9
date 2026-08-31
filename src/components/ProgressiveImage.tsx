@@ -27,7 +27,10 @@ interface ProgressiveImageProps {
   alt: string;
   className?: string;
   rootMargin?: string;
+  /** "contain" shows the whole frame without cropping. Defaults to "cover". */
+  fit?: "cover" | "contain";
 }
+
 
 /**
  * Lazy-loads images via IntersectionObserver and fades them in.
@@ -39,7 +42,9 @@ export const ProgressiveImage = ({
   alt,
   className = "",
   rootMargin = "200px",
+  fit = "cover",
 }: ProgressiveImageProps) => {
+
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const cachedRef = useRef<boolean>(readCache().has(src));
   const [inView, setInView] = useState(cachedRef.current);
@@ -83,7 +88,7 @@ export const ProgressiveImage = ({
             setLoaded(true);
             markLoaded(src);
           }}
-          className={`w-full h-full object-cover transition-opacity duration-500 ${loaded ? "opacity-100" : "opacity-0"}`}
+          className={`w-full h-full ${fit === "contain" ? "object-contain" : "object-cover"} transition-opacity duration-500 ${loaded ? "opacity-100" : "opacity-0"}`}
         />
       )}
     </div>

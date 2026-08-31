@@ -4,6 +4,8 @@ import { ArrowRight, Sparkles, Users, Search, Heart, Eye, Play, Image as ImageIc
 import { supabase } from "@/integrations/supabase/client";
 import { ProgressiveImage } from "@/components/ProgressiveImage";
 import { FavoriteButton } from "@/components/community/FavoriteButton";
+import { thumbUrl } from "@/lib/image-thumb";
+
 
 type PublicTwibbon = {
   id: string;
@@ -34,18 +36,7 @@ function isVideo(url: string | null | undefined): boolean {
   return !!url && VIDEO_RE.test(url);
 }
 
-/**
- * Serve a small, compressed thumbnail for grid cards instead of the
- * full-resolution original (huge win for homepage load time).
- * Only applies to non-animated images stored in Supabase Storage.
- */
-function thumbUrl(url: string | null | undefined, width = 400): string | undefined {
-  if (!url) return undefined;
-  if (isVideo(url) || /\.(gif|apng)(\?|#|$)/i.test(url)) return url;
-  if (!url.includes("/storage/v1/object/public/")) return url;
-  const base = url.replace("/storage/v1/object/public/", "/storage/v1/render/image/public/");
-  return `${base}${base.includes("?") ? "&" : "?"}width=${width}&quality=60&resize=cover`;
-}
+
 const focusRing =
   "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
@@ -329,9 +320,7 @@ const TypeSection = ({
                         aria-hidden="true"
                         loading="lazy"
                         decoding="async"
-                        width={400}
-                        height={400}
-                        className="absolute inset-0 w-full h-full object-cover"
+                        className="absolute inset-0 w-full h-full object-contain"
                       />
                     )}
                     <video
@@ -343,7 +332,7 @@ const TypeSection = ({
                       preload="none"
                       poster={thumbUrl(tw.preview_url)}
                       aria-label={tw.title ?? "Animated public twibbon by a TwibMotion user"}
-                      className="absolute inset-0 w-full h-full object-cover"
+                      className="absolute inset-0 w-full h-full object-contain"
                     />
                   </div>
                 ) : isAnimatedImage(tw.bottom_layer_url) ? (
@@ -355,9 +344,7 @@ const TypeSection = ({
                         aria-hidden="true"
                         loading="lazy"
                         decoding="async"
-                        width={400}
-                        height={400}
-                        className="absolute inset-0 w-full h-full object-cover"
+                        className="absolute inset-0 w-full h-full object-contain"
                       />
                     )}
                     <img
@@ -365,15 +352,17 @@ const TypeSection = ({
                       alt={tw.title ?? "Animated public twibbon frame by a TwibMotion user"}
                       loading="lazy"
                       decoding="async"
-                      className="absolute inset-0 w-full h-full object-cover"
+                      className="absolute inset-0 w-full h-full object-contain"
                     />
                   </div>
                 ) : (tw.preview_url || tw.bottom_layer_url) ? (
                   <ProgressiveImage
                     src={thumbUrl((tw.preview_url || tw.bottom_layer_url) as string) as string}
                     alt={tw.title ?? "Public twibbon frame by a TwibMotion user"}
+                    fit="contain"
                     className="transition-transform duration-500 group-hover:scale-105"
                   />
+
 
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
