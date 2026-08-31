@@ -20,7 +20,7 @@ type PublicTwibbon = {
   profiles?: { username: string | null; display_name: string | null; avatar_url: string | null } | null;
 };
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 12;
 const ALL = "all";
 const CACHE_TTL_MS = 60_000;
 
@@ -33,8 +33,22 @@ function isAnimatedImage(url: string | null | undefined): boolean {
 function isVideo(url: string | null | undefined): boolean {
   return !!url && VIDEO_RE.test(url);
 }
+
+/**
+ * Serve a small, compressed thumbnail for grid cards instead of the
+ * full-resolution original (huge win for homepage load time).
+ * Only applies to non-animated images stored in Supabase Storage.
+ */
+function thumbUrl(url: string | null | undefined, width = 400): string | undefined {
+  if (!url) return undefined;
+  if (isVideo(url) || /\.(gif|apng)(\?|#|$)/i.test(url)) return url;
+  if (!url.includes("/storage/v1/object/public/")) return url;
+  const base = url.replace("/storage/v1/object/public/", "/storage/v1/render/image/public/");
+  return `${base}${base.includes("?") ? "&" : "?"}width=${width}&quality=60&resize=cover`;
+}
 const focusRing =
   "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+
 
 const CATEGORY_FILTERS: { value: string; label: string }[] = [
   { value: ALL, label: "All" },
