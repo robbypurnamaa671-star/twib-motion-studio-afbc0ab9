@@ -324,11 +324,13 @@ const TypeSection = ({
                   <div className="relative w-full h-full transition-transform duration-500 group-hover:scale-105">
                     {tw.preview_url && (
                       <img
-                        src={tw.preview_url}
+                        src={thumbUrl(tw.preview_url)}
                         alt=""
                         aria-hidden="true"
                         loading="lazy"
                         decoding="async"
+                        width={400}
+                        height={400}
                         className="absolute inset-0 w-full h-full object-cover"
                       />
                     )}
@@ -338,7 +340,8 @@ const TypeSection = ({
                       loop
                       muted
                       playsInline
-                      preload="metadata"
+                      preload="none"
+                      poster={thumbUrl(tw.preview_url)}
                       aria-label={tw.title ?? "Animated public twibbon by a TwibMotion user"}
                       className="absolute inset-0 w-full h-full object-cover"
                     />
@@ -347,11 +350,13 @@ const TypeSection = ({
                   <div className="relative w-full h-full transition-transform duration-500 group-hover:scale-105">
                     {tw.preview_url && (
                       <img
-                        src={tw.preview_url}
+                        src={thumbUrl(tw.preview_url)}
                         alt=""
                         aria-hidden="true"
                         loading="lazy"
                         decoding="async"
+                        width={400}
+                        height={400}
                         className="absolute inset-0 w-full h-full object-cover"
                       />
                     )}
@@ -365,10 +370,11 @@ const TypeSection = ({
                   </div>
                 ) : (tw.preview_url || tw.bottom_layer_url) ? (
                   <ProgressiveImage
-                    src={(tw.preview_url || tw.bottom_layer_url) as string}
+                    src={thumbUrl((tw.preview_url || tw.bottom_layer_url) as string) as string}
                     alt={tw.title ?? "Public twibbon frame by a TwibMotion user"}
                     className="transition-transform duration-500 group-hover:scale-105"
                   />
+
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
                     No preview
