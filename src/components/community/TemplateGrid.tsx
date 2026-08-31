@@ -2,7 +2,9 @@ import { Link } from "react-router-dom";
 import { Eye, Heart, Sparkles } from "lucide-react";
 import { ProgressiveImage } from "@/components/ProgressiveImage";
 import { FavoriteButton } from "@/components/community/FavoriteButton";
+import { thumbUrl } from "@/lib/image-thumb";
 import type { CommunityTemplate } from "@/lib/community-queries";
+
 
 export function TemplateGrid({ items, emptyText }: { items: CommunityTemplate[]; emptyText?: string }) {
   if (items.length === 0) {
