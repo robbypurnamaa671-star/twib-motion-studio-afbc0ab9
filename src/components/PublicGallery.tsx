@@ -4,6 +4,8 @@ import { ArrowRight, Sparkles, Users, Search, Heart, Eye, Play, Image as ImageIc
 import { supabase } from "@/integrations/supabase/client";
 import { ProgressiveImage } from "@/components/ProgressiveImage";
 import { FavoriteButton } from "@/components/community/FavoriteButton";
+import { thumbUrl } from "@/lib/image-thumb";
+
 
 type PublicTwibbon = {
   id: string;
