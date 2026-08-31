@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Sparkles, Users, Search, Heart, Eye, Play, Image as ImageIcon } from "lucide-react";
+import { ArrowRight, Sparkles, Users, Search, Heart, Eye, Play, Image as ImageIcon, LayoutGrid, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProgressiveImage } from "@/components/ProgressiveImage";
 import { FavoriteButton } from "@/components/community/FavoriteButton";
@@ -20,7 +20,7 @@ type PublicTwibbon = {
   profiles?: { username: string | null; display_name: string | null; avatar_url: string | null } | null;
 };
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 12;
 const ALL = "all";
 const CACHE_TTL_MS = 60_000;
 
@@ -33,8 +33,22 @@ function isAnimatedImage(url: string | null | undefined): boolean {
 function isVideo(url: string | null | undefined): boolean {
   return !!url && VIDEO_RE.test(url);
 }
+
+/**
+ * Serve a small, compressed thumbnail for grid cards instead of the
+ * full-resolution original (huge win for homepage load time).
+ * Only applies to non-animated images stored in Supabase Storage.
+ */
+function thumbUrl(url: string | null | undefined, width = 400): string | undefined {
+  if (!url) return undefined;
+  if (isVideo(url) || /\.(gif|apng)(\?|#|$)/i.test(url)) return url;
+  if (!url.includes("/storage/v1/object/public/")) return url;
+  const base = url.replace("/storage/v1/object/public/", "/storage/v1/render/image/public/");
+  return `${base}${base.includes("?") ? "&" : "?"}width=${width}&quality=60&resize=cover`;
+}
 const focusRing =
   "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+
 
 const CATEGORY_FILTERS: { value: string; label: string }[] = [
   { value: ALL, label: "All" },
@@ -169,7 +183,13 @@ const PublicGallery = ({ createUrl }: { createUrl: string }) => {
         query={debouncedQ}
       />
 
-      <div className="text-center mt-10">
+      <div className="text-center mt-10 flex flex-col items-center gap-3">
+        <Link
+          to="/community"
+          className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground font-mono text-sm hover:opacity-90 ${focusRing}`}
+        >
+          <LayoutGrid className="w-4 h-4" /> See all twibbons uploaded on TwibMotion
+        </Link>
         <Link
           to={createUrl}
           className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/40 text-primary font-mono text-sm hover:bg-primary/10 ${focusRing}`}
@@ -177,6 +197,7 @@ const PublicGallery = ({ createUrl }: { createUrl: string }) => {
           Make yours and join the gallery <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>
+
     </section>
   );
 };
@@ -202,17 +223,29 @@ const TypeSection = ({
 }) => {
   const [rows, setRows] = useState<PublicTwibbon[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [page, setPage] = useState(0);
   const key = cacheKey(type, category, ratio, sort, query);
+
+  // Reset paging when the filters change
+  useEffect(() => {
+    setPage(0);
+  }, [key]);
 
   useEffect(() => {
     let active = true;
-    const cached = memoryCache.get(key);
+    const cacheId = `${key}|${page}`;
+    const cached = memoryCache.get(cacheId);
     if (cached && Date.now() - cached.ts < CACHE_TTL_MS) {
-      setRows(cached.rows);
+      setRows((prev) => (page === 0 ? cached.rows : [...prev, ...cached.rows]));
+      setHasMore(cached.rows.length === PAGE_SIZE);
       setLoading(false);
+      setLoadingMore(false);
       return;
     }
-    setLoading(true);
+    if (page === 0) setLoading(true);
+    else setLoadingMore(true);
     (async () => {
       let q = supabase
         .from("shared_templates")
@@ -222,7 +255,7 @@ const TypeSection = ({
         .eq("is_public", true)
         .is("deleted_at", null)
         .order(SORT_COL[sort], { ascending: false })
-        .limit(PAGE_SIZE);
+        .range(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE - 1);
 
       if (category !== ALL) q = q.eq("category", category);
       if (ratio !== ALL) q = q.eq("canvas_ratio", ratio);
@@ -241,14 +274,17 @@ const TypeSection = ({
       const { data } = await q;
       if (!active) return;
       const safeRows = (data ?? []) as unknown as PublicTwibbon[];
-      memoryCache.set(key, { ts: Date.now(), rows: safeRows });
-      setRows(safeRows);
+      memoryCache.set(cacheId, { ts: Date.now(), rows: safeRows });
+      setRows((prev) => (page === 0 ? safeRows : [...prev, ...safeRows]));
+      setHasMore(safeRows.length === PAGE_SIZE);
       setLoading(false);
+      setLoadingMore(false);
     })();
     return () => {
       active = false;
     };
-  }, [key, category, ratio, sort, query, type]);
+  }, [key, page, category, ratio, sort, query, type]);
+
 
   return (
     <div>
@@ -288,11 +324,13 @@ const TypeSection = ({
                   <div className="relative w-full h-full transition-transform duration-500 group-hover:scale-105">
                     {tw.preview_url && (
                       <img
-                        src={tw.preview_url}
+                        src={thumbUrl(tw.preview_url)}
                         alt=""
                         aria-hidden="true"
                         loading="lazy"
                         decoding="async"
+                        width={400}
+                        height={400}
                         className="absolute inset-0 w-full h-full object-cover"
                       />
                     )}
@@ -302,7 +340,8 @@ const TypeSection = ({
                       loop
                       muted
                       playsInline
-                      preload="metadata"
+                      preload="none"
+                      poster={thumbUrl(tw.preview_url)}
                       aria-label={tw.title ?? "Animated public twibbon by a TwibMotion user"}
                       className="absolute inset-0 w-full h-full object-cover"
                     />
@@ -311,11 +350,13 @@ const TypeSection = ({
                   <div className="relative w-full h-full transition-transform duration-500 group-hover:scale-105">
                     {tw.preview_url && (
                       <img
-                        src={tw.preview_url}
+                        src={thumbUrl(tw.preview_url)}
                         alt=""
                         aria-hidden="true"
                         loading="lazy"
                         decoding="async"
+                        width={400}
+                        height={400}
                         className="absolute inset-0 w-full h-full object-cover"
                       />
                     )}
@@ -329,10 +370,11 @@ const TypeSection = ({
                   </div>
                 ) : (tw.preview_url || tw.bottom_layer_url) ? (
                   <ProgressiveImage
-                    src={(tw.preview_url || tw.bottom_layer_url) as string}
+                    src={thumbUrl((tw.preview_url || tw.bottom_layer_url) as string) as string}
                     alt={tw.title ?? "Public twibbon frame by a TwibMotion user"}
                     className="transition-transform duration-500 group-hover:scale-105"
                   />
+
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
                     No preview
@@ -362,6 +404,21 @@ const TypeSection = ({
           ))}
         </div>
       )}
+
+      {!loading && hasMore && (
+        <div className="text-center mt-5">
+          <button
+            type="button"
+            onClick={() => setPage((p) => p + 1)}
+            disabled={loadingMore}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border text-sm font-mono hover:border-primary/60 hover:text-primary disabled:opacity-60 ${focusRing}`}
+          >
+            {loadingMore ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+            {loadingMore ? "Loading…" : `Load more ${type} twibbons`}
+          </button>
+        </div>
+      )}
+
     </div>
   );
 };
