@@ -183,7 +183,13 @@ const PublicGallery = ({ createUrl }: { createUrl: string }) => {
         query={debouncedQ}
       />
 
-      <div className="text-center mt-10">
+      <div className="text-center mt-10 flex flex-col items-center gap-3">
+        <Link
+          to="/community"
+          className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground font-mono text-sm hover:opacity-90 ${focusRing}`}
+        >
+          <LayoutGrid className="w-4 h-4" /> See all twibbons uploaded on TwibMotion
+        </Link>
         <Link
           to={createUrl}
           className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/40 text-primary font-mono text-sm hover:bg-primary/10 ${focusRing}`}
@@ -191,6 +197,7 @@ const PublicGallery = ({ createUrl }: { createUrl: string }) => {
           Make yours and join the gallery <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>
+
     </section>
   );
 };
