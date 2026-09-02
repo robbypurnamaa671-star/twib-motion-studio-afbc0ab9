@@ -45,6 +45,15 @@ export function getMediaType(file: File): "image" | "gif" | "video" | null {
   return null;
 }
 
+export function getMediaTypeFromUrl(url: string, mimeType?: string): "image" | "gif" | "video" {
+  const normalizedMime = mimeType?.toLowerCase() || "";
+  if (normalizedMime.startsWith("video/") || /\.mov(?:[?#]|$)/i.test(url) || /\.mp4(?:[?#]|$)/i.test(url)) {
+    return "video";
+  }
+  if (normalizedMime === "image/gif" || /\.gif(?:[?#]|$)/i.test(url)) return "gif";
+  return "image";
+}
+
 export function validateFile(file: File): string | null {
   if (!ACCEPTED_TYPES.includes(file.type) && !isMovFile(file)) {
     return "Unsupported file type. Use JPG, PNG, GIF, MP4, or MOV.";

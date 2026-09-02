@@ -152,9 +152,9 @@
     "twibbon": "Twibbon",
     "twibbonFrame": "Twibbon Frame",
     "yourPhotoSub": "Your image — always behind the twibbon",
-    "twibbonFrameSub": "Overlay frame — always on top",
+    "twibbonFrameSub": "JPG, PNG, GIF, MP4, or MOV — always on top",
     "exportLabel": "Export:",
-    "exportInfoMp4": "MP4 (animated content detected)",
+    "exportInfoMp4": "MP4 or GIF (animated content detected)",
     "exportInfoStatic": "PNG / JPG (static)",
     "canvasHint": "Scroll on canvas to zoom • Drag to reposition your photo",
     "share": "Share",
@@ -162,7 +162,7 @@
     "back": "Back"
   },
   "upload": {
-    "fileTypes": "JPG, PNG, GIF, MP4 (max 50MB)",
+    "fileTypes": "JPG, PNG, GIF, MP4, MOV (max 50MB)",
     "invalidFile": "Invalid file",
     "tooLong": "Too long",
     "maxDuration": "Max video duration is 30 seconds.",

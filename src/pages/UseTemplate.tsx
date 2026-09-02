@@ -5,7 +5,7 @@ import { Download, Loader2, Upload, Image, Film, X, ZoomIn, ZoomOut, RotateCw, R
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { LayerMedia, TopLayerTransform, getMediaType, validateFile } from "@/lib/media";
+import { LayerMedia, TopLayerTransform, getMediaType, getMediaTypeFromUrl, validateFile } from "@/lib/media";
 import { SharedTemplate, LockSettings } from "@/lib/templates";
 import { exportStatic, downloadBlob } from "@/lib/export";
 import ExportDialog from "@/components/ExportDialog";
@@ -160,9 +160,10 @@ const UseTemplate = () => {
     fetch(template.bottom_layer_url)
       .then(res => res.blob())
       .then(blob => {
-        const file = new File([blob], "twibbon.png", { type: blob.type });
         const url = URL.createObjectURL(blob);
-        const type = blob.type.startsWith("video") ? "video" as const : blob.type === "image/gif" ? "gif" as const : "image" as const;
+        const type = getMediaTypeFromUrl(template.bottom_layer_url, blob.type);
+        const extension = type === "video" ? "mov" : type === "gif" ? "gif" : "png";
+        const file = new File([blob], `twibbon.${extension}`, { type: blob.type || (type === "video" ? "video/quicktime" : `image/${extension}`) });
         setTwibbonMedia({ file, url, type });
       })
       .catch(() => toast({ title: "Failed to load twibbon frame", variant: "destructive" }));
@@ -309,7 +310,7 @@ const UseTemplate = () => {
                 </div>
                 <div className="text-center">
                   <p className="text-sm font-medium text-foreground">Upload Your Photo</p>
-                  <p className="text-xs text-muted-foreground mt-1">JPG, PNG, GIF, MP4 (max 50MB)</p>
+                  <p className="text-xs text-muted-foreground mt-1">JPG, PNG, GIF, MP4, MOV (max 50MB)</p>
                 </div>
               </button>
             )}
@@ -337,7 +338,11 @@ const UseTemplate = () => {
             <div className="rounded-lg border-2 border-border bg-card overflow-hidden opacity-80">
               <div className="aspect-video flex items-center justify-center">
                 {twibbonMedia ? (
-                  <img src={twibbonMedia.url} alt="Twibbon" className="max-h-full max-w-full object-contain" />
+                  twibbonMedia.type === "video" ? (
+                    <video src={twibbonMedia.url} className="max-h-full max-w-full object-contain" muted loop autoPlay playsInline />
+                  ) : (
+                    <img src={twibbonMedia.url} alt="Twibbon" className="max-h-full max-w-full object-contain" />
+                  )
                 ) : (
                   <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
                 )}
@@ -384,7 +389,11 @@ const UseTemplate = () => {
             {/* Twibbon frame layer (top, fixed) */}
             {twibbonMedia && (
               <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 2 }}>
-                <img src={twibbonMedia.url} alt="Twibbon Frame" className="w-full h-full object-cover" />
+                {twibbonMedia.type === "video" ? (
+                  <video src={twibbonMedia.url} className="w-full h-full object-cover" muted loop autoPlay playsInline />
+                ) : (
+                  <img src={twibbonMedia.url} alt="Twibbon Frame" className="w-full h-full object-cover" />
+                )}
               </div>
             )}
 

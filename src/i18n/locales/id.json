@@ -152,9 +152,9 @@
     "twibbon": "Twibbon",
     "twibbonFrame": "Bingkai Twibbon",
     "yourPhotoSub": "Gambar Anda — selalu di belakang twibbon",
-    "twibbonFrameSub": "Bingkai overlay — selalu di atas",
+    "twibbonFrameSub": "JPG, PNG, GIF, MP4, atau MOV — selalu di atas",
     "exportLabel": "Ekspor:",
-    "exportInfoMp4": "MP4 (konten animasi terdeteksi)",
+    "exportInfoMp4": "MP4 atau GIF (konten animasi terdeteksi)",
     "exportInfoStatic": "PNG / JPG (statis)",
     "canvasHint": "Gulir di kanvas untuk zoom • Seret untuk memindahkan foto Anda",
     "share": "Bagikan",
@@ -162,7 +162,7 @@
     "back": "Kembali"
   },
   "upload": {
-    "fileTypes": "JPG, PNG, GIF, MP4 (maks 50MB)",
+    "fileTypes": "JPG, PNG, GIF, MP4, MOV (maks 50MB)",
     "invalidFile": "File tidak valid",
     "tooLong": "Terlalu panjang",
     "maxDuration": "Durasi video maksimal 30 detik.",
