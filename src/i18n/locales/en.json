@@ -162,7 +162,7 @@
     "back": "Back"
   },
   "upload": {
-    "fileTypes": "JPG, PNG, GIF, MP4 (max 50MB)",
+    "fileTypes": "JPG, PNG, GIF, MP4, MOV (max 50MB)",
     "invalidFile": "Invalid file",
     "tooLong": "Too long",
     "maxDuration": "Max video duration is 30 seconds.",

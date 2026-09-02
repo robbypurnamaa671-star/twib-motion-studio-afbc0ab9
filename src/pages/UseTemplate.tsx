@@ -309,7 +309,7 @@ const UseTemplate = () => {
                 </div>
                 <div className="text-center">
                   <p className="text-sm font-medium text-foreground">Upload Your Photo</p>
-                  <p className="text-xs text-muted-foreground mt-1">JPG, PNG, GIF, MP4 (max 50MB)</p>
+                  <p className="text-xs text-muted-foreground mt-1">JPG, PNG, GIF, MP4, MOV (max 50MB)</p>
                 </div>
               </button>
             )}

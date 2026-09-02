@@ -162,7 +162,7 @@
     "back": "Kembali"
   },
   "upload": {
-    "fileTypes": "JPG, PNG, GIF, MP4 (maks 50MB)",
+    "fileTypes": "JPG, PNG, GIF, MP4, MOV (maks 50MB)",
     "invalidFile": "File tidak valid",
     "tooLong": "Terlalu panjang",
     "maxDuration": "Durasi video maksimal 30 detik.",
