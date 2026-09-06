@@ -139,14 +139,25 @@ const UseTemplate = () => {
     const type = getMediaType(file);
     if (!type) return;
     if (type === "video") {
-      const video = document.createElement("video");
-      video.preload = "metadata";
-      video.onloadedmetadata = () => {
-        URL.revokeObjectURL(video.src);
-        if (video.duration > 30) { toast({ title: "Too long", description: "Max 30s", variant: "destructive" }); return; }
-        setUserPhoto({ file, url: URL.createObjectURL(file), type });
-      };
-      video.src = URL.createObjectURL(file);
+      const url = URL.createObjectURL(file);
+      probeVideo(url).then((probe) => {
+        logMediaDiagnostics("select", file, probe);
+        if (!probe.ok) {
+          URL.revokeObjectURL(url);
+          toast({
+            title: "Unsupported video",
+            description: "This MOV file cannot be played by your browser. Please use an H.264 MOV or MP4 file.",
+            variant: "destructive",
+          });
+          return;
+        }
+        if (probe.duration > 30) {
+          URL.revokeObjectURL(url);
+          toast({ title: "Too long", description: "Max 30s", variant: "destructive" });
+          return;
+        }
+        setUserPhoto({ file, url, type });
+      });
     } else {
       setUserPhoto({ file, url: URL.createObjectURL(file), type });
     }
