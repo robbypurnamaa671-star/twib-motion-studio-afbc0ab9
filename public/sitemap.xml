@@ -5536,26 +5536,32 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://twibmotion.com/template/my-twibbon-template-c984f5</loc>
-    <lastmod>2026-06-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://twibmotion.com/template/my-twibbon-template-0ab3ea</loc>
     <lastmod>2026-06-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://twibmotion.com/template/pkkmb-fh-2026-siap-maju-bergerak</loc>
-    <lastmod>2026-06-11</lastmod>
+    <loc>https://twibmotion.com/template/my-twibbon-template-c984f5</loc>
+    <lastmod>2026-06-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://twibmotion.com/template/mother-s-days-twibbon-frame-template</loc>
     <lastmod>2026-06-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/template/template-twibbon-piala-dunia-2026</loc>
+    <lastmod>2026-06-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/template/pkkmb-fh-2026-siap-maju-bergerak</loc>
+    <lastmod>2026-06-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -5573,12 +5579,6 @@
   </url>
   <url>
     <loc>https://twibmotion.com/template/template-twibbon-piala-dunia-9d613d</loc>
-    <lastmod>2026-06-19</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://twibmotion.com/template/template-twibbon-piala-dunia-2026</loc>
     <lastmod>2026-06-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -5752,18 +5752,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://twibmotion.com/template/2</loc>
-    <lastmod>2026-08-28</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://twibmotion.com/template/twibbon</loc>
-    <lastmod>2026-08-28</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://twibmotion.com/template/j-y-serai-croisade-vang-lique-amp</loc>
     <lastmod>2026-08-28</lastmod>
     <changefreq>weekly</changefreq>
@@ -5776,8 +5764,20 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://twibmotion.com/template/2</loc>
+    <lastmod>2026-08-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://twibmotion.com/template/t-com-profa-antonia-pedrosa-1313</loc>
     <lastmod>2026-08-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://twibmotion.com/template/twibbon</loc>
+    <lastmod>2026-08-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
