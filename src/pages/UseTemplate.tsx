@@ -5,7 +5,7 @@ import { Download, Loader2, Upload, Image, Film, X, ZoomIn, ZoomOut, RotateCw, R
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { LayerMedia, TopLayerTransform, getMediaType, getMediaTypeFromUrl, validateFile } from "@/lib/media";
+import { LayerMedia, TopLayerTransform, getMediaType, getMediaTypeFromUrl, validateFile, probeVideo, logMediaDiagnostics } from "@/lib/media";
 import { SharedTemplate, LockSettings } from "@/lib/templates";
 import { exportStatic, downloadBlob } from "@/lib/export";
 import ExportDialog from "@/components/ExportDialog";
