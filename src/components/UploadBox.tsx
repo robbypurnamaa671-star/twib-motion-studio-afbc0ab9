@@ -96,7 +96,7 @@ const UploadBox = ({ label, sublabel, media, onMediaChange, icon }: UploadBoxPro
       {media ? (
         <div className="relative aspect-video flex items-center justify-center overflow-hidden rounded-md">
           {media.type === "video" ? (
-            <video src={media.url} className="max-h-full max-w-full object-contain" muted loop autoPlay playsInline />
+            <video src={media.url} className="max-h-full max-w-full object-contain" muted loop autoPlay playsInline preload="metadata" />
           ) : (
             <img src={media.url} alt={label} className="max-h-full max-w-full object-contain" />
           )}
