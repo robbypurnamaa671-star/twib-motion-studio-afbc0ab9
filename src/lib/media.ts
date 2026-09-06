@@ -63,3 +63,100 @@ export function validateFile(file: File): string | null {
   }
   return null;
 }
+
+// ──── MOV / video diagnostics ────────────────────────────────────────────────
+export type VideoProbe = {
+  ok: boolean;
+  width: number;
+  height: number;
+  duration: number;
+  readyState: number;
+  errorCode?: number;
+  errorMessage?: string;
+};
+
+/** Rough browser capability check for a given file (container level only). */
+export function canBrowserPlayFile(file: File): "probably" | "maybe" | "" {
+  const v = document.createElement("video");
+  const candidates: string[] = [];
+  if (file.type) candidates.push(file.type);
+  if (isMovFile(file)) {
+    candidates.push('video/quicktime; codecs="avc1.42E01E"', "video/quicktime");
+  }
+  if (/\.mp4$/i.test(file.name)) candidates.push("video/mp4");
+  let best: "probably" | "maybe" | "" = "";
+  for (const c of candidates) {
+    const r = v.canPlayType(c) as "probably" | "maybe" | "";
+    if (r === "probably") return "probably";
+    if (r === "maybe") best = "maybe";
+  }
+  return best;
+}
+
+/**
+ * Loads a video URL and reports real decoding capability.
+ * Resolves (never rejects) with diagnostics; times out after `timeoutMs`.
+ */
+export function probeVideo(url: string, timeoutMs = 8000): Promise<VideoProbe> {
+  return new Promise((resolve) => {
+    const v = document.createElement("video");
+    v.preload = "metadata";
+    v.muted = true;
+    (v as HTMLVideoElement & { playsInline: boolean }).playsInline = true;
+    let settled = false;
+    const finish = (probe: VideoProbe) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      v.removeAttribute("src");
+      v.load();
+      resolve(probe);
+    };
+    const timer = setTimeout(
+      () =>
+        finish({
+          ok: false,
+          width: 0,
+          height: 0,
+          duration: 0,
+          readyState: v.readyState,
+          errorMessage: "timeout waiting for video metadata",
+        }),
+      timeoutMs,
+    );
+    v.onloadedmetadata = () =>
+      finish({
+        ok: v.videoWidth > 0 && v.videoHeight > 0,
+        width: v.videoWidth,
+        height: v.videoHeight,
+        duration: Number.isFinite(v.duration) ? v.duration : 0,
+        readyState: v.readyState,
+        errorMessage:
+          v.videoWidth > 0 ? undefined : "metadata loaded but no video track could be decoded",
+      });
+    v.onerror = () =>
+      finish({
+        ok: false,
+        width: 0,
+        height: 0,
+        duration: 0,
+        readyState: v.readyState,
+        errorCode: v.error?.code,
+        errorMessage: v.error?.message || "video element error",
+      });
+    v.src = url;
+  });
+}
+
+export function logMediaDiagnostics(stage: string, file: File, extra?: Record<string, unknown>) {
+  // eslint-disable-next-line no-console
+  console.info(`[media:${stage}]`, {
+    name: file.name,
+    type: file.type || "(empty)",
+    size: file.size,
+    extension: file.name.split(".").pop()?.toLowerCase(),
+    detected: getMediaType(file),
+    canPlayType: canBrowserPlayFile(file),
+    ...extra,
+  });
+}
