@@ -1,4 +1,5 @@
 import { useRef, useState, useCallback, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { LayerMedia, TopLayerTransform } from "@/lib/media";
 
 interface CanvasPreviewProps {
@@ -23,6 +24,12 @@ const CanvasPreview = ({
   const [dragging, setDragging] = useState(false);
   const dragStart = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
   const [displaySize, setDisplaySize] = useState({ w: 300, h: 300 });
+  const [topVideoError, setTopVideoError] = useState(false);
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    setTopVideoError(false);
+  }, [topLayer?.url]);
 
   useEffect(() => {
     const updateSize = () => {
@@ -136,6 +143,8 @@ const CanvasPreview = ({
                 loop
                 autoPlay
                 playsInline
+                preload="metadata"
+                onLoadedMetadata={(e) => { void e.currentTarget.play().catch(() => {}); }}
               />
             ) : (
               <img
@@ -159,6 +168,9 @@ const CanvasPreview = ({
                 loop
                 autoPlay
                 playsInline
+                preload="metadata"
+                onLoadedMetadata={(e) => { setTopVideoError(false); void e.currentTarget.play().catch(() => {}); }}
+                onError={() => setTopVideoError(true)}
               />
             ) : (
               <img
@@ -167,6 +179,18 @@ const CanvasPreview = ({
                 className="w-full h-full object-cover"
               />
             )}
+          </div>
+        )}
+
+        {/* Codec failure notice for the frame layer */}
+        {topVideoError && (
+          <div
+            className="absolute inset-0 flex items-center justify-center bg-background/85 p-4"
+            style={{ zIndex: 20 }}
+          >
+            <p className="text-xs font-mono text-destructive text-center leading-relaxed">
+              {t("upload.codecDesc")}
+            </p>
           </div>
         )}
 

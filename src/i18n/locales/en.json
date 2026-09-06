@@ -166,7 +166,9 @@
     "invalidFile": "Invalid file",
     "tooLong": "Too long",
     "maxDuration": "Max video duration is 30 seconds.",
-    "max30": "Max 30s"
+    "max30": "Max 30s",
+    "codecTitle": "Unsupported video",
+    "codecDesc": "This MOV file cannot be previewed by your browser. Please use an H.264 MOV or MP4 file."
   },
   "useTemplate": {
     "noId": "No template ID",

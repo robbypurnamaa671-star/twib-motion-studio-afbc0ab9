@@ -166,7 +166,9 @@
     "invalidFile": "File tidak valid",
     "tooLong": "Terlalu panjang",
     "maxDuration": "Durasi video maksimal 30 detik.",
-    "max30": "Maks 30 detik"
+    "max30": "Maks 30 detik",
+    "codecTitle": "Video tidak didukung",
+    "codecDesc": "File MOV ini tidak dapat diputar oleh browser Anda. Gunakan MOV H.264 atau MP4."
   },
   "useTemplate": {
     "noId": "ID template tidak ada",

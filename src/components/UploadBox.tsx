@@ -1,7 +1,13 @@
 import { useCallback, useRef, useState } from "react";
 import { Upload, Image, Film, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { LayerMedia, getMediaType, validateFile } from "@/lib/media";
+import {
+  LayerMedia,
+  getMediaType,
+  validateFile,
+  probeVideo,
+  logMediaDiagnostics,
+} from "@/lib/media";
 import { useToast } from "@/hooks/use-toast";
 
 interface UploadBoxProps {
@@ -19,7 +25,7 @@ const UploadBox = ({ label, sublabel, media, onMediaChange, icon }: UploadBoxPro
   const { t } = useTranslation();
 
   const handleFile = useCallback(
-    (file: File) => {
+    async (file: File) => {
       const error = validateFile(file);
       if (error) {
         toast({ title: t("upload.invalidFile"), description: error, variant: "destructive" });
@@ -29,23 +35,32 @@ const UploadBox = ({ label, sublabel, media, onMediaChange, icon }: UploadBoxPro
       if (!type) return;
 
       if (type === "video") {
-        const video = document.createElement("video");
-        video.preload = "metadata";
-        video.onloadedmetadata = () => {
-          URL.revokeObjectURL(video.src);
-          if (video.duration > 30) {
-            toast({ title: t("upload.tooLong"), description: t("upload.maxDuration"), variant: "destructive" });
-            return;
-          }
-          onMediaChange({ file, url: URL.createObjectURL(file), type });
-        };
-        video.src = URL.createObjectURL(file);
+        const url = URL.createObjectURL(file);
+        const probe = await probeVideo(url);
+        logMediaDiagnostics("select", file, probe);
+        if (!probe.ok) {
+          URL.revokeObjectURL(url);
+          toast({
+            title: t("upload.codecTitle"),
+            description: t("upload.codecDesc"),
+            variant: "destructive",
+          });
+          return;
+        }
+        if (probe.duration > 30) {
+          URL.revokeObjectURL(url);
+          toast({ title: t("upload.tooLong"), description: t("upload.maxDuration"), variant: "destructive" });
+          return;
+        }
+        onMediaChange({ file, url, type });
       } else {
+        logMediaDiagnostics("select", file);
         onMediaChange({ file, url: URL.createObjectURL(file), type });
       }
     },
     [onMediaChange, toast, t]
   );
+
 
   const onDrop = useCallback(
     (e: React.DragEvent) => {
@@ -81,7 +96,7 @@ const UploadBox = ({ label, sublabel, media, onMediaChange, icon }: UploadBoxPro
       {media ? (
         <div className="relative aspect-video flex items-center justify-center overflow-hidden rounded-md">
           {media.type === "video" ? (
-            <video src={media.url} className="max-h-full max-w-full object-contain" muted loop autoPlay playsInline />
+            <video src={media.url} className="max-h-full max-w-full object-contain" muted loop autoPlay playsInline preload="metadata" />
           ) : (
             <img src={media.url} alt={label} className="max-h-full max-w-full object-contain" />
           )}
