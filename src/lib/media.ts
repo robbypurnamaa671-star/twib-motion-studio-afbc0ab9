@@ -1,8 +1,24 @@
 export type LayerMedia = {
+  /** Original asset as provided by the user (MOV stays MOV). */
   file: File;
+  /** Object/remote URL of the original asset. */
   url: string;
   type: "image" | "gif" | "video";
+  /** Browser-playable H.264 MP4 copy, present only when transcoding was needed. */
+  workingFile?: File;
+  workingUrl?: string;
+  transcoded?: boolean;
 };
+
+/** URL that <video>/canvas/export must always use. */
+export function playableUrl(media: LayerMedia): string {
+  return media.workingUrl || media.url;
+}
+
+/** File that should be uploaded/persisted so templates never re-transcode. */
+export function playableFile(media: LayerMedia): File {
+  return media.workingFile || media.file;
+}
 
 export type CanvasRatio = {
   label: string;
