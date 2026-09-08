@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { SITE_URL } from "@/lib/site";
 import { useToast } from "@/hooks/use-toast";
-import { LayerMedia, TopLayerTransform } from "@/lib/media";
+import { LayerMedia, TopLayerTransform, playableFile } from "@/lib/media";
 import { DEFAULT_LOCK_SETTINGS, LockSettings } from "@/lib/templates";
 import { exportStatic } from "@/lib/export";
 
@@ -57,12 +57,16 @@ const ShareTemplateDialog = ({
     setSaving(true);
     try {
       // Upload twibbon frame to storage
-      const ext = topLayer.file.name.split(".").pop() || "png";
+      // Persist the browser-playable copy (transcoded MP4 when the original
+      // MOV codec is not natively decodable) so opening the template later
+      // never needs to transcode again.
+      const frameFile = playableFile(topLayer);
+      const ext = frameFile.name.split(".").pop() || "png";
       const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
 
       const { error: uploadError } = await supabase.storage
         .from("template-assets")
-        .upload(path, topLayer.file, { upsert: false });
+        .upload(path, frameFile, { upsert: false, contentType: frameFile.type || undefined });
 
       if (uploadError) throw uploadError;
 

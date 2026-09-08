@@ -168,7 +168,12 @@
     "maxDuration": "Durasi video maksimal 30 detik.",
     "max30": "Maks 30 detik",
     "codecTitle": "Video tidak didukung",
-    "codecDesc": "File MOV ini tidak dapat diputar oleh browser Anda. Gunakan MOV H.264 atau MP4."
+    "codecDesc": "File MOV ini tidak dapat diputar browser Anda. Kami akan mengonversinya otomatis.",
+    "checking": "Memeriksa video...",
+    "preparing": "Menyiapkan video untuk diedit...",
+    "ready": "Video siap",
+    "failedTitle": "Tidak dapat memproses video ini",
+    "failedDesc": "Kami tidak dapat membaca atau mengonversi file ini. Coba video lain."
   },
   "useTemplate": {
     "noId": "ID template tidak ada",

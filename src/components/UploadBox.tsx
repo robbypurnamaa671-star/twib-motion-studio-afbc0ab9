@@ -1,12 +1,14 @@
 import { useCallback, useRef, useState } from "react";
-import { Upload, Image, Film, X } from "lucide-react";
+import { Upload, Image, Film, X, Loader2, CheckCircle2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   LayerMedia,
   getMediaType,
   validateFile,
-  probeVideo,
+  prepareVideoMedia,
+  playableUrl,
   logMediaDiagnostics,
+  VideoPrepStage,
 } from "@/lib/media";
 import { useToast } from "@/hooks/use-toast";
 
@@ -21,6 +23,8 @@ interface UploadBoxProps {
 const UploadBox = ({ label, sublabel, media, onMediaChange, icon }: UploadBoxProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [stage, setStage] = useState<VideoPrepStage | null>(null);
+  const [progress, setProgress] = useState(0);
   const { toast } = useToast();
   const { t } = useTranslation();
 
@@ -35,24 +39,25 @@ const UploadBox = ({ label, sublabel, media, onMediaChange, icon }: UploadBoxPro
       if (!type) return;
 
       if (type === "video") {
-        const url = URL.createObjectURL(file);
-        const probe = await probeVideo(url);
-        logMediaDiagnostics("select", file, probe);
-        if (!probe.ok) {
-          URL.revokeObjectURL(url);
-          toast({
-            title: t("upload.codecTitle"),
-            description: t("upload.codecDesc"),
-            variant: "destructive",
-          });
+        const result = await prepareVideoMedia(file, (s, p) => {
+          setStage(s);
+          setProgress(p ?? 0);
+        });
+        if (!result.ok || !result.media) {
+          if (result.reason === "too-long") {
+            toast({ title: t("upload.tooLong"), description: t("upload.maxDuration"), variant: "destructive" });
+          } else {
+            toast({
+              title: t("upload.failedTitle"),
+              description: t("upload.failedDesc"),
+              variant: "destructive",
+            });
+          }
+          setStage(null);
           return;
         }
-        if (probe.duration > 30) {
-          URL.revokeObjectURL(url);
-          toast({ title: t("upload.tooLong"), description: t("upload.maxDuration"), variant: "destructive" });
-          return;
-        }
-        onMediaChange({ file, url, type });
+        onMediaChange(result.media);
+        setTimeout(() => setStage(null), 1500);
       } else {
         logMediaDiagnostics("select", file);
         onMediaChange({ file, url: URL.createObjectURL(file), type });
@@ -93,10 +98,29 @@ const UploadBox = ({ label, sublabel, media, onMediaChange, icon }: UploadBoxPro
       onDragLeave={() => setDragOver(false)}
       onDrop={onDrop}
     >
+      {stage && stage !== "failed" && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 rounded-lg bg-background/90 backdrop-blur-sm">
+          {stage === "ready" ? (
+            <CheckCircle2 className="w-5 h-5 text-primary" />
+          ) : (
+            <Loader2 className="w-5 h-5 animate-spin text-primary" />
+          )}
+          <p className="text-xs font-mono text-foreground">
+            {stage === "checking" && t("upload.checking")}
+            {stage === "transcoding" && t("upload.preparing")}
+            {stage === "ready" && t("upload.ready")}
+          </p>
+          {stage === "transcoding" && (
+            <div className="w-32 h-1 rounded bg-secondary overflow-hidden">
+              <div className="h-full bg-primary transition-all" style={{ width: `${Math.round(progress * 100)}%` }} />
+            </div>
+          )}
+        </div>
+      )}
       {media ? (
         <div className="relative aspect-video flex items-center justify-center overflow-hidden rounded-md">
           {media.type === "video" ? (
-            <video src={media.url} className="max-h-full max-w-full object-contain" muted loop autoPlay playsInline preload="metadata" />
+            <video src={playableUrl(media)} className="max-h-full max-w-full object-contain" muted loop autoPlay playsInline preload="metadata" />
           ) : (
             <img src={media.url} alt={label} className="max-h-full max-w-full object-contain" />
           )}

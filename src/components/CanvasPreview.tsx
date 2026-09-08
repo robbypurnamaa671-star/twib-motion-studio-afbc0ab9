@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { LayerMedia, TopLayerTransform } from "@/lib/media";
+import { LayerMedia, TopLayerTransform, playableUrl } from "@/lib/media";
 
 interface CanvasPreviewProps {
   canvasW: number;
@@ -137,7 +137,7 @@ const CanvasPreview = ({
           >
             {bottomLayer.type === "video" ? (
               <video
-                src={bottomLayer.url}
+                src={playableUrl(bottomLayer)}
                 className="w-full h-full object-cover pointer-events-none"
                 muted
                 loop
@@ -148,7 +148,7 @@ const CanvasPreview = ({
               />
             ) : (
               <img
-                src={bottomLayer.url}
+                src={playableUrl(bottomLayer)}
                 alt="Your Photo"
                 className="w-full h-full object-cover pointer-events-none select-none"
                 draggable={false}
@@ -162,7 +162,7 @@ const CanvasPreview = ({
           <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 2 }}>
             {topLayer.type === "video" ? (
               <video
-                src={topLayer.url}
+                src={playableUrl(topLayer)}
                 className="w-full h-full object-cover"
                 muted
                 loop
@@ -174,7 +174,7 @@ const CanvasPreview = ({
               />
             ) : (
               <img
-                src={topLayer.url}
+                src={playableUrl(topLayer)}
                 alt="Twibbon Frame"
                 className="w-full h-full object-cover"
               />

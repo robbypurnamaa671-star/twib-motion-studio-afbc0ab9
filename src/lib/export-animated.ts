@@ -1,7 +1,7 @@
 import { Muxer, ArrayBufferTarget } from "mp4-muxer";
 import { GIFEncoder, quantize, applyPalette } from "gifenc";
 import { parseGIF, decompressFrames } from "gifuct-js";
-import { LayerMedia, TopLayerTransform } from "./media";
+import { LayerMedia, TopLayerTransform, playableUrl } from "./media";
 import { drawImageCover } from "./export";
 
 type AnimatedExportOptions = {
@@ -44,7 +44,7 @@ function getExportDimensions(
 
 // ──── Decode a GIF file into individual ImageData frames ────
 async function decodeGif(layer: LayerMedia): Promise<DecodedGifFrames> {
-  const response = await fetch(layer.url);
+  const response = await fetch(playableUrl(layer));
   const buffer = await response.arrayBuffer();
   const gif = parseGIF(buffer);
   const frames = decompressFrames(gif, true);
@@ -94,17 +94,17 @@ function loadMediaElement(layer: LayerMedia): Promise<HTMLVideoElement | HTMLIma
       const vid = document.createElement("video");
       vid.muted = true;
       vid.playsInline = true;
-      if (!layer.url.startsWith("blob:")) vid.crossOrigin = "anonymous";
+      if (!playableUrl(layer).startsWith("blob:")) vid.crossOrigin = "anonymous";
       vid.preload = "auto";
       vid.onloadeddata = () => resolve(vid);
       vid.onerror = (e) => reject(new Error(`Failed to load video: ${e}`));
-      vid.src = layer.url;
+      vid.src = playableUrl(layer);
     } else {
       const img = new Image();
-      if (!layer.url.startsWith("blob:")) img.crossOrigin = "anonymous";
+      if (!playableUrl(layer).startsWith("blob:")) img.crossOrigin = "anonymous";
       img.onload = () => resolve(img);
       img.onerror = (e) => reject(new Error(`Failed to load image: ${e}`));
-      img.src = layer.url;
+      img.src = playableUrl(layer);
     }
   });
 }
@@ -118,10 +118,10 @@ function getVideoDuration(layer: LayerMedia): Promise<number> {
     const vid = document.createElement("video");
     vid.muted = true;
     vid.preload = "metadata";
-    if (!layer.url.startsWith("blob:")) vid.crossOrigin = "anonymous";
+    if (!playableUrl(layer).startsWith("blob:")) vid.crossOrigin = "anonymous";
     vid.onloadedmetadata = () => resolve(vid.duration);
     vid.onerror = () => reject(new Error("Failed to get video duration"));
-    vid.src = layer.url;
+    vid.src = playableUrl(layer);
   });
 }
 
