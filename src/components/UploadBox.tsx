@@ -23,6 +23,8 @@ interface UploadBoxProps {
 const UploadBox = ({ label, sublabel, media, onMediaChange, icon }: UploadBoxProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [stage, setStage] = useState<VideoPrepStage | null>(null);
+  const [progress, setProgress] = useState(0);
   const { toast } = useToast();
   const { t } = useTranslation();
 
@@ -37,24 +39,25 @@ const UploadBox = ({ label, sublabel, media, onMediaChange, icon }: UploadBoxPro
       if (!type) return;
 
       if (type === "video") {
-        const url = URL.createObjectURL(file);
-        const probe = await probeVideo(url);
-        logMediaDiagnostics("select", file, probe);
-        if (!probe.ok) {
-          URL.revokeObjectURL(url);
-          toast({
-            title: t("upload.codecTitle"),
-            description: t("upload.codecDesc"),
-            variant: "destructive",
-          });
+        const result = await prepareVideoMedia(file, (s, p) => {
+          setStage(s);
+          setProgress(p ?? 0);
+        });
+        if (!result.ok) {
+          if (result.reason === "too-long") {
+            toast({ title: t("upload.tooLong"), description: t("upload.maxDuration"), variant: "destructive" });
+          } else {
+            toast({
+              title: t("upload.failedTitle"),
+              description: t("upload.failedDesc"),
+              variant: "destructive",
+            });
+          }
+          setStage(null);
           return;
         }
-        if (probe.duration > 30) {
-          URL.revokeObjectURL(url);
-          toast({ title: t("upload.tooLong"), description: t("upload.maxDuration"), variant: "destructive" });
-          return;
-        }
-        onMediaChange({ file, url, type });
+        onMediaChange(result.media);
+        setTimeout(() => setStage(null), 1500);
       } else {
         logMediaDiagnostics("select", file);
         onMediaChange({ file, url: URL.createObjectURL(file), type });
