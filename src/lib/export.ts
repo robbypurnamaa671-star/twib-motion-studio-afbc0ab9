@@ -1,4 +1,4 @@
-import { LayerMedia, TopLayerTransform } from "./media";
+import { LayerMedia, TopLayerTransform, playableUrl } from "./media";
 
 /**
  * Draw an image/video onto a canvas region using "object-cover" semantics:
@@ -141,9 +141,9 @@ export async function exportStatic(opts: ExportOptions): Promise<Blob> {
     try {
       let source: CanvasImageSource;
       if (bottomLayer.type === "video") {
-        source = await getVideoFrame(bottomLayer.url);
+        source = await getVideoFrame(playableUrl(bottomLayer));
       } else {
-        source = await loadImage(bottomLayer.url);
+        source = await loadImage(playableUrl(bottomLayer));
       }
 
       ctx.save();
@@ -164,9 +164,9 @@ export async function exportStatic(opts: ExportOptions): Promise<Blob> {
     try {
       let source: CanvasImageSource;
       if (topLayer.type === "video") {
-        source = await getVideoFrame(topLayer.url);
+        source = await getVideoFrame(playableUrl(topLayer));
       } else {
-        source = await loadImage(topLayer.url);
+        source = await loadImage(playableUrl(topLayer));
       }
       ctx.drawImage(source, 0, 0, dims.w, dims.h);
     } catch (e) {
