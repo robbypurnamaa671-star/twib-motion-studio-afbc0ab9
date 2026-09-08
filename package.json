@@ -16,6 +16,8 @@
     "validate:seo": "bunx tsx scripts/validate-seo.ts"
   },
   "dependencies": {
+    "@ffmpeg/ffmpeg": "^0.12.15",
+    "@ffmpeg/util": "^0.12.2",
     "@hookform/resolvers": "^3.10.0",
     "@imgly/background-removal": "^1.7.0",
     "@lovable.dev/cloud-auth-js": "^1.1.2",
