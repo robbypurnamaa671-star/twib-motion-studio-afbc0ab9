@@ -1,12 +1,14 @@
 import { useCallback, useRef, useState } from "react";
-import { Upload, Image, Film, X } from "lucide-react";
+import { Upload, Image, Film, X, Loader2, CheckCircle2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   LayerMedia,
   getMediaType,
   validateFile,
-  probeVideo,
+  prepareVideoMedia,
+  playableUrl,
   logMediaDiagnostics,
+  VideoPrepStage,
 } from "@/lib/media";
 import { useToast } from "@/hooks/use-toast";
 
