@@ -5,7 +5,7 @@ import { Download, Loader2, Upload, Image, Film, X, ZoomIn, ZoomOut, RotateCw, R
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { LayerMedia, TopLayerTransform, getMediaType, getMediaTypeFromUrl, validateFile, probeVideo, logMediaDiagnostics } from "@/lib/media";
+import { LayerMedia, TopLayerTransform, getMediaType, getMediaTypeFromUrl, validateFile, prepareVideoMedia, prepareVideoFromBlob, playableUrl, logMediaDiagnostics, VideoPrepStage } from "@/lib/media";
 import { SharedTemplate, LockSettings } from "@/lib/templates";
 import { exportStatic, downloadBlob } from "@/lib/export";
 import ExportDialog from "@/components/ExportDialog";
@@ -133,32 +133,26 @@ const UseTemplate = () => {
 
   // File upload handler
   const inputRef = useRef<HTMLInputElement>(null);
-  const handleFile = useCallback((file: File) => {
+  const [prepStage, setPrepStage] = useState<VideoPrepStage | null>(null);
+  const [prepProgress, setPrepProgress] = useState(0);
+  const handleFile = useCallback(async (file: File) => {
     const err = validateFile(file);
     if (err) { toast({ title: "Invalid file", description: err, variant: "destructive" }); return; }
     const type = getMediaType(file);
     if (!type) return;
     if (type === "video") {
-      const url = URL.createObjectURL(file);
-      probeVideo(url).then((probe) => {
-        logMediaDiagnostics("select", file, probe);
-        if (!probe.ok) {
-          URL.revokeObjectURL(url);
-          toast({
-            title: "Unsupported video",
-            description: "This MOV file cannot be played by your browser. Please use an H.264 MOV or MP4 file.",
-            variant: "destructive",
-          });
-          return;
-        }
-        if (probe.duration > 30) {
-          URL.revokeObjectURL(url);
-          toast({ title: "Too long", description: "Max 30s", variant: "destructive" });
-          return;
-        }
-        setUserPhoto({ file, url, type });
-      });
+      const result = await prepareVideoMedia(file, (st, p) => { setPrepStage(st); setPrepProgress(p ?? 0); });
+      if (!result.ok || !result.media) {
+        toast(result.reason === "too-long"
+          ? { title: "Too long", description: "Max 30s", variant: "destructive" }
+          : { title: "Unable to process this video", description: "We could not read or convert this file. Try a different video.", variant: "destructive" });
+        setPrepStage(null);
+        return;
+      }
+      setUserPhoto(result.media);
+      setTimeout(() => setPrepStage(null), 1500);
     } else {
+      logMediaDiagnostics("select", file);
       setUserPhoto({ file, url: URL.createObjectURL(file), type });
     }
   }, [toast]);
@@ -170,11 +164,22 @@ const UseTemplate = () => {
     // Create a fake LayerMedia from the public URL
     fetch(template.bottom_layer_url)
       .then(res => res.blob())
-      .then(blob => {
-        const url = URL.createObjectURL(blob);
+      .then(async blob => {
         const type = getMediaTypeFromUrl(template.bottom_layer_url, blob.type);
-        const extension = type === "video" ? "mov" : type === "gif" ? "gif" : "png";
-        const file = new File([blob], `twibbon.${extension}`, { type: blob.type || (type === "video" ? "video/quicktime" : `image/${extension}`) });
+        const extension = type === "video" ? (/\.mp4(?:[?#]|$)/i.test(template.bottom_layer_url) ? "mp4" : "mov") : type === "gif" ? "gif" : "png";
+        if (type === "video") {
+          // Saved templates already store a browser-playable copy; this only
+          // kicks in for legacy frames whose codec the browser cannot decode.
+          const result = await prepareVideoFromBlob(blob, `twibbon.${extension}`);
+          if (!result.ok || !result.media) {
+            toast({ title: "Unable to process this video", description: "This twibbon frame could not be loaded.", variant: "destructive" });
+            return;
+          }
+          setTwibbonMedia(result.media);
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        const file = new File([blob], `twibbon.${extension}`, { type: blob.type || `image/${extension}` });
         setTwibbonMedia({ file, url, type });
       })
       .catch(() => toast({ title: "Failed to load twibbon frame", variant: "destructive" }));
@@ -295,7 +300,7 @@ const UseTemplate = () => {
               <div className="relative rounded-lg border-2 border-border bg-card overflow-hidden">
                 <div className="aspect-video flex items-center justify-center">
                   {userPhoto.type === "video" ? (
-                    <video src={userPhoto.url} className="max-h-full max-w-full object-contain" muted loop autoPlay playsInline />
+                    <video src={playableUrl(userPhoto)} className="max-h-full max-w-full object-contain" muted loop autoPlay playsInline />
                   ) : (
                     <img src={userPhoto.url} alt="Your photo" className="max-h-full max-w-full object-contain" />
                   )}
@@ -325,6 +330,16 @@ const UseTemplate = () => {
                 </div>
               </button>
             )}
+            {prepStage && prepStage !== "failed" && (
+              <div className="mt-2 flex items-center gap-2 text-xs font-mono text-muted-foreground">
+                {prepStage !== "ready" && <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />}
+                <span>
+                  {prepStage === "checking" && "Checking video..."}
+                  {prepStage === "transcoding" && `Preparing video for editing... ${Math.round(prepProgress * 100)}%`}
+                  {prepStage === "ready" && "Video ready"}
+                </span>
+              </div>
+            )}
             <input
               ref={inputRef}
               type="file"
@@ -350,7 +365,7 @@ const UseTemplate = () => {
               <div className="aspect-video flex items-center justify-center">
                 {twibbonMedia ? (
                   twibbonMedia.type === "video" ? (
-                    <video src={twibbonMedia.url} className="max-h-full max-w-full object-contain" muted loop autoPlay playsInline />
+                    <video src={playableUrl(twibbonMedia)} className="max-h-full max-w-full object-contain" muted loop autoPlay playsInline />
                   ) : (
                     <img src={twibbonMedia.url} alt="Twibbon" className="max-h-full max-w-full object-contain" />
                   )
@@ -390,7 +405,7 @@ const UseTemplate = () => {
                 onPointerUp={onPointerUp}
               >
                 {userPhoto.type === "video" ? (
-                  <video src={userPhoto.url} className="w-full h-full object-cover pointer-events-none" muted loop autoPlay playsInline />
+                  <video src={playableUrl(userPhoto)} className="w-full h-full object-cover pointer-events-none" muted loop autoPlay playsInline />
                 ) : (
                   <img src={userPhoto.url} alt="Your Photo" className="w-full h-full object-cover pointer-events-none select-none" draggable={false} />
                 )}
@@ -401,7 +416,7 @@ const UseTemplate = () => {
             {twibbonMedia && (
               <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 2 }}>
                 {twibbonMedia.type === "video" ? (
-                  <video src={twibbonMedia.url} className="w-full h-full object-cover" muted loop autoPlay playsInline />
+                  <video src={playableUrl(twibbonMedia)} className="w-full h-full object-cover" muted loop autoPlay playsInline />
                 ) : (
                   <img src={twibbonMedia.url} alt="Twibbon Frame" className="w-full h-full object-cover" />
                 )}
