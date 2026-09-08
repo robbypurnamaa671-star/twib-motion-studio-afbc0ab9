@@ -12,7 +12,7 @@ import ShareTemplateDialog from "@/components/ShareTemplateDialog";
 import UserMenu from "@/components/UserMenu";
 import { CreditsBadge } from "@/components/CreditsBadge";
 import { StickyHeader } from "@/components/StickyHeader";
-import { LayerMedia, TopLayerTransform } from "@/lib/media";
+import { LayerMedia, TopLayerTransform, playableUrl } from "@/lib/media";
 import { hasAnimation } from "@/lib/export";
 
 const Editor = () => {
@@ -45,11 +45,11 @@ const Editor = () => {
       const v = document.createElement("video");
       v.preload = "metadata";
       v.onloadedmetadata = () => apply(v.videoWidth, v.videoHeight);
-      v.src = topLayer.url;
+      v.src = playableUrl(topLayer);
     } else {
       const img = new window.Image();
       img.onload = () => apply(img.naturalWidth, img.naturalHeight);
-      img.src = topLayer.url;
+      img.src = playableUrl(topLayer);
     }
     return () => { cancelled = true; };
   }, [isCustom, topLayer]);
