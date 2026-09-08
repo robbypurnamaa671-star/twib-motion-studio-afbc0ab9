@@ -168,7 +168,12 @@
     "maxDuration": "Max video duration is 30 seconds.",
     "max30": "Max 30s",
     "codecTitle": "Unsupported video",
-    "codecDesc": "This MOV file cannot be previewed by your browser. Please use an H.264 MOV or MP4 file."
+    "codecDesc": "This MOV file cannot be previewed by your browser. We will convert it automatically.",
+    "checking": "Checking video...",
+    "preparing": "Preparing video for editing...",
+    "ready": "Video ready",
+    "failedTitle": "Unable to process this video",
+    "failedDesc": "We could not read or convert this file. Try a different video."
   },
   "useTemplate": {
     "noId": "No template ID",
