@@ -43,7 +43,7 @@ const UploadBox = ({ label, sublabel, media, onMediaChange, icon }: UploadBoxPro
           setStage(s);
           setProgress(p ?? 0);
         });
-        if (!result.ok) {
+        if (!result.ok || !result.media) {
           if (result.reason === "too-long") {
             toast({ title: t("upload.tooLong"), description: t("upload.maxDuration"), variant: "destructive" });
           } else {

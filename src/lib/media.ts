@@ -180,9 +180,11 @@ export function logMediaDiagnostics(stage: string, file: File, extra?: Record<st
 // ──── Video preparation pipeline ─────────────────────────────────────────────
 export type VideoPrepStage = "checking" | "transcoding" | "ready" | "failed";
 
-export type PrepareResult =
-  | { ok: true; media: LayerMedia }
-  | { ok: false; reason: "too-long" | "undecodable" };
+export type PrepareResult = {
+  ok: boolean;
+  media?: LayerMedia;
+  reason?: "too-long" | "undecodable";
+};
 
 /**
  * Accepts ANY video file (including every MOV codec):
