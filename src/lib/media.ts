@@ -176,3 +176,74 @@ export function logMediaDiagnostics(stage: string, file: File, extra?: Record<st
     ...extra,
   });
 }
+
+// ──── Video preparation pipeline ─────────────────────────────────────────────
+export type VideoPrepStage = "checking" | "transcoding" | "ready" | "failed";
+
+export type PrepareResult =
+  | { ok: true; media: LayerMedia }
+  | { ok: false; reason: "too-long" | "undecodable" };
+
+/**
+ * Accepts ANY video file (including every MOV codec):
+ *  1. probes native decodability
+ *  2. if playable → uses the original directly
+ *  3. if not → transcodes a working H.264 MP4 copy in the browser
+ */
+export async function prepareVideoMedia(
+  file: File,
+  onStage?: (stage: VideoPrepStage, progress?: number) => void,
+): Promise<PrepareResult> {
+  onStage?.("checking");
+  const url = URL.createObjectURL(file);
+  const probe = await probeVideo(url);
+  logMediaDiagnostics("select", file, probe);
+
+  if (probe.ok) {
+    if (probe.duration > MAX_VIDEO_DURATION) {
+      URL.revokeObjectURL(url);
+      onStage?.("failed");
+      return { ok: false, reason: "too-long" };
+    }
+    onStage?.("ready");
+    return { ok: true, media: { file, url, type: "video" } };
+  }
+
+  // Not natively decodable → build a working MP4 copy.
+  onStage?.("transcoding", 0);
+  try {
+    const { transcodeToMp4, canTranscode } = await import("./video-transcode");
+    if (!canTranscode()) throw new Error("WebAssembly unavailable");
+    const mp4 = await transcodeToMp4(file, (p) => onStage?.("transcoding", p));
+    const workingUrl = URL.createObjectURL(mp4);
+    const workingProbe = await probeVideo(workingUrl);
+    logMediaDiagnostics("transcoded", mp4, workingProbe);
+    if (!workingProbe.ok) throw new Error(workingProbe.errorMessage || "transcoded file undecodable");
+    if (workingProbe.duration > MAX_VIDEO_DURATION) {
+      URL.revokeObjectURL(url);
+      URL.revokeObjectURL(workingUrl);
+      onStage?.("failed");
+      return { ok: false, reason: "too-long" };
+    }
+    onStage?.("ready");
+    return {
+      ok: true,
+      media: { file, url, type: "video", workingFile: mp4, workingUrl, transcoded: true },
+    };
+  } catch (err) {
+    console.error("[media:transcode] failed", err);
+    URL.revokeObjectURL(url);
+    onStage?.("failed");
+    return { ok: false, reason: "undecodable" };
+  }
+}
+
+/** Same pipeline for a video already fetched from storage (saved templates). */
+export async function prepareVideoFromBlob(
+  blob: Blob,
+  fileName: string,
+  onStage?: (stage: VideoPrepStage, progress?: number) => void,
+): Promise<PrepareResult> {
+  const file = new File([blob], fileName, { type: blob.type || "video/quicktime" });
+  return prepareVideoMedia(file, onStage);
+}
