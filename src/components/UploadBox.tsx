@@ -98,10 +98,29 @@ const UploadBox = ({ label, sublabel, media, onMediaChange, icon }: UploadBoxPro
       onDragLeave={() => setDragOver(false)}
       onDrop={onDrop}
     >
+      {stage && stage !== "failed" && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 rounded-lg bg-background/90 backdrop-blur-sm">
+          {stage === "ready" ? (
+            <CheckCircle2 className="w-5 h-5 text-primary" />
+          ) : (
+            <Loader2 className="w-5 h-5 animate-spin text-primary" />
+          )}
+          <p className="text-xs font-mono text-foreground">
+            {stage === "checking" && t("upload.checking")}
+            {stage === "transcoding" && t("upload.preparing")}
+            {stage === "ready" && t("upload.ready")}
+          </p>
+          {stage === "transcoding" && (
+            <div className="w-32 h-1 rounded bg-secondary overflow-hidden">
+              <div className="h-full bg-primary transition-all" style={{ width: `${Math.round(progress * 100)}%` }} />
+            </div>
+          )}
+        </div>
+      )}
       {media ? (
         <div className="relative aspect-video flex items-center justify-center overflow-hidden rounded-md">
           {media.type === "video" ? (
-            <video src={media.url} className="max-h-full max-w-full object-contain" muted loop autoPlay playsInline preload="metadata" />
+            <video src={playableUrl(media)} className="max-h-full max-w-full object-contain" muted loop autoPlay playsInline preload="metadata" />
           ) : (
             <img src={media.url} alt={label} className="max-h-full max-w-full object-contain" />
           )}
